@@ -48,6 +48,154 @@ void geom_store::fini()
 	is_geometry_set = false;
 }
 
+void geom_store::load_constrained_ring(std::ifstream& input_file)
+{
+	// Read the Raw Data
+	// Read the entire file into a string
+	std::string file_contents((std::istreambuf_iterator<char>(input_file)),
+		std::istreambuf_iterator<char>());
+
+	// Split the string into lines
+	std::istringstream iss(file_contents);
+	std::string line;
+	std::vector<std::string> cdata_lines;
+	while (std::getline(iss, line))
+	{
+		cdata_lines.push_back(line);
+	}
+	//________________________________________________________________________
+	//________________________________________________________________________
+
+	int j = 0;
+
+	// Initialize the constrained ring
+	this->constrained_ring.init(&geom_param);
+	this->model_nodes.init(&geom_param);
+	this->model_lineelements.init(&geom_param);
+
+	// Node constraints
+	this->node_constraints.init(&geom_param);
+	this->node_loads.init(&geom_param);
+	this->node_inldispl.init(&geom_param);
+	this->node_inlvelo.init(&geom_param);
+
+	// Re-initialize the result elements
+	this->modal_result_nodes.init(&geom_param);
+	this->modal_result_lineelements.init(&geom_param);
+	this->pulse_result_nodes.init(&geom_param);
+	this->pulse_result_lineelements.init(&geom_param);
+
+
+	//Node Point list
+	std::vector<glm::vec2> node_pts_list;
+
+	// Process the lines
+	while (j < cdata_lines.size())
+	{
+		std::istringstream iss(cdata_lines[j]);
+
+		std::string inpt_type;
+		char comma;
+		iss >> inpt_type;
+
+		if (inpt_type == "*NODE")
+		{
+			// Nodes
+			while (j < cdata_lines.size())
+			{
+				std::istringstream nodeIss(cdata_lines[j + 1]);
+
+				// Vector to store the split values
+				std::vector<std::string> splitValues;
+
+				// Split the string by comma
+				std::string token;
+				while (std::getline(nodeIss, token, ','))
+				{
+					splitValues.push_back(token);
+				}
+
+				if (static_cast<int>(splitValues.size()) <= 3)
+				{
+					break;
+				}
+
+				int node_id = std::stoi(splitValues[0]); // node ID
+				double x = geom_parameters::roundToSixDigits(std::stod(splitValues[1])); // Node coordinate x
+				double y = geom_parameters::roundToSixDigits(std::stod(splitValues[2])); // Node coordinate y
+
+				glm::vec2 node_pt = glm::vec2(x, y);
+				node_pts_list.push_back(node_pt);
+
+				// Add the nodes
+				this->constrained_ring.add_constrainednodes(node_id, x,y);
+				j++;
+			}
+
+		}
+
+		if (inpt_type == "*ELEMENT,TYPE=CTRIA")
+		{
+			// Triangle Element
+			while (j < cdata_lines.size())
+			{
+				std::istringstream elementIss(cdata_lines[j + 1]);
+
+				// Vector to store the split values
+				std::vector<std::string> splitValues;
+
+				// Split the string by comma
+				std::string token;
+				while (std::getline(elementIss, token, ','))
+				{
+					splitValues.push_back(token);
+				}
+
+				if (static_cast<int>(splitValues.size()) != 4)
+				{
+					break;
+				}
+
+				int tri_id = std::stoi(splitValues[0]); // triangle ID
+				int nd1 = std::stoi(splitValues[1]); // Node id 1
+				int nd2 = std::stoi(splitValues[2]); // Node id 2
+				int nd3 = std::stoi(splitValues[3]); // Node id 3
+
+				// Add the Triangle Elements
+				this->constrained_ring.add_constrainedtris(tri_id, nd1, nd2,nd3);
+				j++;
+			}
+		}
+
+		// Iterate the line
+		j++;
+	}
+
+	// Geometry is loaded
+	is_geometry_set = true;
+
+	// Set the boundary of the geometry
+	std::pair<glm::vec2, glm::vec2> result = geom_parameters::findMinMaxXY(node_pts_list);
+	this->geom_param.min_b = result.first;
+	this->geom_param.max_b = result.second;
+	this->geom_param.geom_bound = geom_param.max_b - geom_param.min_b;
+
+	// Set the center of the geometry
+	this->geom_param.center = geom_parameters::findGeometricCenter(node_pts_list);
+
+	// Set the geometry
+	update_model_matrix();
+	update_model_zoomfit();
+
+	// Set the buffer
+	this->constrained_ring.set_buffer();
+
+	//________________________________________________________________________________________________________________________
+	//________________________________________________________________________________________________________________________
+
+
+}
+
 void geom_store::load_model(const int& model_type, std::vector<std::string> input_data)
 {
 
@@ -305,6 +453,7 @@ void geom_store::update_model_matrix()
 	geom_param.modelMatrix = g_transl * glm::scale(glm::mat4(1.0f), glm::vec3(static_cast<float>(geom_param.geom_scale)));
 
 	// Update the model matrix
+	constrained_ring.update_geometry_matrices(true, false, false, true, false);
 	model_nodes.update_geometry_matrices(true, false, false, true, false);
 	model_lineelements.update_geometry_matrices(true, false, false, true, false);
 	node_constraints.update_geometry_matrices(true, false, false, true, false);
@@ -332,6 +481,7 @@ void geom_store::update_model_zoomfit()
 	geom_param.zoom_scale = 1.0f;
 
 	// Update the zoom scale and pan translation
+	constrained_ring.update_geometry_matrices(false, true, true, false, false);
 	model_nodes.update_geometry_matrices(false, true, true, false, false);
 	model_lineelements.update_geometry_matrices(false, true, true, false, false);
 	node_constraints.update_geometry_matrices(false, true, true, false, false);
@@ -359,6 +509,7 @@ void geom_store::update_model_pan(glm::vec2& transl)
 	geom_param.panTranslation[1][3] = transl.y;
 
 	// Update the pan translation
+	constrained_ring.update_geometry_matrices(false, true, false, false, false);
 	model_nodes.update_geometry_matrices(false, true, false, false, false);
 	model_lineelements.update_geometry_matrices(false, true, false, false, false);
 	node_constraints.update_geometry_matrices(false, true, false, false, false);
@@ -383,6 +534,7 @@ void geom_store::update_model_zoom(double& z_scale)
 	geom_param.zoom_scale = z_scale;
 
 	// Update the Zoom
+	constrained_ring.update_geometry_matrices(false, false, true, false, false);
 	model_nodes.update_geometry_matrices(false, false, true, false, false);
 	model_lineelements.update_geometry_matrices(false, false, true, false, false);
 	node_constraints.update_geometry_matrices(false, false, true, false, false);
@@ -415,6 +567,7 @@ void geom_store::update_model_transperency(bool is_transparent)
 	}
 
 	// Update the model transparency
+	constrained_ring.update_geometry_matrices(false, false, false, true, false);
 	model_nodes.update_geometry_matrices(false, false, false, true, false);
 	model_lineelements.update_geometry_matrices(false, false, false, true, false);
 	node_constraints.update_geometry_matrices(false, false, false, true, false);
@@ -494,6 +647,9 @@ void geom_store::paint_model()
 
 	//______________________________________________
 	// Paint the model
+
+	constrained_ring.paint_constrained_ring();
+
 	if (op_window->is_show_modelelements == true)
 	{
 		// Show the model elements

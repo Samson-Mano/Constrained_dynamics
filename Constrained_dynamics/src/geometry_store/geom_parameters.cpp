@@ -45,6 +45,8 @@ void geom_parameters::init()
 	geom_colors.inlcond_displ_color = glm::vec3(0.96f, 0.5f, 0.1f);
 	geom_colors.inlcond_velo_color = glm::vec3(0.54f, 0.06f, 0.31f);
 
+	// Traingle mesh
+	geom_colors.triangle_color = glm::vec3(0.82f, 0.77f, 0.92f);
 
 
 //	Theme 1:
@@ -257,6 +259,12 @@ double geom_parameters::HueToRGB(double v1, double v2, double vH)
 		return (v1 + (v2 - v1) * ((2.0f / 3) - vH) * 6);
 
 	return v1;
+}
+
+
+double geom_parameters::roundToSixDigits(const double& number)
+{
+	return std::round(number * 1e6) / 1e6;
 }
 
 

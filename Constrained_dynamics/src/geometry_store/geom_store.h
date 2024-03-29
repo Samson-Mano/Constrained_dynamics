@@ -19,6 +19,7 @@
 #include "../fe_solver/pulse_analysis_solver.h"
 
 // FE Objects
+#include "fe_objects/constrained_ring_store.h"
 #include "fe_objects/nodes_list_store.h"
 #include "fe_objects/elementline_list_store.h"
 #include "fe_objects/nodeconstraint_list_store.h"
@@ -58,6 +59,7 @@ public:
 	void fini();
 
 	// Load the geometry
+	void load_constrained_ring(std::ifstream& input_file);
 	void load_model(const int& model_type,std::vector<std::string> input_data);
 
 	// Functions to control the drawing area
@@ -78,6 +80,7 @@ private:
 	dynamic_selrectangle_store selection_rectangle;
 
 	// Geometry objects
+	constrained_ring_store constrained_ring;
 	nodes_list_store model_nodes;
 	elementline_list_store model_lineelements;
 

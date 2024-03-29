@@ -84,6 +84,11 @@ void app_window::init()
 		&inl_window,
 		&md_window);
 
+	// Add the constrained ring and model
+	std::ifstream constraintring_file("./resources/gyro_constraint.txt", std::ifstream::in);
+	geom.load_constrained_ring(constraintring_file);
+
+
 	// Set the mouse button callback function with the user pointer pointing to the mouseHandler object
 	glfwSetWindowUserPointer(window, &mouse_Handler);
 

@@ -21,6 +21,7 @@ struct geom_color_theme
 	glm::vec3 ptmass_color = glm::vec3(0);
 	glm::vec3 inlcond_displ_color = glm::vec3(0);
 	glm::vec3 inlcond_velo_color = glm::vec3(0);
+	glm::vec3 triangle_color = glm::vec3(0);
 };
 
 struct chart_setting_data
@@ -142,6 +143,8 @@ public:
 	static std::pair<glm::vec2, glm::vec2> findMinMaxXY(const std::vector<glm::vec2>& all_pts);
 
 	static glm::vec3 getHeatMapColor(float value);
+
+	static	double roundToSixDigits(const double& number);
 
 	static glm::vec3 getContourColor_d(float value);
 

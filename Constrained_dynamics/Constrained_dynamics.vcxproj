@@ -250,6 +250,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="resources\gyro_constraint.txt" />
+    <Text Include="resources\gyro_model.txt" />
     <Text Include="src\junk\junk_code.txt" />
     <Text Include="src\junk\lagrange_MPC_solver.txt" />
   </ItemGroup>

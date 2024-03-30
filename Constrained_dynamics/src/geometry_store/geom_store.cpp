@@ -48,18 +48,18 @@ void geom_store::fini()
 	is_geometry_set = false;
 }
 
-void geom_store::load_constrained_ring(std::ifstream& input_file)
+void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifstream& gyro_input_data)
 {
-	// Read the Raw Data
+	// Read the Raw Data - Constrained Ring
 	// Read the entire file into a string
-	std::string file_contents((std::istreambuf_iterator<char>(input_file)),
+	std::string cringfile_contents((std::istreambuf_iterator<char>(cring_input_data)),
 		std::istreambuf_iterator<char>());
 
 	// Split the string into lines
-	std::istringstream iss(file_contents);
+	std::istringstream iss1(cringfile_contents);
 	std::string line;
 	std::vector<std::string> cdata_lines;
-	while (std::getline(iss, line))
+	while (std::getline(iss1, line))
 	{
 		cdata_lines.push_back(line);
 	}
@@ -170,6 +170,25 @@ void geom_store::load_constrained_ring(std::ifstream& input_file)
 		// Iterate the line
 		j++;
 	}
+
+	// Read the Raw Data - Gyro Model
+	// Read the entire file into a string
+	std::string gyrofile_contents((std::istreambuf_iterator<char>(gyro_input_data)),
+		std::istreambuf_iterator<char>());
+
+	// Split the string into lines
+	std::istringstream iss2(gyrofile_contents);
+	std::vector<std::string> gyro_lines;
+
+	while (std::getline(iss2, line))
+	{
+		gyro_lines.push_back(line);
+	}
+	//________________________________________________________________________
+	//________________________________________________________________________
+
+
+
 
 	// Geometry is loaded
 	is_geometry_set = true;

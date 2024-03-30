@@ -59,8 +59,8 @@ public:
 	void fini();
 
 	// Load the geometry
-	void load_constrained_ring(std::ifstream& input_file);
-	void load_model(const int& model_type,std::vector<std::string> input_data);
+	void load_constrained_ring(std::ifstream& cring_input_data, std::ifstream& gyro_input_data);
+	void load_model(const int& model_type,std::vector<std::string> cring_input_data);
 
 	// Functions to control the drawing area
 	void update_WindowDimension(const int& window_width, const int& window_height);

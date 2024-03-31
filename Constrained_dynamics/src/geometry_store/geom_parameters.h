@@ -82,8 +82,8 @@ public:
 	const float selected_line_width = 4.2f;
 	
 	// element width
-	const float spring_element_width = 2.4f;
-	const float rigid_element_width = 0.6f;
+	const float spring_element_width = 1.4f;
+	const float rigid_element_width = 1.6f;
 
 	// Spring turns
 	const double spring_turn_min = 10.0;

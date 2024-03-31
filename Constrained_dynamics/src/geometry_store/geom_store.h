@@ -20,6 +20,7 @@
 
 // FE Objects
 #include "fe_objects/constrained_ring_store.h"
+#include "fe_objects/gyro_model_store.h"
 #include "fe_objects/nodes_list_store.h"
 #include "fe_objects/elementline_list_store.h"
 #include "fe_objects/nodeconstraint_list_store.h"
@@ -81,6 +82,8 @@ private:
 
 	// Geometry objects
 	constrained_ring_store constrained_ring;
+	gyro_model_store gyro_model;
+
 	nodes_list_store model_nodes;
 	elementline_list_store model_lineelements;
 

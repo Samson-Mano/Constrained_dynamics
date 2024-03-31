@@ -152,10 +152,13 @@
     <ClCompile Include="src\fe_solver\pulse_analysis_solver.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\constrained_ring_store.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\elementline_list_store.cpp" />
+    <ClCompile Include="src\geometry_store\fe_objects\gyro_model_store.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\nodeconstraint_list_store.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\nodeinlcond_list_store.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\nodeload_list_store.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\nodes_list_store.cpp" />
+    <ClCompile Include="src\geometry_store\fe_objects\rigidelement_store.cpp" />
+    <ClCompile Include="src\geometry_store\fe_objects\springelement_store.cpp" />
     <ClCompile Include="src\geometry_store\geometry_buffers\font_atlas.cpp" />
     <ClCompile Include="src\geometry_store\geometry_buffers\gBuffers.cpp" />
     <ClCompile Include="src\geometry_store\geometry_buffers\IndexBuffer.cpp" />
@@ -203,10 +206,13 @@
     <ClInclude Include="src\fe_solver\pulse_analysis_solver.h" />
     <ClInclude Include="src\geometry_store\fe_objects\constrained_ring_store.h" />
     <ClInclude Include="src\geometry_store\fe_objects\elementline_list_store.h" />
+    <ClInclude Include="src\geometry_store\fe_objects\gyro_model_store.h" />
     <ClInclude Include="src\geometry_store\fe_objects\nodeconstraint_list_store.h" />
     <ClInclude Include="src\geometry_store\fe_objects\nodeinlcond_list_store.h" />
     <ClInclude Include="src\geometry_store\fe_objects\nodeload_list_store.h" />
     <ClInclude Include="src\geometry_store\fe_objects\nodes_list_store.h" />
+    <ClInclude Include="src\geometry_store\fe_objects\rigidelement_store.h" />
+    <ClInclude Include="src\geometry_store\fe_objects\springelement_store.h" />
     <ClInclude Include="src\geometry_store\geometry_buffers\font_atlas.h" />
     <ClInclude Include="src\geometry_store\geometry_buffers\gBuffers.h" />
     <ClInclude Include="src\geometry_store\geometry_buffers\IndexBuffer.h" />

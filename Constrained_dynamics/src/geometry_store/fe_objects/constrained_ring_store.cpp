@@ -41,9 +41,9 @@ void constrained_ring_store::add_constrainedtris(int& tri_id, int& nd1, int& nd2
 {
 	constrainedtri_store temp_tri;
 	temp_tri.ctri_id = tri_id;
-	temp_tri.c_nd1 = c_nodes[nd1];
-	temp_tri.c_nd2 = c_nodes[nd2];
-	temp_tri.c_nd3 = c_nodes[nd3];
+	temp_tri.c_nd1 = &c_nodes[nd1];
+	temp_tri.c_nd2 = &c_nodes[nd2];
+	temp_tri.c_nd3 = &c_nodes[nd3];
 
 	// Add to the triangle list
 	c_triangles.push_back(temp_tri);

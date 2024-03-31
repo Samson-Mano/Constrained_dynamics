@@ -19,9 +19,9 @@ struct constrainednode_store
 struct constrainedtri_store
 {
 	int ctri_id = 0; // ID of the triangle element
-	constrainednode_store c_nd1; // node 1
-	constrainednode_store c_nd2; // node 2
-	constrainednode_store c_nd3; // node 3
+	constrainednode_store* c_nd1; // node 1
+	constrainednode_store* c_nd2; // node 2
+	constrainednode_store* c_nd3; // node 3
 };
 
 

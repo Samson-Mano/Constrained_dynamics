@@ -70,6 +70,8 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 
 	// Initialize the constrained ring
 	this->constrained_ring.init(&geom_param);
+	this->gyro_model.init(&geom_param);
+
 	this->model_nodes.init(&geom_param);
 	this->model_lineelements.init(&geom_param);
 
@@ -171,6 +173,8 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 		j++;
 	}
 
+	//________________________________________________________________________
+	//________________________________________________________________________
 	// Read the Raw Data - Gyro Model
 	// Read the entire file into a string
 	std::string gyrofile_contents((std::istreambuf_iterator<char>(gyro_input_data)),
@@ -184,6 +188,64 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 	{
 		gyro_lines.push_back(line);
 	}
+
+	j = 0;
+
+	// Process the lines
+	while (j < gyro_lines.size())
+	{
+		line = gyro_lines[j];
+		std::string type = line.substr(0, 4);  // Extract the first 4 characters of the line
+
+		// Split the line into comma-separated fields
+		std::istringstream iss3(line);
+		std::string field1;
+		std::vector<std::string> fields;
+		while (std::getline(iss3, field1, ','))
+		{
+			fields.push_back(field1);
+		}
+
+		if (type == "node")
+		{
+			// Read the nodes
+			int node_id = std::stoi(fields[1]); // node ID
+			double x = std::stod(fields[2]); // Node coordinate x
+			double y = std::stod(fields[3]); // Node coordinate y
+
+			// Add to node Map
+			this->gyro_model.add_gyronodes(node_id, x,y);
+		}
+		else if (type == "sprg")
+		{
+			int line_id = std::stoi(fields[1]); // line ID
+			int start_node_id = std::stoi(fields[2]); // line id start node
+			int end_node_id = std::stoi(fields[3]); // line id end node
+			int material_id = std::stoi(fields[4]); // materail ID of the line
+
+			// Add to spring element map
+			this->gyro_model.add_gyrosprings(line_id, start_node_id, end_node_id);
+		}
+		else if (type == "rigd")
+		{
+			int line_id = std::stoi(fields[1]); // line ID
+			int start_node_id = std::stoi(fields[2]); // line id start node
+			int end_node_id = std::stoi(fields[3]); // line id end node
+			int material_id = std::stoi(fields[4]); // materail ID of the line
+
+			// Add to rigid element map
+			this->gyro_model.add_gyrorigids(line_id, start_node_id,end_node_id);
+		}
+		else if (type == "ptms")
+		{
+			
+		}
+
+		// Iterate line
+		j++;
+	}
+
+
 	//________________________________________________________________________
 	//________________________________________________________________________
 
@@ -208,6 +270,7 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 
 	// Set the buffer
 	this->constrained_ring.set_buffer();
+	this->gyro_model.set_buffer();
 
 	//________________________________________________________________________________________________________________________
 	//________________________________________________________________________________________________________________________
@@ -473,6 +536,8 @@ void geom_store::update_model_matrix()
 
 	// Update the model matrix
 	constrained_ring.update_geometry_matrices(true, false, false, true, false);
+	gyro_model.update_geometry_matrices(true, false, false, true, false);
+
 	model_nodes.update_geometry_matrices(true, false, false, true, false);
 	model_lineelements.update_geometry_matrices(true, false, false, true, false);
 	node_constraints.update_geometry_matrices(true, false, false, true, false);
@@ -501,6 +566,8 @@ void geom_store::update_model_zoomfit()
 
 	// Update the zoom scale and pan translation
 	constrained_ring.update_geometry_matrices(false, true, true, false, false);
+	gyro_model.update_geometry_matrices(false, true, true, false, false);
+
 	model_nodes.update_geometry_matrices(false, true, true, false, false);
 	model_lineelements.update_geometry_matrices(false, true, true, false, false);
 	node_constraints.update_geometry_matrices(false, true, true, false, false);
@@ -529,6 +596,8 @@ void geom_store::update_model_pan(glm::vec2& transl)
 
 	// Update the pan translation
 	constrained_ring.update_geometry_matrices(false, true, false, false, false);
+	gyro_model.update_geometry_matrices(false, true, false, false, false);
+
 	model_nodes.update_geometry_matrices(false, true, false, false, false);
 	model_lineelements.update_geometry_matrices(false, true, false, false, false);
 	node_constraints.update_geometry_matrices(false, true, false, false, false);
@@ -554,6 +623,8 @@ void geom_store::update_model_zoom(double& z_scale)
 
 	// Update the Zoom
 	constrained_ring.update_geometry_matrices(false, false, true, false, false);
+	gyro_model.update_geometry_matrices(false, false, true, false, false);
+
 	model_nodes.update_geometry_matrices(false, false, true, false, false);
 	model_lineelements.update_geometry_matrices(false, false, true, false, false);
 	node_constraints.update_geometry_matrices(false, false, true, false, false);
@@ -587,6 +658,8 @@ void geom_store::update_model_transperency(bool is_transparent)
 
 	// Update the model transparency
 	constrained_ring.update_geometry_matrices(false, false, false, true, false);
+	gyro_model.update_geometry_matrices(false, false, false, true, false);
+
 	model_nodes.update_geometry_matrices(false, false, false, true, false);
 	model_lineelements.update_geometry_matrices(false, false, false, true, false);
 	node_constraints.update_geometry_matrices(false, false, false, true, false);
@@ -668,6 +741,7 @@ void geom_store::paint_model()
 	// Paint the model
 
 	constrained_ring.paint_constrained_ring();
+	gyro_model.paint_gyro_model();
 
 	if (op_window->is_show_modelelements == true)
 	{

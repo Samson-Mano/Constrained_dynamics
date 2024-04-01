@@ -238,7 +238,12 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 		}
 		else if (type == "ptms")
 		{
-			
+			int ptmass_id = std::stoi(fields[1]); // mass ID
+			int node_id = std::stoi(fields[2]); // node ID
+			double ptmass_val = std::stod(fields[3]); // point mass value
+
+			// Add to the point mass map
+			this->gyro_model.add_gyroptmass(ptmass_id, node_id);
 		}
 
 		// Iterate line

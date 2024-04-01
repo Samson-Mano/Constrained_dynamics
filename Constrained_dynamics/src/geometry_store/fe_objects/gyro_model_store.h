@@ -5,7 +5,7 @@
 #include "../geom_parameters.h"
 #include "springelement_store.h"
 #include "rigidelement_store.h"
-
+#include "masselement_store.h"
 
 struct gyronode_store
 {
@@ -18,8 +18,8 @@ struct gyronode_store
 struct gyrospring_store
 {
 	int gsprg_id = 0; // Spring ID
-	gyronode_store* gstart_node; // Start node
-	gyronode_store* gend_node; // End node
+	gyronode_store* gstart_node = nullptr; // Start node
+	gyronode_store* gend_node = nullptr; // End node
 
 };
 
@@ -27,15 +27,15 @@ struct gyrospring_store
 struct gyrorigid_store
 {
 	int grigd_id = 0; // Rigid ID
-	gyronode_store* gstart_node; // Start node
-	gyronode_store* gend_node; // End node
+	gyronode_store* gstart_node = nullptr; // Start node
+	gyronode_store* gend_node = nullptr; // End node
 
 };
 
 struct gyroptmass_store
 {
 	int gmass_id = 0; // Mass ID
-	gyronode_store* gmass_node; // Mass node
+	gyronode_store* gmass_node = nullptr; // Mass node
 
 };
 
@@ -68,5 +68,6 @@ private:
 
 	springelement_store spring_elements; // Spring elements
 	rigidelement_store rigid_elements; // Rigid elements
+	masselement_store mass_elements; // Mass elements
 
 };

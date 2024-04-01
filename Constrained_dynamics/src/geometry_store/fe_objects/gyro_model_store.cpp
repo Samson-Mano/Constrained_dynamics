@@ -26,6 +26,7 @@ void gyro_model_store::init(geom_parameters* geom_param_ptr)
 	// Gyro model
 	spring_elements.init(geom_param_ptr);
 	rigid_elements.init(geom_param_ptr);
+	mass_elements.init(geom_param_ptr);
 }
 
 void gyro_model_store::add_gyronodes(int& node_id, double& nd_x, double& nd_y)
@@ -66,6 +67,13 @@ void gyro_model_store::add_gyrorigids(int& rigd_id, int& startnd_id, int& endnd_
 
 void gyro_model_store::add_gyroptmass(int& mass_id, int& mass_nd_id)
 {
+	gyroptmass_store temp_mass;
+	temp_mass.gmass_id = mass_id;
+	temp_mass.gmass_node = &g_nodes[mass_nd_id];
+
+	// Add to the mass list
+	g_ptmass.push_back(temp_mass);
+
 }
 
 void gyro_model_store::set_buffer()
@@ -85,6 +93,11 @@ void gyro_model_store::set_buffer()
 	spring_elements.set_buffer();
 
 	// Create the Mass element geometry
+	for (auto& pmass : g_ptmass)
+	{
+		mass_elements.add_ptmass_geom(pmass.gmass_node->gnode_pt);
+	}
+	mass_elements.set_buffer();
 
 }
 
@@ -93,6 +106,8 @@ void gyro_model_store::paint_gyro_model()
 	// Paint the gyro model
 	spring_elements.paint_spring_geom();
 	rigid_elements.paint_rigid_geom();
+	mass_elements.paint_ptmass_geom();
+
 }
 
 void gyro_model_store::update_geometry_matrices(bool set_modelmatrix, bool set_pantranslation, bool set_zoomtranslation, bool set_transparency, bool set_deflscale)
@@ -100,5 +115,6 @@ void gyro_model_store::update_geometry_matrices(bool set_modelmatrix, bool set_p
 	// Update model openGL uniforms
 	spring_elements.update_geometry_matrices(set_modelmatrix, set_pantranslation, set_zoomtranslation, set_transparency, set_deflscale);
 	rigid_elements.update_geometry_matrices(set_modelmatrix, set_pantranslation, set_zoomtranslation, set_transparency, set_deflscale);
+	mass_elements.update_geometry_matrices(set_modelmatrix, set_pantranslation, set_zoomtranslation, set_transparency, set_deflscale);
 
 }

@@ -14,29 +14,15 @@
 #include "../tool_window/modal_analysis_window.h"
 #include "../tool_window/pulse_analysis_window.h"
 
-// Solver
-#include "../fe_solver/modal_analysis_solver.h"
-#include "../fe_solver/pulse_analysis_solver.h"
-
 // FE Objects
 #include "fe_objects/constrained_ring_store.h"
 #include "fe_objects/gyro_model_store.h"
-#include "fe_objects/nodes_list_store.h"
-#include "fe_objects/elementline_list_store.h"
-#include "fe_objects/nodeconstraint_list_store.h"
-#include "fe_objects/nodeload_list_store.h"
-#include "fe_objects/nodeinlcond_list_store.h"
 
 // Geometry Objects
 #include "geometry_objects/dynamic_selrectangle_store.h"
 
-// FE Result Objects Modal analysis
-#include "result_objects/modal_nodes_list_store.h";
-#include "result_objects/modal_elementline_list_store.h";
+// FE Result Objects
 
-// FE Result Objects Pulse analysis
-#include "result_objects/pulse_node_list_store.h"
-#include "result_objects/pulse_elementline_list_store.h"
 
 
 class geom_store
@@ -61,7 +47,6 @@ public:
 
 	// Load the geometry
 	void load_constrained_ring(std::ifstream& cring_input_data, std::ifstream& gyro_input_data);
-	void load_model(const int& model_type,std::vector<std::string> cring_input_data);
 
 	// Functions to control the drawing area
 	void update_WindowDimension(const int& window_width, const int& window_height);
@@ -84,30 +69,6 @@ private:
 	constrained_ring_store constrained_ring;
 	gyro_model_store gyro_model;
 
-	nodes_list_store model_nodes;
-	elementline_list_store model_lineelements;
-
-	// Material data
-	material_data mat_data;
-
-	// Node initial condition, loads & Constraints
-	nodeconstraint_list_store node_constraints;
-	nodeload_list_store node_loads;
-	nodeinlcond_list_store node_inldispl;
-	nodeinlcond_list_store node_inlvelo;
-
-	// Modal analysis result 
-	modal_nodes_list_store modal_result_nodes;
-	modal_elementline_list_store modal_result_lineelements;
-
-	// Pulse analysis result
-	pulse_node_list_store pulse_result_nodes;
-	pulse_elementline_list_store pulse_result_lineelements;
-
-	// Solver object
-	modal_analysis_solver modal_solver;
-	pulse_analysis_solver pulse_solver;
-
 	// Window pointers
 	new_model_window* md_window = nullptr;
 	options_window* op_window = nullptr;
@@ -120,10 +81,6 @@ private:
 
 	void paint_model(); // Paint the model
 	void paint_model_results(); // Paint the results
-
-	//_____________________________________________________________________________________
-	void paint_modal_analysis_results(); // Paint the modal analysis results
-	void paint_pulse_analysis_results(); // Paint the pulse analysis results
 
 };
 

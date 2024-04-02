@@ -72,12 +72,6 @@
     <ClCompile Include="src\geometry_store\geom_store.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\fe_solver\modal_analysis_solver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\fe_solver\pulse_analysis_solver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\events_handler\file_events.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -88,21 +82,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\events_handler\Stopwatch_events.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\geometry_store\fe_objects\elementline_list_store.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\geometry_store\fe_objects\nodeconstraint_list_store.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\geometry_store\fe_objects\nodeinlcond_list_store.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\geometry_store\fe_objects\nodeload_list_store.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\geometry_store\fe_objects\nodes_list_store.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\geometry_store\geometry_buffers\font_atlas.cpp">
@@ -177,6 +156,9 @@
     <ClCompile Include="src\geometry_store\fe_objects\masselement_store.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\fe_solver\lagrange_dynamics_solver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\app_window.h">
@@ -245,12 +227,6 @@
     <ClInclude Include="src\geometry_store\geom_store.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\fe_solver\modal_analysis_solver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\fe_solver\pulse_analysis_solver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\events_handler\file_events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -261,21 +237,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\events_handler\Stopwatch_events.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\geometry_store\fe_objects\elementline_list_store.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\geometry_store\fe_objects\nodeconstraint_list_store.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\geometry_store\fe_objects\nodeinlcond_list_store.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\geometry_store\fe_objects\nodeload_list_store.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\geometry_store\fe_objects\nodes_list_store.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\geometry_store\geometry_buffers\font_atlas.h">
@@ -348,6 +309,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\geometry_store\fe_objects\masselement_store.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fe_solver\lagrange_dynamics_solver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

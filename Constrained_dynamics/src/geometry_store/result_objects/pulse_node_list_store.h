@@ -1,5 +1,5 @@
 #pragma once
-#include "../fe_objects/nodes_list_store.h"
+#include "../fe_objects/gyro_model_store.h"
 #include "../geometry_objects/dynamic_point_list_store.h"
 
 

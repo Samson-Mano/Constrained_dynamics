@@ -89,11 +89,20 @@ void mouse_event_handler::handleMouseButton(int button, int action, int mods, do
 				glm::vec2 loc = glm::vec2(xpos, ypos);
 				mouse_evnt.select_operation_start(loc, false);
 			}
+
+			if (isCtrlDown == false && isShiftDown == false)
+			{
+				// Ctrl key OR Shift key not pressed
+				// Start of constraint rotation start
+				glm::vec2 loc = glm::vec2(xpos, ypos);
+				mouse_evnt.constrained_ring_rotate_start(loc);
+			}
 		}
 		else if (action == GLFW_RELEASE)
 		{
 			// Left Mouse up
 			// mouse_evnt.rotation_operation_ends();
+			mouse_evnt.constrained_ring_rotate_ends();
 
 			// Calculate mouse move distance
 			double deltaX = xpos - last_pt.x;

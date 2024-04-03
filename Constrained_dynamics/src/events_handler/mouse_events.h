@@ -14,6 +14,7 @@ public:
 	bool is_pan = false;
 	bool is_rightbutton = false;
 	bool is_select = false;
+	bool is_constrained_ring_rotate = false;
 	double zoom_val = 1.0;
 
 	mouse_events();
@@ -30,6 +31,10 @@ public:
 	void select_operation_start(glm::vec2& loc, bool is_rightbutton);
 	void select_operation_ends(glm::vec2& current_loc);
 
+	// Contrained Rotate operation
+	void constrained_ring_rotate_start(glm::vec2& loc);
+	void constrained_ring_rotate_ends();
+
 	void zoom_operation(double& e_delta, glm::vec2& loc);
 	void zoom_to_fit();
 	void left_mouse_click(glm::vec2& loc);
@@ -41,4 +46,6 @@ public:
 private:
 	void pan_operation(glm::vec2& current_translataion);
 	void select_operation(glm::vec2& click_loc, glm::vec2& current_loc);
+	void constrained_ring_rotate_operation(glm::vec2& current_rotation);
+
 };

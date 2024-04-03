@@ -31,6 +31,12 @@ void mouse_events::mouse_location(glm::vec2& loc)
 		pan_operation(current_translataion);
 	}
 
+	if (is_constrained_ring_rotate == true)
+	{
+		// Constrained ring rotation operation in progress
+
+	}
+
 	// Select operation in progress
 	if (is_select == true)
 	{
@@ -62,6 +68,26 @@ void mouse_events::pan_operation_ends()
 	is_pan = false;
 	//std::cout << "Pan Operation End" << std::endl;
 }
+
+void mouse_events::constrained_ring_rotate_start(glm::vec2& loc)
+{
+	// Check whether the constrained ring is clicked
+
+	click_pt = loc;
+}
+
+void mouse_events::constrained_ring_rotate_operation(glm::vec2& current_rotation)
+{
+	// Constrained ring rotation operation in progress
+	
+}
+
+void mouse_events::constrained_ring_rotate_ends()
+{
+	// Constrained ring rotation ends
+	is_constrained_ring_rotate = false;
+}
+
 
 void mouse_events::select_operation_start(glm::vec2& loc, bool is_rightbutton)
 {

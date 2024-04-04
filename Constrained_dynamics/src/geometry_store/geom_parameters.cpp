@@ -327,6 +327,46 @@ double geom_parameters::get_triangle_area(const glm::vec2& pt1, const glm::vec2&
 	return area;
 }
 
+
+bool geom_parameters::isLeft(const glm::vec2& A, const glm::vec2& B, const glm::vec2& P)
+{
+	// Helper function to check if point P is on the left side of vector AB
+	return ((B.x - A.x) * (P.y - A.y) - (B.y - A.y) * (P.x - A.x)) > 0;
+}
+
+bool geom_parameters::is_triangle_clicked(const glm::vec2& mouse_loc, const glm::vec2& tri_nd1,const glm::vec2& tri_nd2, const glm::vec2& tri_nd3)
+{
+	// Check if mouse_loc is on the same side of AB as C
+	bool side1 = isLeft(tri_nd1, tri_nd2, mouse_loc) == isLeft(tri_nd1, tri_nd2, tri_nd3);
+
+	// Check if mouse_loc is on the same side of BC as A
+	bool side2 = isLeft(tri_nd2, tri_nd3, mouse_loc) == isLeft(tri_nd2, tri_nd3, tri_nd1);
+
+	// Check if mouse_loc is on the same side of CA as B
+	bool side3 = isLeft(tri_nd3, tri_nd1, mouse_loc) == isLeft(tri_nd3, tri_nd1, tri_nd2);
+
+	// If mouse_loc is on the same side of all edges as the third vertex, it's inside
+	return side1 && side2 && side3;
+}
+
+double geom_parameters::calculateAngle_withOrigin(const glm::vec2& pt1, const glm::vec2& pt2)
+{
+	// Calculate angles of Pt1 and Pt2 relative to the x-axis
+	float angle_pt1 = std::atan2(pt1.y, pt1.x);
+	float angle_pt2 = std::atan2(pt2.y, pt2.x);
+
+	// Calculate relative angle
+	float angle = angle_pt2 - angle_pt1;
+
+	// Normalize the angle to be within the range [0, 2pi]
+	if (angle < 0) 
+	{
+		angle += 2.0 * 3.1415926535897932384626433;
+	}
+
+	return angle;
+}
+
 double geom_parameters::get_line_length(const glm::vec2& pt1, const glm::vec2& pt2)
 {
 	// Length of line

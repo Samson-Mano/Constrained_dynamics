@@ -34,7 +34,7 @@ void mouse_events::mouse_location(glm::vec2& loc)
 	if (is_constrained_ring_rotate == true)
 	{
 		// Constrained ring rotation operation in progress
-
+		constrained_ring_rotate_operation(loc);
 	}
 
 	// Select operation in progress
@@ -72,14 +72,22 @@ void mouse_events::pan_operation_ends()
 void mouse_events::constrained_ring_rotate_start(glm::vec2& loc)
 {
 	// Check whether the constrained ring is clicked
+	is_constrained_ring_rotate = geom->is_constrained_clicked(loc);
+	
+	if (is_constrained_ring_rotate == true)
+	{
+		click_pt = loc;
+	}
 
-	click_pt = loc;
 }
 
-void mouse_events::constrained_ring_rotate_operation(glm::vec2& current_rotation)
+void mouse_events::constrained_ring_rotate_operation(glm::vec2& current_loc)
 {
 	// Constrained ring rotation operation in progress
-	
+	double rotation_angle = geom_parameters::calculateAngle_withOrigin(click_pt, current_loc);
+
+	// Rotate the constraint
+	geom->rotate_constraint(rotation_angle);
 }
 
 void mouse_events::constrained_ring_rotate_ends()

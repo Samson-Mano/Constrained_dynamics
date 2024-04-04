@@ -46,6 +46,6 @@ public:
 private:
 	void pan_operation(glm::vec2& current_translataion);
 	void select_operation(glm::vec2& click_loc, glm::vec2& current_loc);
-	void constrained_ring_rotate_operation(glm::vec2& current_rotation);
+	void constrained_ring_rotate_operation(glm::vec2& current_loc);
 
 };

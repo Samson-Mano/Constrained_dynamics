@@ -263,6 +263,28 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 
 }
 
+
+bool geom_store::is_constrained_clicked(glm::vec2& mouse_loc)
+{
+	// Convert the mouse location to transformed screen locations
+	int max_dim = geom_param.window_width > geom_param.window_height ? geom_param.window_width : geom_param.window_height;
+
+	// Transform the mouse location to openGL screen coordinates
+	glm::vec2 screen_loc = glm::vec2(2.0f * ((mouse_loc.x - (geom_param.window_width * 0.5f)) / max_dim),
+									 2.0f * (((geom_param.window_height * 0.5f) - mouse_loc.y) / max_dim));
+
+
+	// Is constrained click
+	return constrained_ring.is_constrained_ring_clicked(screen_loc);
+
+}
+
+void geom_store::rotate_constraint(double& rotation_angle)
+{
+	// Rotate constraint ring and the gyro model
+}
+
+
 void geom_store::update_WindowDimension(const int& window_width, const int& window_height)
 {
 	// Update the window dimension

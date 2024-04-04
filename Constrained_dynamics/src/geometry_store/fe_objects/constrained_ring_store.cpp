@@ -58,6 +58,41 @@ void constrained_ring_store::add_constrainedtris(int& tri_id, int& nd1, int& nd2
 
 }
 
+bool constrained_ring_store::is_constrained_ring_clicked(glm::vec2& screen_loc)
+{
+	// Check whether the constrained is clicked or not
+	// Convert the nodal location to screen location
+	glm::mat4 scaling_matrix = glm::mat4(1.0) * static_cast<float>(geom_param_ptr->zoom_scale);
+	scaling_matrix[3][3] = 1.0f;
+
+	glm::mat4 scaledModelMatrix = scaling_matrix * geom_param_ptr->modelMatrix;
+
+	for (auto& tri : c_triangles)
+	{
+		// convert all the 3 points to screen position
+		glm::vec4 nd1_screenpos = scaledModelMatrix * glm::vec4(tri.c_nd1->cnode_pt.x, tri.c_nd1->cnode_pt.y, 0, 1.0f) * geom_param_ptr->panTranslation;
+		glm::vec4 nd2_screenpos = scaledModelMatrix * glm::vec4(tri.c_nd2->cnode_pt.x, tri.c_nd2->cnode_pt.y, 0, 1.0f) * geom_param_ptr->panTranslation;
+		glm::vec4 nd3_screenpos = scaledModelMatrix * glm::vec4(tri.c_nd3->cnode_pt.x, tri.c_nd3->cnode_pt.y, 0, 1.0f) * geom_param_ptr->panTranslation;
+
+		// Convert glm::vec4 to glm::vec2 by simply taking the x and y components
+		glm::vec2 nd1_screenpos2D = glm::vec2(nd1_screenpos.x, nd1_screenpos.y);
+		glm::vec2 nd2_screenpos2D = glm::vec2(nd2_screenpos.x, nd2_screenpos.y);
+		glm::vec2 nd3_screenpos2D = glm::vec2(nd3_screenpos.x, nd3_screenpos.y);
+
+		bool is_triangle_clicked = geom_parameters::is_triangle_clicked(screen_loc, nd1_screenpos2D, nd2_screenpos2D, nd3_screenpos2D);
+
+		if (is_triangle_clicked == true)
+		{
+			// Return true if triangle is clicked
+			return true;
+		}
+	}
+
+
+	return false;
+}
+
+
 void constrained_ring_store::set_buffer()
 {
 	// Set the buffers for the Model

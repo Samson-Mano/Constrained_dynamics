@@ -40,6 +40,8 @@ public:
 	void add_constrainednodes(int& node_id,double& nd_x, double& nd_y);
 	void add_constrainedtris(int& tri_id, int& nd1, int& nd2, int& nd3);
 
+	bool is_constrained_ring_clicked(glm::vec2& screen_loc);
+
 	void set_buffer();
 	void paint_constrained_ring();
 	void update_geometry_matrices(bool set_modelmatrix, bool set_pantranslation, bool set_zoomtranslation, bool set_transparency, bool set_deflscale);

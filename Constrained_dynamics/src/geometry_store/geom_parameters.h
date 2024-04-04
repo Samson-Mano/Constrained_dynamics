@@ -161,6 +161,12 @@ public:
 	static double get_remap(const double& max_value, const double& min_value, const double& limit_max, 
 		const double& limit_min,		const double& value);
 
+	static bool isLeft(const glm::vec2& A, const glm::vec2& B, const glm::vec2& P);
+
+	static bool is_triangle_clicked(const glm::vec2& mouse_loc, const glm::vec2& tri_nd1, const glm::vec2& tri_nd2, const glm::vec2& tri_nd3);
+
+	static double calculateAngle_withOrigin(const glm::vec2& pt1, const glm::vec2& pt2);
+
 private:
 	static double HueToRGB(double v1, double v2, double vH);
 

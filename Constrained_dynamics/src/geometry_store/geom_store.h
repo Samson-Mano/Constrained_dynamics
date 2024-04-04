@@ -48,6 +48,9 @@ public:
 	// Load the geometry
 	void load_constrained_ring(std::ifstream& cring_input_data, std::ifstream& gyro_input_data);
 
+	bool is_constrained_clicked(glm::vec2& mouse_loc);
+	void rotate_constraint(double& rotation_angle);
+
 	// Functions to control the drawing area
 	void update_WindowDimension(const int& window_width, const int& window_height);
 	void update_model_matrix();

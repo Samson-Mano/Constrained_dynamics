@@ -76,6 +76,13 @@ void gyro_model_store::add_gyroptmass(int& mass_id, int& mass_nd_id)
 
 }
 
+void gyro_model_store::rotate_gyro_model(const double& rotation_angle)
+{
+	// Rotate the gyro ring
+
+}
+
+
 void gyro_model_store::set_buffer()
 {
 	// Create the Rigid element geometry

@@ -92,6 +92,13 @@ bool constrained_ring_store::is_constrained_ring_clicked(glm::vec2& screen_loc)
 	return false;
 }
 
+void constrained_ring_store::rotate_constrained_ring(const double& rotation_angle)
+{
+	// Rotate the constrained ring
+
+}
+
+
 
 void constrained_ring_store::set_buffer()
 {

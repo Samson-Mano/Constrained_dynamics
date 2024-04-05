@@ -59,6 +59,8 @@ public:
 	void add_gyrorigids(int& rigd_id, int& startnd_id,int& endnd_id);
 	void add_gyroptmass(int& mass_id,int& mass_nd_id);
 
+	void rotate_gyro_model(const double& rotation_angle);
+
 	void set_buffer();
 	void paint_gyro_model();
 	void update_geometry_matrices(bool set_modelmatrix, bool set_pantranslation, bool set_zoomtranslation, bool set_transparency, bool set_deflscale);

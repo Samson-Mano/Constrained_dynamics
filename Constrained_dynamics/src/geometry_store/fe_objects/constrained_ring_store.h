@@ -41,6 +41,7 @@ public:
 	void add_constrainedtris(int& tri_id, int& nd1, int& nd2, int& nd3);
 
 	bool is_constrained_ring_clicked(glm::vec2& screen_loc);
+	void rotate_constrained_ring(const double& rotation_angle);
 
 	void set_buffer();
 	void paint_constrained_ring();

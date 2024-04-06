@@ -16,6 +16,7 @@ public:
 	void add_ptmass_geom(glm::vec2 ptmass_pt);
 
 	void set_buffer();
+	void update_buffer();
 	void paint_ptmass_geom();
 	void update_geometry_matrices(bool set_modelmatrix, bool set_pantranslation, bool set_zoomtranslation, bool set_transparency, bool set_deflscale);
 
@@ -25,7 +26,8 @@ private:
 	Shader ptmass_shader;
 	Texture ptmass_texture;
 
+	void get_masselement_vertex_buffer(glm::vec2& ptm_loc, float* ptmass_vertices, unsigned int& ptmass_v_index);
 
-	void get_constraint_buffer(glm::vec2& ptm_loc, float* ptmass_vertices, unsigned int& ptmass_v_index,
-		unsigned int* ptmass_indices, unsigned int& ptmass_i_index);
+	void get_masselement_index_buffer(unsigned int* dyn_ptmass_indices, unsigned int& dyn_ptmass_i_index);
+
 };

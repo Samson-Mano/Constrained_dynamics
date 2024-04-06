@@ -45,43 +45,62 @@ void masselement_store::add_ptmass_geom(glm::vec2 ptmass_pt)
 
 void masselement_store::set_buffer()
 {
-	// Set the point mass buffer
-	unsigned int ptmass_vertex_count = 4 * 12 * ptmass_count;
-	float* ptmass_vertices = new float[ptmass_vertex_count];
-
+	// Set the point mass buffer for the index
 	unsigned int ptmass_indices_count = 6 * ptmass_count;
 	unsigned int* ptmass_indices = new unsigned int[ptmass_indices_count];
 
-	unsigned int ptmass_v_index = 0;
 	unsigned int ptmass_i_index = 0;
 
 	for (auto& ptm_loc : pt_mass_locations)
 	{
-		// Add the texture buffer
-		get_constraint_buffer(ptm_loc, ptmass_vertices, ptmass_v_index, ptmass_indices, ptmass_i_index);
+		// Add the texture index buffer
+		get_masselement_index_buffer(ptmass_indices, ptmass_i_index);
 	}
 
 	VertexBufferLayout ptmass_layout;
 	ptmass_layout.AddFloat(2);  // Position
 	ptmass_layout.AddFloat(2);  // Center
-	ptmass_layout.AddFloat(2);  // Defl
-	ptmass_layout.AddFloat(3);  // Color
 	ptmass_layout.AddFloat(2);  // Texture co-ordinate
-	ptmass_layout.AddFloat(1);  // Is Deflection
+	ptmass_layout.AddFloat(1);  // Defl
 
+	// Define the point mass vertices of model for a node
+	unsigned int ptmass_vertex_count = 4 * 7 * ptmass_count;
 	unsigned int ptmass_vertex_size = ptmass_vertex_count * sizeof(float);
 
-	// Create the Constraint buffers
-	ptmass_buffer.CreateBuffers(ptmass_vertices, ptmass_vertex_size,
+	// Allocate space for the ptmass vertex buffer
+	ptmass_buffer.CreateDynamicBuffers(ptmass_vertex_size,
 		ptmass_indices, ptmass_indices_count, ptmass_layout);
 
 	// Delete the Dynamic arrays
-	delete[] ptmass_vertices;
 	delete[] ptmass_indices;
 
+}
 
+void masselement_store::update_buffer()
+{
+	// Update the point mass vertex buffer
+	unsigned int ptmass_vertex_count = 4 * 7 * ptmass_count;
+	float* ptmass_vertices = new float[ptmass_vertex_count];
+
+	unsigned int ptmass_v_index = 0;
+
+	// Update the point mass vertex buffer
+	for (auto& ptm_loc : pt_mass_locations)
+	{
+		// Add the texture vertex buffer
+		get_masselement_vertex_buffer(ptm_loc, ptmass_vertices, ptmass_v_index);
+	}
+
+	unsigned int ptmass_vertex_size = ptmass_vertex_count * sizeof(float); // size of the ptmass vertex
+
+	// Update the buffer
+	ptmass_buffer.UpdateDynamicVertexBuffer(ptmass_vertices, ptmass_vertex_size);
+
+	// Delete the Dynamic arrays
+	delete[] ptmass_vertices;
 
 }
+
 
 void masselement_store::paint_ptmass_geom()
 {
@@ -134,7 +153,7 @@ void masselement_store::update_geometry_matrices(bool set_modelmatrix, bool set_
 
 }
 
-void masselement_store::get_constraint_buffer(glm::vec2& ptm_loc, float* ptmass_vertices, unsigned int& ptmass_v_index, unsigned int* ptmass_indices, unsigned int& ptmass_i_index)
+void masselement_store::get_masselement_vertex_buffer(glm::vec2& ptm_loc, float* ptmass_vertices, unsigned int& ptmass_v_index)
 {
 	// Constraint color
 	glm::vec3 ptmass_color = geom_param_ptr->geom_colors.ptmass_color;
@@ -148,24 +167,15 @@ void masselement_store::get_constraint_buffer(glm::vec2& ptm_loc, float* ptmass_
 	ptmass_vertices[ptmass_v_index + 2] = ptm_loc.x;
 	ptmass_vertices[ptmass_v_index + 3] = ptm_loc.y;
 
-	// Defl value
+	// Texture co-ordinate
 	ptmass_vertices[ptmass_v_index + 4] = 0.0;
 	ptmass_vertices[ptmass_v_index + 5] = 0.0;
 
-	// Set the node color
-	ptmass_vertices[ptmass_v_index + 6] = ptmass_color.x;
-	ptmass_vertices[ptmass_v_index + 7] = ptmass_color.y;
-	ptmass_vertices[ptmass_v_index + 8] = ptmass_color.z;
-
-	// Set the Texture co-ordinates
-	ptmass_vertices[ptmass_v_index + 9] = 0.0;
-	ptmass_vertices[ptmass_v_index + 10] = 0.0;
-
-	// Set the defl_value
-	ptmass_vertices[ptmass_v_index + 11] = 0.0;
+	// Defl value
+	ptmass_vertices[ptmass_v_index + 6] = 0.0;
 
 	// Increment
-	ptmass_v_index = ptmass_v_index + 12;
+	ptmass_v_index = ptmass_v_index + 7;
 
 
 	// Set the Point mass vertices Corner 2 Top Right
@@ -176,24 +186,15 @@ void masselement_store::get_constraint_buffer(glm::vec2& ptm_loc, float* ptmass_
 	ptmass_vertices[ptmass_v_index + 2] = ptm_loc.x;
 	ptmass_vertices[ptmass_v_index + 3] = ptm_loc.y;
 
-	// Defl value
-	ptmass_vertices[ptmass_v_index + 4] = 0.0;
+	// Texture co-ordinate
+	ptmass_vertices[ptmass_v_index + 4] = 1.0;
 	ptmass_vertices[ptmass_v_index + 5] = 0.0;
 
-	// Set the node color
-	ptmass_vertices[ptmass_v_index + 6] = ptmass_color.x;
-	ptmass_vertices[ptmass_v_index + 7] = ptmass_color.y;
-	ptmass_vertices[ptmass_v_index + 8] = ptmass_color.z;
-
-	// Set the Texture co-ordinates
-	ptmass_vertices[ptmass_v_index + 9] = 1.0;
-	ptmass_vertices[ptmass_v_index + 10] = 0.0;
-
-	// Set the defl_value
-	ptmass_vertices[ptmass_v_index + 11] = 0.0;
+	// Defl value
+	ptmass_vertices[ptmass_v_index + 6] = 0.0;
 
 	// Increment
-	ptmass_v_index = ptmass_v_index + 12;
+	ptmass_v_index = ptmass_v_index + 7;
 
 
 	// Set the Point Mass vertices Corner 3 Bot Right
@@ -204,24 +205,15 @@ void masselement_store::get_constraint_buffer(glm::vec2& ptm_loc, float* ptmass_
 	ptmass_vertices[ptmass_v_index + 2] = ptm_loc.x;
 	ptmass_vertices[ptmass_v_index + 3] = ptm_loc.y;
 
+	// Texture co-ordinate
+	ptmass_vertices[ptmass_v_index + 4] = 1.0;
+	ptmass_vertices[ptmass_v_index + 5] = 1.0;
+
 	// Defl value
-	ptmass_vertices[ptmass_v_index + 4] = 0.0;
-	ptmass_vertices[ptmass_v_index + 5] = 0.0;
-
-	// Set the node color
-	ptmass_vertices[ptmass_v_index + 6] = ptmass_color.x;
-	ptmass_vertices[ptmass_v_index + 7] = ptmass_color.y;
-	ptmass_vertices[ptmass_v_index + 8] = ptmass_color.z;
-
-	// Set the Texture co-ordinates
-	ptmass_vertices[ptmass_v_index + 9] = 1.0;
-	ptmass_vertices[ptmass_v_index + 10] = 1.0;
-
-	// Set the defl_value
-	ptmass_vertices[ptmass_v_index + 11] = 0.0;
+	ptmass_vertices[ptmass_v_index + 6] = 0.0;
 
 	// Increment
-	ptmass_v_index = ptmass_v_index + 12;
+	ptmass_v_index = ptmass_v_index + 7;
 
 
 	// Set the Constraint vertices Corner 4 Bot Left
@@ -232,46 +224,38 @@ void masselement_store::get_constraint_buffer(glm::vec2& ptm_loc, float* ptmass_
 	ptmass_vertices[ptmass_v_index + 2] = ptm_loc.x;
 	ptmass_vertices[ptmass_v_index + 3] = ptm_loc.y;
 
-	// Defl value
+	// Texture co-ordinate
 	ptmass_vertices[ptmass_v_index + 4] = 0.0;
-	ptmass_vertices[ptmass_v_index + 5] = 0.0;
+	ptmass_vertices[ptmass_v_index + 5] = 1.0;
 
-	// Set the node color
-	ptmass_vertices[ptmass_v_index + 6] = ptmass_color.x;
-	ptmass_vertices[ptmass_v_index + 7] = ptmass_color.y;
-	ptmass_vertices[ptmass_v_index + 8] = ptmass_color.z;
-
-	// Set the Texture co-ordinates
-	ptmass_vertices[ptmass_v_index + 9] = 0.0;
-	ptmass_vertices[ptmass_v_index + 10] = 1.0;
-
-	// Set the defl_value
-	ptmass_vertices[ptmass_v_index + 11] = 0.0;
+	// Defl value
+	ptmass_vertices[ptmass_v_index + 6] = 0.0;
 
 	// Increment
-	ptmass_v_index = ptmass_v_index + 12;
+	ptmass_v_index = ptmass_v_index + 7;
+
+}
 
 
-	//______________________________________________________________________
+void masselement_store::get_masselement_index_buffer(unsigned int* dyn_ptmass_indices, unsigned int& dyn_ptmass_i_index)
+{
+	//__________________________________________________________________________
+	// Add the indices
 
 	// Set the Quad indices
-	unsigned int t_id = ((ptmass_i_index / 6) * 4);
+	unsigned int t_id = ((dyn_ptmass_i_index / 6) * 4);
 
 	// Triangle 0,1,2
-	ptmass_indices[ptmass_i_index + 0] = t_id + 0;
-	ptmass_indices[ptmass_i_index + 1] = t_id + 1;
-	ptmass_indices[ptmass_i_index + 2] = t_id + 2;
+	dyn_ptmass_indices[dyn_ptmass_i_index + 0] = t_id + 0;
+	dyn_ptmass_indices[dyn_ptmass_i_index + 1] = t_id + 1;
+	dyn_ptmass_indices[dyn_ptmass_i_index + 2] = t_id + 2;
 
 	// Triangle 2,3,0
-	ptmass_indices[ptmass_i_index + 3] = t_id + 2;
-	ptmass_indices[ptmass_i_index + 4] = t_id + 3;
-	ptmass_indices[ptmass_i_index + 5] = t_id + 0;
+	dyn_ptmass_indices[dyn_ptmass_i_index + 3] = t_id + 2;
+	dyn_ptmass_indices[dyn_ptmass_i_index + 4] = t_id + 3;
+	dyn_ptmass_indices[dyn_ptmass_i_index + 5] = t_id + 0;
 
 	// Increment
-	ptmass_i_index = ptmass_i_index + 6;
-
-
-
-
+	dyn_ptmass_i_index = dyn_ptmass_i_index + 6;
 
 }

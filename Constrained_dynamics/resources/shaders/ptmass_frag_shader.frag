@@ -2,7 +2,7 @@
 uniform sampler2D u_Texture;
 
 in vec2 v_textureCoord;
-in vec4 v_textureColor;
+in float v_deflvalue;
 
 out vec4 f_Color; // fragment's final color (out to the fragment shader)
 

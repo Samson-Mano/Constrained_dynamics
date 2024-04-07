@@ -7,46 +7,14 @@
 #include "rigidelement_store.h"
 #include "masselement_store.h"
 
-struct gyronode_store
-{
-	int gnode_id = 0; // Node ID
-	glm::vec2 gnode_pt = glm::vec2(0); // Node point
-
-};
-
-
-struct gyrospring_store
-{
-	int gsprg_id = 0; // Spring ID
-	gyronode_store* gstart_node = nullptr; // Start node
-	gyronode_store* gend_node = nullptr; // End node
-
-};
-
-
-struct gyrorigid_store
-{
-	int grigd_id = 0; // Rigid ID
-	gyronode_store* gstart_node = nullptr; // Start node
-	gyronode_store* gend_node = nullptr; // End node
-
-};
-
-struct gyroptmass_store
-{
-	int gmass_id = 0; // Mass ID
-	gyronode_store* gmass_node = nullptr; // Mass node
-
-};
-
-
 class gyro_model_store
 {
 public:
+	std::vector<glm::vec2> g_nodepts;
 	std::unordered_map<int, gyronode_store> g_nodes;
 	std::vector<gyrospring_store> g_springs;
 	std::vector<gyrorigid_store> g_rigids;
-	std::vector<gyroptmass_store> g_ptmass;
+	std::vector<gyroptmass_store*> g_ptmass;
 
 
 	gyro_model_store();

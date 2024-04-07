@@ -68,6 +68,39 @@ struct material_data
 };
 
 
+struct gyronode_store
+{
+	int gnode_id = 0; // Node ID
+	glm::vec2 gnode_pt = glm::vec2(0); // Node point
+
+};
+
+
+struct gyrospring_store
+{
+	int gsprg_id = 0; // Spring ID
+	gyronode_store* gstart_node = nullptr; // Start node
+	gyronode_store* gend_node = nullptr; // End node
+
+};
+
+
+struct gyrorigid_store
+{
+	int grigd_id = 0; // Rigid ID
+	gyronode_store* gstart_node = nullptr; // Start node
+	gyronode_store* gend_node = nullptr; // End node
+
+};
+
+struct gyroptmass_store
+{
+	int gmass_id = 0; // Mass ID
+	gyronode_store* gmass_node = nullptr; // Mass node
+
+};
+
+
 class geom_parameters
 {
 public:

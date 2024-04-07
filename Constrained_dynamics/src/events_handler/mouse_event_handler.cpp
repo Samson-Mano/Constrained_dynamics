@@ -207,6 +207,12 @@ void mouse_event_handler::handleMouseMove(double xpos, double ypos)
 		glm::vec2 loc = glm::vec2(xpos, ypos);
 		mouse_evnt.mouse_location(loc);
 	}
+
+	if (mouse_evnt.is_constrained_ring_rotate == true)
+	{
+		glm::vec2 loc = glm::vec2(xpos, ypos);
+		mouse_evnt.mouse_location(loc);
+	}
 }
 
 void mouse_event_handler::handleMouseScroll(double xoffset, double yoffset, double xpos, double ypos)

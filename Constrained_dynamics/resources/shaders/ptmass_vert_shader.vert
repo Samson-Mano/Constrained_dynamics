@@ -13,7 +13,7 @@ layout(location = 2) in vec2 textureCoord;
 layout(location = 3) in float node_defl;
 
 out vec2 v_textureCoord;
-out float v_deflvalue
+out float v_deflvalue;
 
 void main()
 {

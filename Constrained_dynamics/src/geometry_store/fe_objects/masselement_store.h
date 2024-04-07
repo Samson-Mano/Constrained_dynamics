@@ -6,14 +6,15 @@
 class masselement_store
 {
 public:
-	std::vector<glm::vec2> pt_mass_locations; // point mass location
+	std::vector<gyroptmass_store*>* g_ptmass;
+	// std::vector<glm::vec2> pt_mass_locations; // point mass location
 	int ptmass_count = 0; // point mass count
 
 	masselement_store();
 	~masselement_store();
 
-	void init(geom_parameters* geom_param_ptr);
-	void add_ptmass_geom(glm::vec2 ptmass_pt);
+	void init(geom_parameters* geom_param_ptr, std::vector<gyroptmass_store*>* g_ptmass);
+	// void add_ptmass_geom(glm::vec2 ptmass_pt);
 
 	void set_buffer();
 	void update_buffer();

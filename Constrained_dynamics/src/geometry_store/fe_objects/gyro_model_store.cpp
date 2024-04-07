@@ -26,7 +26,7 @@ void gyro_model_store::init(geom_parameters* geom_param_ptr)
 	// Gyro model
 	spring_elements.init(geom_param_ptr);
 	rigid_elements.init(geom_param_ptr);
-	mass_elements.init(geom_param_ptr);
+	mass_elements.init(geom_param_ptr,&g_ptmass);
 }
 
 void gyro_model_store::add_gyronodes(int& node_id, double& nd_x, double& nd_y)
@@ -35,6 +35,9 @@ void gyro_model_store::add_gyronodes(int& node_id, double& nd_x, double& nd_y)
 	gyronode_store temp_node;
 	temp_node.gnode_id = node_id;
 	temp_node.gnode_pt = glm::vec2(nd_x, nd_y);
+
+	// Add to the node point list
+	g_nodepts.push_back(temp_node.gnode_pt);
 
 	// Add to the node list
 	g_nodes.insert({ node_id, temp_node });
@@ -67,9 +70,9 @@ void gyro_model_store::add_gyrorigids(int& rigd_id, int& startnd_id, int& endnd_
 
 void gyro_model_store::add_gyroptmass(int& mass_id, int& mass_nd_id)
 {
-	gyroptmass_store temp_mass;
-	temp_mass.gmass_id = mass_id;
-	temp_mass.gmass_node = &g_nodes[mass_nd_id];
+	gyroptmass_store* temp_mass = new gyroptmass_store;
+	temp_mass->gmass_id = mass_id;
+	temp_mass->gmass_node = &g_nodes[mass_nd_id];
 
 	// Add to the mass list
 	g_ptmass.push_back(temp_mass);
@@ -80,6 +83,17 @@ void gyro_model_store::rotate_gyro_model(const double& rotation_angle)
 {
 	// Rotate the gyro ring
 
+	for (int i = 0; i < static_cast<int>(g_nodes.size()); i++)
+	{
+		double x = g_nodepts[i].x;
+		double y = g_nodepts[i].y;
+
+		g_nodes[i].gnode_pt.x = x * cos(rotation_angle) - y * sin(rotation_angle);
+		g_nodes[i].gnode_pt.y = x * sin(rotation_angle) + y * cos(rotation_angle);
+	}
+
+	// Update the buffer
+	mass_elements.update_buffer();
 }
 
 
@@ -100,10 +114,10 @@ void gyro_model_store::set_buffer()
 	spring_elements.set_buffer();
 
 	// Create the Mass element geometry
-	for (auto& pmass : g_ptmass)
-	{
-		mass_elements.add_ptmass_geom(pmass.gmass_node->gnode_pt);
-	}
+	//for (auto& pmass : g_ptmass)
+	//{
+	//	// mass_elements.add_ptmass_geom(pmass->gmass_node->gnode_pt);
+	//}
 	mass_elements.set_buffer();
 
 }

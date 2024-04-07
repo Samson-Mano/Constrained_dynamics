@@ -12,10 +12,11 @@ masselement_store::~masselement_store()
 
 }
 
-void masselement_store::init(geom_parameters* geom_param_ptr)
+void masselement_store::init(geom_parameters* geom_param_ptr, std::vector<gyroptmass_store*>* g_ptmass)
 {
 	// Set the geometry parameters
 	this->geom_param_ptr = geom_param_ptr;
+	this->g_ptmass = g_ptmass;
 
 	// Create the shader and Texture for the drawing the constraints
 	std::filesystem::path shadersPath = geom_param_ptr->resourcePath;
@@ -30,28 +31,31 @@ void masselement_store::init(geom_parameters* geom_param_ptr)
 	ptmass_texture.LoadTexture((shadersPath.string() + "/resources/images/pic_3D_circle.png").c_str());
 
 	// Clear the Point mass locations
-	pt_mass_locations.clear();
+	// pt_mass_locations.clear();
 	ptmass_count = 0;
 
 }
 
-void masselement_store::add_ptmass_geom(glm::vec2 ptmass_pt)
-{
-	// Add to the point mass locations
-	pt_mass_locations.push_back(ptmass_pt);
-	ptmass_count++;
-
-}
+//void masselement_store::add_ptmass_geom(glm::vec2 ptmass_pt)
+//{
+//	// Add to the point mass locations
+//	pt_mass_locations.push_back(ptmass_pt);
+//	ptmass_count++;
+//
+//}
 
 void masselement_store::set_buffer()
 {
+	ptmass_count = static_cast<int>((*g_ptmass).size());
+
 	// Set the point mass buffer for the index
 	unsigned int ptmass_indices_count = 6 * ptmass_count;
 	unsigned int* ptmass_indices = new unsigned int[ptmass_indices_count];
 
 	unsigned int ptmass_i_index = 0;
 
-	for (auto& ptm_loc : pt_mass_locations)
+
+	for (auto& ptm_loc : *g_ptmass)
 	{
 		// Add the texture index buffer
 		get_masselement_index_buffer(ptmass_indices, ptmass_i_index);
@@ -74,6 +78,7 @@ void masselement_store::set_buffer()
 	// Delete the Dynamic arrays
 	delete[] ptmass_indices;
 
+	update_buffer();
 }
 
 void masselement_store::update_buffer()
@@ -85,9 +90,11 @@ void masselement_store::update_buffer()
 	unsigned int ptmass_v_index = 0;
 
 	// Update the point mass vertex buffer
-	for (auto& ptm_loc : pt_mass_locations)
+	for (auto& ptm : *g_ptmass)
 	{
 		// Add the texture vertex buffer
+		glm::vec2 ptm_loc = ptm->gmass_node->gnode_pt;
+
 		get_masselement_vertex_buffer(ptm_loc, ptmass_vertices, ptmass_v_index);
 	}
 

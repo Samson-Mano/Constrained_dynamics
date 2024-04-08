@@ -12,8 +12,8 @@ class gyro_model_store
 public:
 	std::vector<glm::vec2> g_nodepts;
 	std::unordered_map<int, gyronode_store> g_nodes;
-	std::vector<gyrospring_store> g_springs;
-	std::vector<gyrorigid_store> g_rigids;
+	std::vector<gyrospring_store*> g_springs;
+	std::vector<gyrorigid_store*> g_rigids;
 	std::vector<gyroptmass_store*> g_ptmass;
 
 

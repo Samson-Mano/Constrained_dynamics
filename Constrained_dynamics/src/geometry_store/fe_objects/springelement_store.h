@@ -11,7 +11,7 @@ public:
 	~springelement_store();
 
 	void init(geom_parameters* geom_param_ptr);
-	void add_spring_geom(glm::vec2 start_pt, glm::vec2 end_pt);
+	void set_spring_geom(glm::vec2 start_pt, glm::vec2 end_pt);
 
 	void set_buffer();
 	void paint_spring_geom();

@@ -46,10 +46,10 @@ void gyro_model_store::add_gyronodes(int& node_id, double& nd_x, double& nd_y)
 
 void gyro_model_store::add_gyrosprings(int& sprg_id, int& startnd_id, int& endnd_id)
 {
-	gyrospring_store temp_spring;
-	temp_spring.gsprg_id = sprg_id;
-	temp_spring.gstart_node = &g_nodes[startnd_id];
-	temp_spring.gend_node = &g_nodes[endnd_id];
+	gyrospring_store* temp_spring = new gyrospring_store;
+	temp_spring->gsprg_id = sprg_id;
+	temp_spring->gstart_node = &g_nodes[startnd_id];
+	temp_spring->gend_node = &g_nodes[endnd_id];
 
 	// Add to the spring list
 	g_springs.push_back(temp_spring);
@@ -58,10 +58,10 @@ void gyro_model_store::add_gyrosprings(int& sprg_id, int& startnd_id, int& endnd
 
 void gyro_model_store::add_gyrorigids(int& rigd_id, int& startnd_id, int& endnd_id)
 {
-	gyrorigid_store temp_rigid;
-	temp_rigid.grigd_id = rigd_id;
-	temp_rigid.gstart_node = &g_nodes[startnd_id];
-	temp_rigid.gend_node = &g_nodes[endnd_id];
+	gyrorigid_store* temp_rigid = new gyrorigid_store;
+	temp_rigid->grigd_id = rigd_id;
+	temp_rigid->gstart_node = &g_nodes[startnd_id];
+	temp_rigid->gend_node = &g_nodes[endnd_id];
 
 	// Add to the rigid list
 	g_rigids.push_back(temp_rigid);
@@ -100,17 +100,17 @@ void gyro_model_store::rotate_gyro_model(const double& rotation_angle)
 void gyro_model_store::set_buffer()
 {
 	// Create the Rigid element geometry
-	for (auto& relm : g_rigids)
-	{
-		rigid_elements.add_rigid_geom(relm.gstart_node->gnode_pt, relm.gend_node->gnode_pt);
-	}
+	//for (auto& relm : g_rigids)
+	//{
+	//	rigid_elements.add_rigid_geom(relm.gstart_node->gnode_pt, relm.gend_node->gnode_pt);
+	//}
 	rigid_elements.set_buffer();
 
 	// Create the Spring element geometry
-	for (auto& selm : g_springs)
-	{
-		spring_elements.add_spring_geom(selm.gstart_node->gnode_pt, selm.gend_node->gnode_pt);
-	}
+	//for (auto& selm : g_springs)
+	//{
+	//	spring_elements.add_spring_geom(selm.gstart_node->gnode_pt, selm.gend_node->gnode_pt);
+	//}
 	spring_elements.set_buffer();
 
 	// Create the Mass element geometry

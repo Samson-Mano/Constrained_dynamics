@@ -23,7 +23,7 @@ void springelement_store::init(geom_parameters* geom_param_ptr)
 
 }
 
-void springelement_store::add_spring_geom(glm::vec2 start_pt, glm::vec2 end_pt)
+void springelement_store::set_spring_geom(glm::vec2 start_pt, glm::vec2 end_pt)
 {
 	// Line length
 	double element_length = geom_parameters::get_line_length(start_pt, end_pt);

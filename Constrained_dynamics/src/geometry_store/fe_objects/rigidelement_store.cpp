@@ -10,11 +10,11 @@ rigidelement_store::~rigidelement_store()
 {
 	// Empty destructor
 }
-
-void rigidelement_store::init(geom_parameters* geom_param_ptr)
+void rigidelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyrorigid_store*>* g_rigids)
 {
 	// Set the geometry parameters
 	this->geom_param_ptr = geom_param_ptr;
+	this->g_rigids = g_rigids;
 
 	// Clear the rigid element surface
 	rigid_element_surfaces.init(geom_param_ptr);

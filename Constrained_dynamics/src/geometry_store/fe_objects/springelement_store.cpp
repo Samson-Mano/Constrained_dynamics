@@ -12,10 +12,11 @@ springelement_store::~springelement_store()
 
 }
 
-void springelement_store::init(geom_parameters* geom_param_ptr)
+void springelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyrospring_store*>* g_springs)
 {
 	// Set the geometry parameters
 	this->geom_param_ptr = geom_param_ptr;
+	this->g_springs = g_springs;
 
 	// Clear the spring lines
 	spring_lines.init(geom_param_ptr);

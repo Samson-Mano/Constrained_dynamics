@@ -6,7 +6,6 @@
 class masselement_store
 {
 public:
-	std::vector<gyroptmass_store*>* g_ptmass;
 	// std::vector<glm::vec2> pt_mass_locations; // point mass location
 	int ptmass_count = 0; // point mass count
 
@@ -23,6 +22,8 @@ public:
 
 private:
 	geom_parameters* geom_param_ptr = nullptr;
+	std::vector<gyroptmass_store*>* g_ptmass;
+
 	gBuffers ptmass_buffer;
 	Shader ptmass_shader;
 	Texture ptmass_texture;

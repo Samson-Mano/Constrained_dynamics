@@ -10,7 +10,7 @@ public:
 	springelement_store();
 	~springelement_store();
 
-	void init(geom_parameters* geom_param_ptr);
+	void init(geom_parameters* geom_param_ptr, std::vector<gyrospring_store*>* g_springs);
 	void set_spring_geom(glm::vec2 start_pt, glm::vec2 end_pt);
 
 	void set_buffer();
@@ -19,6 +19,7 @@ public:
 private:
 	geom_parameters* geom_param_ptr = nullptr;
 
+	std::vector<gyrospring_store*>* g_springs;
 	line_list_store spring_lines;
 
 };

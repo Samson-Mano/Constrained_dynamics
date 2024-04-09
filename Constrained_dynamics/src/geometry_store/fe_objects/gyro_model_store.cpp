@@ -24,8 +24,8 @@ void gyro_model_store::init(geom_parameters* geom_param_ptr)
 	g_ptmass.clear();
 
 	// Gyro model
-	spring_elements.init(geom_param_ptr);
-	rigid_elements.init(geom_param_ptr);
+	spring_elements.init(geom_param_ptr, &g_springs);
+	rigid_elements.init(geom_param_ptr, &g_rigids);
 	mass_elements.init(geom_param_ptr,&g_ptmass);
 }
 

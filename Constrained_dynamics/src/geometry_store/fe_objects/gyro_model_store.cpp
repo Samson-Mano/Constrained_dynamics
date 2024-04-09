@@ -114,10 +114,6 @@ void gyro_model_store::set_buffer()
 	spring_elements.set_buffer();
 
 	// Create the Mass element geometry
-	//for (auto& pmass : g_ptmass)
-	//{
-	//	// mass_elements.add_ptmass_geom(pmass->gmass_node->gnode_pt);
-	//}
 	mass_elements.set_buffer();
 
 }

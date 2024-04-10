@@ -11,7 +11,6 @@ public:
 	~springelement_store();
 
 	void init(geom_parameters* geom_param_ptr, std::vector<gyrospring_store*>* g_springs);
-	void set_spring_geom(glm::vec2 start_pt, glm::vec2 end_pt);
 
 	void set_buffer();
 	void paint_spring_geom();

@@ -22,42 +22,47 @@ void rigidelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyror
 
 }
 
-void rigidelement_store::add_rigid_geom(glm::vec2 start_pt, glm::vec2 end_pt)
-{
-	// Add the Rigid line
-	// Line length
-	double element_length = geom_parameters::get_line_length(start_pt, end_pt);
-
-	// Direction cosines
-	double l_cos = (end_pt.x - start_pt.x) / element_length; // l cosine
-	double m_sin = (start_pt.y - end_pt.y) / element_length; // m sine
-
-	double rigid_width_amplitude = geom_param_ptr->rigid_element_width *
-		(geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
-
-	// Half-width vector
-	glm::vec2 half_width_vector = glm::vec2(m_sin, l_cos) * static_cast<float>(rigid_width_amplitude/2.0f);
-
-	// Four points to form the rigid element rectangle
-	glm::vec2 point1 = start_pt + half_width_vector; // Upper left
-	glm::vec2 point2 = start_pt - half_width_vector; // Lower left
-	glm::vec2 point3 = end_pt + half_width_vector;   // Upper right
-	glm::vec2 point4 = end_pt - half_width_vector;   // Lower right
-
-
-	// Rigid element triangle 1
-	int tri_id = rigid_element_surfaces.tri_count;
-	rigid_element_surfaces.add_tri(tri_id, point2, point1, point3);
-
-	// Rigid element triangle 2
-	tri_id = rigid_element_surfaces.tri_count;
-	rigid_element_surfaces.add_tri(tri_id, point3, point4, point2);
-
-}
-
 void rigidelement_store::set_buffer()
 {
 	// Set the buffer for the rigid element triangles
+	for (auto& rigd_e : *g_rigids)
+	{
+		glm::vec2 start_pt = rigd_e->gstart_node->gnode_pt; // get the start pt
+		glm::vec2 end_pt = rigd_e->gend_node->gnode_pt; // get the end pt
+
+		// Add the Rigid line
+		// Line length
+		double element_length = geom_parameters::get_line_length(start_pt, end_pt);
+
+		// Direction cosines
+		double l_cos = (end_pt.x - start_pt.x) / element_length; // l cosine
+		double m_sin = (start_pt.y - end_pt.y) / element_length; // m sine
+
+		double rigid_width_amplitude = geom_param_ptr->rigid_element_width *
+			(geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
+
+		// Half-width vector
+		glm::vec2 half_width_vector = glm::vec2(m_sin, l_cos) * static_cast<float>(rigid_width_amplitude / 2.0f);
+
+		// Four points to form the rigid element rectangle
+		glm::vec2 point1 = start_pt + half_width_vector; // Upper left
+		glm::vec2 point2 = start_pt - half_width_vector; // Lower left
+		glm::vec2 point3 = end_pt + half_width_vector;   // Upper right
+		glm::vec2 point4 = end_pt - half_width_vector;   // Lower right
+
+
+		// Rigid element triangle 1
+		int tri_id = rigid_element_surfaces.tri_count;
+		rigid_element_surfaces.add_tri(tri_id, point2, point1, point3);
+
+		// Rigid element triangle 2
+		tri_id = rigid_element_surfaces.tri_count;
+		rigid_element_surfaces.add_tri(tri_id, point3, point4, point2);
+
+	}
+
+
+
 	rigid_element_surfaces.set_buffer();
 
 }

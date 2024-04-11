@@ -339,6 +339,8 @@
     <None Include="resources\shaders\text_vert_shader.vert" />
     <None Include="resources\shaders\cnstpoint_vert_shader.vert" />
     <None Include="resources\shaders\cnstpoint_frag_shader.frag" />
+    <None Include="resources\shaders\sprg_vert_shader.vert" />
+    <None Include="resources\shaders\sprg_frag_shader.frag" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="resources\fonts\CanadaDBNormal.ttf" />

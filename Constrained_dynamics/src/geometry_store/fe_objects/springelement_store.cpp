@@ -18,6 +18,13 @@ void springelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyro
 	this->geom_param_ptr = geom_param_ptr;
 	this->g_springs = g_springs;
 
+	// Create the point shader
+	std::filesystem::path shadersPath = geom_param_ptr->resourcePath;
+
+	sprg_shader.create_shader((shadersPath.string() + "/resources/shaders/sprg_vert_shader.vert").c_str(),
+		(shadersPath.string() + "/resources/shaders/sprg_frag_shader.frag").c_str());
+
+
 	// Clear the spring lines
 	spring_lines.init(geom_param_ptr);
 	spring_lines.clear_lines();

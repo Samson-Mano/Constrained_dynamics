@@ -6,8 +6,8 @@
 class springelement_store
 {
 public:
-	const int spring_turn_count = 12;
-	int sprg_line_count = 0; // point mass count
+	const int spring_turn_count = 12; // spring turn count
+	int sprg_line_count = 0; // Spring line count
 
 	springelement_store();
 	~springelement_store();

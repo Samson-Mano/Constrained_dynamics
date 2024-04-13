@@ -59,7 +59,7 @@ void springelement_store::set_buffer()
 	sprg_layout.AddFloat(2);  // Position
 	sprg_layout.AddFloat(1);  // Defl
 
-	// Define the point mass vertices of model for a node
+	// Define the spring line vertices of model
 	unsigned int sprg_vertex_count = 2 * 3 * sprg_line_count;
 	unsigned int sprg_vertex_size = sprg_vertex_count * sizeof(float);
 

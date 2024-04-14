@@ -6,7 +6,7 @@
 class rigidelement_store
 {
 public:
-	int rigd_surf_count = 0; // Rigid line count
+	int rigd_line_count = 0; // Rigid line count
 
 	rigidelement_store();
 	~rigidelement_store();

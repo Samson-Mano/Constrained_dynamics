@@ -95,6 +95,7 @@ void gyro_model_store::rotate_gyro_model(const double& rotation_angle)
 	// Update the buffer
 	mass_elements.update_buffer();
 	spring_elements.update_buffer();
+	rigid_elements.update_buffer();
 
 }
 

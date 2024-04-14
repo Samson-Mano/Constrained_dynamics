@@ -27,11 +27,11 @@ void rigidelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyror
 void rigidelement_store::set_buffer()
 {
 	// Set the number of lines
-	rigd_surf_count = static_cast<int>((*g_rigids).size()) * 2; // 2 triangle surface for every single rigid line
+	rigd_line_count = static_cast<int>((*g_rigids).size()); // 2 triangle surface for every single rigid line
 
 
 	// Set the rigid lines buffer for the index
-	unsigned int rigd_indices_count = 4 * rigd_surf_count;
+	unsigned int rigd_indices_count = 6 * rigd_line_count; // 6 indices for single rigid line (3  + 3 for 2 triangles)
 	unsigned int* rigd_vertex_indices = new unsigned int[rigd_indices_count];
 
 	unsigned int rigd_i_index = 0;
@@ -49,7 +49,7 @@ void rigidelement_store::set_buffer()
 	rigd_layout.AddFloat(1);  // Defl
 
 	// Define the Rigid surface vertices of model
-	unsigned int rigd_vertex_count = 2 * 3 * sprg_line_count;
+	unsigned int rigd_vertex_count = 4 * 3 * rigd_line_count;  // 4 points per rigid line (2 + 1)
 	unsigned int rigd_vertex_size = rigd_vertex_count * sizeof(float);
 
 	// Allocate space for the spring vertex buffer
@@ -63,55 +63,37 @@ void rigidelement_store::set_buffer()
 	// Update the buffer for the spring lines points
 	update_buffer();
 
-
-
-	// Set the buffer for the rigid element triangles
-	for (auto& rigd_e : *g_rigids)
-	{
-		glm::vec2 start_pt = rigd_e->gstart_node->gnode_pt; // get the start pt
-		glm::vec2 end_pt = rigd_e->gend_node->gnode_pt; // get the end pt
-
-		// Add the Rigid line
-		// Line length
-		double element_length = geom_parameters::get_line_length(start_pt, end_pt);
-
-		// Direction cosines
-		double l_cos = (end_pt.x - start_pt.x) / element_length; // l cosine
-		double m_sin = (start_pt.y - end_pt.y) / element_length; // m sine
-
-		double rigid_width_amplitude = geom_param_ptr->rigid_element_width *
-			(geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
-
-		// Half-width vector
-		glm::vec2 half_width_vector = glm::vec2(m_sin, l_cos) * static_cast<float>(rigid_width_amplitude / 2.0f);
-
-		// Four points to form the rigid element rectangle
-		glm::vec2 point1 = start_pt + half_width_vector; // Upper left
-		glm::vec2 point2 = start_pt - half_width_vector; // Lower left
-		glm::vec2 point3 = end_pt + half_width_vector;   // Upper right
-		glm::vec2 point4 = end_pt - half_width_vector;   // Lower right
-
-
-		// Rigid element triangle 1
-		int tri_id = rigid_element_surfaces.tri_count;
-		rigid_element_surfaces.add_tri(tri_id, point2, point1, point3);
-
-		// Rigid element triangle 2
-		tri_id = rigid_element_surfaces.tri_count;
-		rigid_element_surfaces.add_tri(tri_id, point3, point4, point2);
-
-	}
-
-
-
-	rigid_element_surfaces.set_buffer();
-
 }
 
 
 
 void rigidelement_store::update_buffer()
 {
+	// Update the buffer
+	// Update the spring vertex buffer
+	unsigned int rigd_vertex_count = 4 * 3 * rigd_line_count;  // 4 points per rigid line (2 + 1)
+	float* rigd_vertices = new float[rigd_vertex_count];
+
+	unsigned int rigd_v_index = 0;
+
+	// Update the spring vertex buffer
+	for (auto& rigd_e : *g_rigids)
+	{
+		glm::vec2 start_pt = rigd_e->gstart_node->gnode_pt; // get the start pt
+		glm::vec2 end_pt = rigd_e->gend_node->gnode_pt; // get the end pt
+
+		// Add the vertex buffer of rigid quad
+		get_rigd_vertex_buffer(start_pt, end_pt, rigd_vertices, rigd_v_index);
+
+	}
+
+	unsigned int rigd_vertex_size = rigd_vertex_count * sizeof(float); // size of the spring vertices
+
+	// Update the buffer
+	rigd_buffer.UpdateDynamicVertexBuffer(rigd_vertices, rigd_vertex_size);
+
+	// Delete the Dynamic arrays
+	delete[] rigd_vertices;
 
 }
 
@@ -121,7 +103,7 @@ void rigidelement_store::paint_rigid_geom()
 	// Paint the rigid triangles (surfaces)
 	rigd_shader.Bind();
 	rigd_buffer.Bind();
-	glDrawElements(GL_TRIANGLES, (3 * tri_count), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, (6 * rigd_line_count), GL_UNSIGNED_INT, 0);
 	rigd_buffer.UnBind();
 	rigd_shader.UnBind();
 
@@ -167,16 +149,94 @@ void rigidelement_store::update_geometry_matrices(bool set_modelmatrix, bool set
 }
 
 
-void get_rigd_vertex_buffer(glm::vec2 rigd_startpt, glm::vec2 rigd_endpt,
+void rigidelement_store::get_rigd_vertex_buffer(glm::vec2 rigd_startpt, glm::vec2 rigd_endpt,
 	float* rigd_vertices, unsigned int& rigd_v_index)
 {
 
+	// Add the Rigid line as surface with 2 triangles
+	// Line length
+	double element_length = geom_parameters::get_line_length(rigd_startpt, rigd_endpt);
+
+	// Direction cosines
+	double l_cos = (rigd_endpt.x - rigd_startpt.x) / element_length; // l cosine
+	double m_sin = (rigd_startpt.y - rigd_endpt.y) / element_length; // m sine
+
+	double rigid_width_amplitude = geom_param_ptr->rigid_element_width *
+		(geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
+
+	// Half-width vector
+	glm::vec2 half_width_vector = glm::vec2(m_sin, l_cos) * static_cast<float>(rigid_width_amplitude / 2.0f);
+
+	// Four points to form the rigid element rectangle
+	glm::vec2 point1 = rigd_startpt + half_width_vector; // Upper left 
+	glm::vec2 point2 = rigd_startpt - half_width_vector; // Lower left
+	glm::vec2 point3 = rigd_endpt + half_width_vector;   // Upper right
+	glm::vec2 point4 = rigd_endpt - half_width_vector;   // Lower right
+
+
+	// Get the three node buffer for the shader
+	// Point 1
+	// Point location
+	rigd_vertices[rigd_v_index + 0] = point1.x;
+	rigd_vertices[rigd_v_index + 1] = point1.y;
+
+	// Point color
+	rigd_vertices[rigd_v_index + 2] = 0;
+
+	// Iterate
+	rigd_v_index = rigd_v_index + 3;
+
+	// Point 2
+	// Point location
+	rigd_vertices[rigd_v_index + 0] = point2.x;
+	rigd_vertices[rigd_v_index + 1] = point2.y;
+
+	// Point color
+	rigd_vertices[rigd_v_index + 2] = 0.0;
+
+	// Iterate
+	rigd_v_index = rigd_v_index + 3;
+
+	// Point 3
+	// Point location
+	rigd_vertices[rigd_v_index + 0] = point3.x;
+	rigd_vertices[rigd_v_index + 1] = point3.y;
+
+	// Point color
+	rigd_vertices[rigd_v_index + 2] = 0.0;
+
+	// Iterate
+	rigd_v_index = rigd_v_index + 3;
+
+	// Point 4
+	// Point location
+	rigd_vertices[rigd_v_index + 0] = point4.x;
+	rigd_vertices[rigd_v_index + 1] = point4.y;
+
+	// Point color
+	rigd_vertices[rigd_v_index + 2] = 0.0;
+
+	// Iterate
+	rigd_v_index = rigd_v_index + 3;
 
 }
 
-void get_rigd_index_buffer(unsigned int* rigd_vertex_indices, unsigned int& rigd_i_index)
+void rigidelement_store::get_rigd_index_buffer(unsigned int* rigd_vertex_indices, unsigned int& rigd_i_index)
 {
+	//__________________________________________________________________________
+	// Add the indices
+	// Index 0 1 2
+	rigd_vertex_indices[rigd_i_index + 0] = static_cast<int>((rigd_i_index / 6.0) * 4.0) + 0;
+	rigd_vertex_indices[rigd_i_index + 1] = static_cast<int>((rigd_i_index / 6.0) * 4.0) + 1;
+	rigd_vertex_indices[rigd_i_index + 2] = static_cast<int>((rigd_i_index / 6.0) * 4.0) + 2;
 
+	// Index 2 3 0
+	rigd_vertex_indices[rigd_i_index + 3] = static_cast<int>((rigd_i_index / 6.0) * 4.0) + 2;
+	rigd_vertex_indices[rigd_i_index + 4] = static_cast<int>((rigd_i_index / 6.0) * 4.0) + 3;
+	rigd_vertex_indices[rigd_i_index + 5] = static_cast<int>((rigd_i_index / 6.0) * 4.0) + 0;
+
+
+	rigd_i_index = rigd_i_index + 6;
 
 }
 

@@ -82,7 +82,6 @@ void gyro_model_store::add_gyroptmass(int& mass_id, int& mass_nd_id)
 void gyro_model_store::rotate_gyro_model(const double& rotation_angle)
 {
 	// Rotate the gyro ring
-
 	for (int i = 0; i < static_cast<int>(g_nodes.size()); i++)
 	{
 		double x = g_nodepts[i].x;

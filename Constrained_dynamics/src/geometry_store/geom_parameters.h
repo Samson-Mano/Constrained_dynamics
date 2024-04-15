@@ -101,6 +101,15 @@ struct gyroptmass_store
 };
 
 
+struct constrainedtri_store
+{
+	int ctri_id = 0; // ID of the triangle element
+	gyronode_store* c_nd1 = nullptr; // node 1
+	gyronode_store* c_nd2 = nullptr; // node 2
+	gyronode_store* c_nd3 = nullptr; // node 3
+};
+
+
 class geom_parameters
 {
 public:

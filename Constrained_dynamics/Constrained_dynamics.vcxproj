@@ -254,8 +254,8 @@
     <None Include="resources\dlls\freetype.dll" />
     <None Include="resources\dlls\glew32.dll" />
     <None Include="resources\dlls\glfw3.dll" />
-    <None Include="resources\shaders\cnstpoint_frag_shader.frag" />
-    <None Include="resources\shaders\cnstpoint_vert_shader.vert" />
+    <None Include="resources\shaders\cnsrpoint_frag_shader.frag" />
+    <None Include="resources\shaders\cnsrpoint_vert_shader.vert" />
     <None Include="resources\shaders\constraint_frag_shader.frag" />
     <None Include="resources\shaders\constraint_vert_shader.vert" />
     <None Include="resources\shaders\load_frag_shader.frag" />

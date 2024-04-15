@@ -18,8 +18,8 @@ void tri_list_store::init(geom_parameters* geom_param_ptr)
 	// Create the point shader
 	std::filesystem::path shadersPath = geom_param_ptr->resourcePath;
 
-	tri_shader.create_shader((shadersPath.string() + "/resources/shaders/cnstpoint_vert_shader.vert").c_str(),
-		(shadersPath.string() + "/resources/shaders/cnstpoint_frag_shader.frag").c_str());
+	tri_shader.create_shader((shadersPath.string() + "/resources/shaders/cnsrpoint_vert_shader.vert").c_str(),
+		(shadersPath.string() + "/resources/shaders/cnsrpoint_frag_shader.frag").c_str());
 
 	tri_shader.setUniform("triColor", geom_param_ptr->geom_colors.triangle_color);
 

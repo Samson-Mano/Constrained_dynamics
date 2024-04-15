@@ -17,6 +17,7 @@ void springelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyro
 	// Set the geometry parameters
 	this->geom_param_ptr = geom_param_ptr;
 	this->g_springs = g_springs;
+	sprg_line_count = 0;
 
 	// Create the point shader
 	std::filesystem::path shadersPath = geom_param_ptr->resourcePath;
@@ -216,7 +217,7 @@ void springelement_store::update_geometry_matrices(bool set_modelmatrix, bool se
 void springelement_store::get_sprg_vertex_buffer(glm::vec2 sprg_startpt, glm::vec2 sprg_endpt,
 	float* sprg_vertices, unsigned int& sprg_v_index)
 {
-	// Get the node buffer for the shader
+	// Get the vertex buffer for the shader
 	// Start Point
 	// Point location
 	sprg_vertices[sprg_v_index + 0] = sprg_startpt.x;

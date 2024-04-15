@@ -15,6 +15,7 @@ void rigidelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyror
 	// Set the geometry parameters
 	this->geom_param_ptr = geom_param_ptr;
 	this->g_rigids = g_rigids;
+	rigd_line_count = 0;
 
 	// Create the point shader
 	std::filesystem::path shadersPath = geom_param_ptr->resourcePath;
@@ -70,13 +71,13 @@ void rigidelement_store::set_buffer()
 void rigidelement_store::update_buffer()
 {
 	// Update the buffer
-	// Update the spring vertex buffer
+	// Update the rigid element buffer
 	unsigned int rigd_vertex_count = 4 * 3 * rigd_line_count;  // 4 points per rigid line (2 + 1)
 	float* rigd_vertices = new float[rigd_vertex_count];
 
 	unsigned int rigd_v_index = 0;
 
-	// Update the spring vertex buffer
+	// Update the rigid element vertex buffer
 	for (auto& rigd_e : *g_rigids)
 	{
 		glm::vec2 start_pt = rigd_e->gstart_node->gnode_pt; // get the start pt
@@ -87,7 +88,7 @@ void rigidelement_store::update_buffer()
 
 	}
 
-	unsigned int rigd_vertex_size = rigd_vertex_count * sizeof(float); // size of the spring vertices
+	unsigned int rigd_vertex_size = rigd_vertex_count * sizeof(float); // size of the rigid element vertices
 
 	// Update the buffer
 	rigd_buffer.UpdateDynamicVertexBuffer(rigd_vertices, rigd_vertex_size);
@@ -174,7 +175,7 @@ void rigidelement_store::get_rigd_vertex_buffer(glm::vec2 rigd_startpt, glm::vec
 	glm::vec2 point4 = rigd_endpt - half_width_vector;   // Lower right
 
 
-	// Get the three node buffer for the shader
+	// Get the vertex buffer for the shader
 	// Point 1
 	// Point location
 	rigd_vertices[rigd_v_index + 0] = point1.x;

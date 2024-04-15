@@ -4,33 +4,15 @@
 #include <unordered_map>
 #include "../geom_parameters.h"
 #include "../geometry_buffers/gBuffers.h"
-#include "../geometry_objects/tri_list_store.h"
-#include "../geometry_objects/point_list_store.h"
-
-
-struct constrainednode_store
-{
-	int cnode_id = 0; // Node ID
-	glm::vec2 cnode_pt = glm::vec2(0); // Node point
-	
-};
-
-
-struct constrainedtri_store
-{
-	int ctri_id = 0; // ID of the triangle element
-	constrainednode_store* c_nd1; // node 1
-	constrainednode_store* c_nd2; // node 2
-	constrainednode_store* c_nd3; // node 3
-};
-
 
 
 class constrained_ring_store
 {
 public:
-	std::unordered_map<int, constrainednode_store> c_nodes;
+	std::vector<glm::vec2> c_nodepts;
+	std::unordered_map<int, gyronode_store> c_nodes;
 	std::vector<constrainedtri_store> c_triangles;
+	int cnsr_triangle_count = 0; // Constrained ring surface triangle count
 
 	constrained_ring_store();
 	~constrained_ring_store();
@@ -44,11 +26,20 @@ public:
 	void rotate_constrained_ring(const double& rotation_angle);
 
 	void set_buffer();
+	void update_buffer();
 	void paint_constrained_ring();
 	void update_geometry_matrices(bool set_modelmatrix, bool set_pantranslation, bool set_zoomtranslation, bool set_transparency, bool set_deflscale);
 private:
 	geom_parameters* geom_param_ptr = nullptr;
+	gBuffers cnsr_buffer;
+	Shader cnsr_shader;
 
-	tri_list_store c_surfacetris;
+	void get_cnsr_vertex_buffer(glm::vec2 cnsr_pt1, glm::vec2 cnsr_pt2, glm::vec2 cnsr_pt3,
+		float* cnsr_vertices, unsigned int& cnsr_v_index);
+
+	void get_cnsr_index_buffer(unsigned int* cnsr_vertex_indices, unsigned int& cnsr_i_index);
+
+
+	// tri_list_store c_surfacetris;
 
 };

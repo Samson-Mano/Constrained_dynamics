@@ -234,9 +234,6 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 	//________________________________________________________________________
 	//________________________________________________________________________
 
-
-
-
 	// Geometry is loaded
 	is_geometry_set = true;
 

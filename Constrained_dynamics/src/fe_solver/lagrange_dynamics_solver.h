@@ -34,6 +34,14 @@ public:
 	lagrange_dynamics_solver();
 	~lagrange_dynamics_solver();
 
+	// Mass matrix
+
+	// Stiffness matrix
+
+	// Damping matrix
+
+	// External force matrix (Column matrix)
+
 private:
 
 };

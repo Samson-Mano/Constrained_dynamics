@@ -99,6 +99,22 @@ void gyro_model_store::rotate_gyro_model(const double& rotation_angle)
 }
 
 
+void gyro_model_store::rotate_gyro_model_ends(const double& rotation_angle)
+{
+	// Set the rotation angle
+	for (int i = 0; i < static_cast<int>(g_nodes.size()); i++)
+	{
+		double x = g_nodepts[i].x;
+		double y = g_nodepts[i].y;
+
+		g_nodepts[i].x = x * cos(rotation_angle) - y * sin(rotation_angle);
+		g_nodepts[i].y = x * sin(rotation_angle) + y * cos(rotation_angle);
+
+	}
+
+}
+
+
 void gyro_model_store::set_buffer()
 {
 	// Create the Rigid element geometry

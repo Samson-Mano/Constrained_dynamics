@@ -37,13 +37,13 @@ void constrained_ring_store::add_constrainednodes(int& node_id, double& nd_x, do
 	// Add the node to the list
 	gyronode_store temp_node;
 	temp_node.gnode_id = node_id;
-	temp_node.gnode_pt = glm::vec2(nd_x,nd_y);
+	temp_node.gnode_pt = glm::vec2(nd_x, nd_y);
 
 	// Add to the node point list
 	c_nodepts.push_back(temp_node.gnode_pt);
 
 	// Add to the node list
-	c_nodes.insert({ node_id, temp_node});
+	c_nodes.insert({ node_id, temp_node });
 
 }
 
@@ -108,6 +108,23 @@ void constrained_ring_store::rotate_constrained_ring(const double& rotation_angl
 
 	update_buffer();
 }
+
+
+void constrained_ring_store::rotate_constrained_ring_ends(const double& rotation_angle)
+{
+	// Set the rotation angle
+	for (int i = 0; i < static_cast<int>(c_nodes.size()); i++)
+	{
+		double x = c_nodepts[i].x;
+		double y = c_nodepts[i].y;
+
+		c_nodepts[i].x = x * cos(rotation_angle) - y * sin(rotation_angle);
+		c_nodepts[i].y = x * sin(rotation_angle) + y * cos(rotation_angle);
+
+	}
+
+}
+
 
 void constrained_ring_store::set_buffer()
 {
@@ -267,7 +284,7 @@ void constrained_ring_store::get_cnsr_index_buffer(unsigned int* cnsr_vertex_ind
 	cnsr_vertex_indices[cnsr_i_index + 0] = cnsr_i_index + 0;
 	cnsr_vertex_indices[cnsr_i_index + 1] = cnsr_i_index + 1;
 	cnsr_vertex_indices[cnsr_i_index + 2] = cnsr_i_index + 2;
-	
+
 	cnsr_i_index = cnsr_i_index + 3;
 
 }

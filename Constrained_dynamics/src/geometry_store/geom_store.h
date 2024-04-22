@@ -50,6 +50,7 @@ public:
 
 	bool is_constrained_clicked(glm::vec2& mouse_loc);
 	void rotate_constraint(double& rotation_angle);
+	void rotate_constraint_ends(double& rotation_angle);
 
 	// Functions to control the drawing area
 	void update_WindowDimension(const int& window_width, const int& window_height);

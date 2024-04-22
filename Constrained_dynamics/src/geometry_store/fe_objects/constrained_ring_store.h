@@ -24,6 +24,7 @@ public:
 
 	bool is_constrained_ring_clicked(glm::vec2& screen_loc);
 	void rotate_constrained_ring(const double& rotation_angle);
+	void rotate_constrained_ring_ends(const double& rotation_angle);
 
 	void set_buffer();
 	void update_buffer();

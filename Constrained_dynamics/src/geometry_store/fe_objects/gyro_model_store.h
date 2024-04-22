@@ -28,6 +28,8 @@ public:
 	void add_gyroptmass(int& mass_id,int& mass_nd_id);
 
 	void rotate_gyro_model(const double& rotation_angle);
+	void rotate_gyro_model_ends(const double& rotation_angle);
+
 
 	void set_buffer();
 	void paint_gyro_model();

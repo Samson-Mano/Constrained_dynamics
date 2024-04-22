@@ -284,6 +284,13 @@ void geom_store::rotate_constraint(double& rotation_angle)
 
 }
 
+void geom_store::rotate_constraint_ends(double& rotation_angle)
+{
+	// Rotate ends for constraint ring & gyro model
+	constrained_ring.rotate_constrained_ring_ends(rotation_angle);
+	gyro_model.rotate_gyro_model_ends(rotation_angle);
+
+}
 
 void geom_store::update_WindowDimension(const int& window_width, const int& window_height)
 {

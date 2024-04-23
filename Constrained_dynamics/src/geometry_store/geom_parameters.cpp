@@ -351,6 +351,11 @@ bool geom_parameters::is_triangle_clicked(const glm::vec2& mouse_loc, const glm:
 
 double geom_parameters::calculateAngle_withOrigin(const glm::vec2& pt1, const glm::vec2& pt2)
 {
+
+	// SNsupport.Supportinclination = If((e.Y - 80) < 0, -1 * Math.Acos((e.X - 80) / (Math.Sqrt(Math.Pow((e.X - 80), 2) + Math.Pow((e.Y - 80), 2)))), 
+	//	Math.Acos((e.X - 80) / (Math.Sqrt(Math.Pow((e.X - 80), 2) + Math.Pow((e.Y - 80), 2)))))
+
+
 	// Calculate angles of Pt1 and Pt2 relative to the x-axis
 	float angle_pt1 = std::atan2(pt1.y, pt1.x);
 	float angle_pt2 = std::atan2(pt2.y, pt2.x);

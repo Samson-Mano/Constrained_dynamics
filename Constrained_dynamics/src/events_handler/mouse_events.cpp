@@ -85,18 +85,15 @@ void mouse_events::constrained_ring_rotate_operation(glm::vec2& current_loc)
 {
 	// Constrained ring rotation operation in progress
 	curr_pt = current_loc;
-	double rotation_angle = geom_parameters::calculateAngle_withOrigin(click_pt, curr_pt);
 
 	// Rotate the constraint
-	geom->rotate_constraint(rotation_angle);
+	geom->rotate_constraint(click_pt, curr_pt);
 }
 
 void mouse_events::constrained_ring_rotate_ends()
 {
-	double rotation_angle = geom_parameters::calculateAngle_withOrigin(click_pt, curr_pt);
-
 	// Constrained ring rotation ends
-	geom->rotate_constraint_ends(rotation_angle);
+	geom->rotate_constraint_ends(click_pt, curr_pt);
 
 	is_constrained_ring_rotate = false;
 }

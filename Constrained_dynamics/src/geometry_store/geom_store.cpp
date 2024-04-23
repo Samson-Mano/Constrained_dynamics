@@ -276,15 +276,18 @@ bool geom_store::is_constrained_clicked(glm::vec2& mouse_loc)
 
 }
 
-void geom_store::rotate_constraint(double& rotation_angle)
+void geom_store::rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt)
 {
 	// Rotate constraint ring and the gyro model
+	
+
+
 	constrained_ring.rotate_constrained_ring(rotation_angle);
 	gyro_model.rotate_gyro_model(rotation_angle);
 
 }
 
-void geom_store::rotate_constraint_ends(double& rotation_angle)
+void geom_store::rotate_constraint_ends(glm::vec2& click_pt, glm::vec2& curr_pt)
 {
 	// Rotate ends for constraint ring & gyro model
 	constrained_ring.rotate_constrained_ring_ends(rotation_angle);

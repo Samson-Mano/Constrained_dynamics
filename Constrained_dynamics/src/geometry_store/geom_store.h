@@ -49,8 +49,8 @@ public:
 	void load_constrained_ring(std::ifstream& cring_input_data, std::ifstream& gyro_input_data);
 
 	bool is_constrained_clicked(glm::vec2& mouse_loc);
-	void rotate_constraint(double& rotation_angle);
-	void rotate_constraint_ends(double& rotation_angle);
+	void rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt);
+	void rotate_constraint_ends(glm::vec2& click_pt, glm::vec2& curr_pt);
 
 	// Functions to control the drawing area
 	void update_WindowDimension(const int& window_width, const int& window_height);

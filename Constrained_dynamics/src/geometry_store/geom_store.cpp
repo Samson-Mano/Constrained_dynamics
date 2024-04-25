@@ -279,7 +279,19 @@ bool geom_store::is_constrained_clicked(glm::vec2& mouse_loc)
 void geom_store::rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt)
 {
 	// Rotate constraint ring and the gyro model
-	
+	// Convert the screen point to model point
+	glm::mat4 scaling_matrix = glm::mat4(1.0) * static_cast<float>(geom_param.zoom_scale);
+	scaling_matrix[3][3] = 1.0f;
+
+	glm::mat4 scaledModelMatrix = scaling_matrix *geom_param.modelMatrix;
+
+	//glm::vec4 pt1 = scaledModelMatrix * glm::vec4(click_pt.x - (geom_param.window_width * 0.5f), 
+	//	((geom_param.window_height * 0.5f) - click_pt.y), 0, 1.0f)  * geom_param.panTranslation;
+
+	glm::vec4 pt1 =  geom_param.panTranslation* glm::vec4(click_pt.x - (geom_param.window_width * 0.5f), 
+		((geom_param.window_height * 0.5f) - click_pt.y), 0, 1.0f)  * scaledModelMatrix ;
+
+	double rotation_angle = 0.0;
 
 
 	constrained_ring.rotate_constrained_ring(rotation_angle);
@@ -290,6 +302,11 @@ void geom_store::rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt)
 void geom_store::rotate_constraint_ends(glm::vec2& click_pt, glm::vec2& curr_pt)
 {
 	// Rotate ends for constraint ring & gyro model
+	// Convert the screen point to model point
+
+
+	double rotation_angle = 0.0;
+
 	constrained_ring.rotate_constrained_ring_ends(rotation_angle);
 	gyro_model.rotate_gyro_model_ends(rotation_angle);
 

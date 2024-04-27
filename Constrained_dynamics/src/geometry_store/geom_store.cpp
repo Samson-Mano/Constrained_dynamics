@@ -299,12 +299,31 @@ void geom_store::rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt)
 	//	((geom_param.window_height * 0.5f) - click_pt.y), 0, 1.0f)  * geom_param.panTranslation;
 
 
+	glm::mat4 scaling_matrix = glm::mat4(1.0) * static_cast<float>(geom_param.zoom_scale);
+	scaling_matrix[3][3] = 1.0f;
+
+	glm::mat4 scaledModelMatrix = scaling_matrix;
+
+	glm::vec4 pt0 = scaledModelMatrix * glm::vec4(0.0, 0.0, 0.0, 1.0f)  * geom_param.panTranslation;
+
+
+
 	glm::vec2 mid_pt = glm::vec2((geom_param.window_width), (geom_param.window_height)) * 0.5f;
 	float win_minsize = (std::min((geom_param.window_width), (geom_param.window_height))) * 0.5f;
 
-	glm::vec2 mouse_pt = glm::vec2(click_pt.x - mid_pt.x, mid_pt.y - click_pt.y) / win_minsize;
+	glm::vec2 mouse_pt = (glm::vec2(click_pt.x - mid_pt.x, mid_pt.y - click_pt.y) / win_minsize);
 
-	glm::vec4 pt1 =  glm::vec4(mouse_pt.x, mouse_pt.y, 0, 1.0f)  * geom_param.panTranslation;
+
+
+	glm::vec4 pt1 = glm::vec4(mouse_pt.x, mouse_pt.y, 0, 1.0f) * geom_param.panTranslation;
+
+
+	std::cout << "Zero pt: " << pt0.x << ", " << pt0.y << std::endl;
+	std::cout << "Mouse pt: " << mouse_pt.x << ", " << mouse_pt.y << std::endl;
+	std::cout << "Click pt transformed: " << pt1.x << ", " << pt1.y << std::endl;
+	std::cout << "__________________________________________________________________" << std::endl;
+
+	//glm::vec4 pt1 =  glm::vec4(mouse_pt.x, mouse_pt.y, 0, 1.0f)  * geom_param.panTranslation;
 
 	double rotation_angle = 0.0;
 

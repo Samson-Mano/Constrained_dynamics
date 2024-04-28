@@ -279,53 +279,26 @@ bool geom_store::is_constrained_clicked(glm::vec2& mouse_loc)
 void geom_store::rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt)
 {
 	// Rotate constraint ring and the gyro model
-	// Convert the screen point to model point
-	//glm::mat4 scaling_matrix = glm::mat4(1.0) * static_cast<float>(geom_param.zoom_scale);
-	//scaling_matrix[3][3] = 1.0f;
+	// Transform the screen point to model point
+	
+	glm::vec2 mid_pt = glm::vec2(geom_param.window_width, geom_param.window_height) * 0.5f;
+	float win_minsize = (std::min(geom_param.window_width, geom_param.window_height)) * 0.5f * geom_param.zoom_scale;
+	float win_maxsize = (std::max(geom_param.window_width, geom_param.window_height) * 0.5f);
 
-	//glm::mat4 scaledModelMatrix = scaling_matrix *geom_param.modelMatrix;
+	float x_transl = geom_param.panTranslation[0][3] * win_maxsize;
+	float y_transl = geom_param.panTranslation[1][3] * win_maxsize;
 
-	//glm::vec3 geom_translation = glm::vec3(-1.0f * (geom_param.max_b.x + geom_param.min_b.x) * 0.5f * geom_param.geom_scale,
-	//	-1.0f * (geom_param.max_b.y + geom_param.min_b.y) * 0.5f * geom_param.geom_scale,
-	//	0.0f);
-
-	//glm::mat4 g_transl = glm::translate(glm::mat4(1.0f), geom_translation);
-
-
-	////glm::vec4 pt1 = scaledModelMatrix * glm::vec4(click_pt.x - (geom_param.window_width * 0.5f), 
-	////	((geom_param.window_height * 0.5f) - click_pt.y), 0, 1.0f)  * geom_param.panTranslation;
-
-	//glm::vec4 pt1 =  glm::vec4(click_pt.x - (geom_param.window_width * 0.5f), 
-	//	((geom_param.window_height * 0.5f) - click_pt.y), 0, 1.0f)  * geom_param.panTranslation;
-
-
-	glm::mat4 scaling_matrix = glm::mat4(1.0) * static_cast<float>(geom_param.zoom_scale);
-	scaling_matrix[3][3] = 1.0f;
-
-	glm::mat4 scaledModelMatrix = scaling_matrix;
-
-	glm::vec4 pt0 = scaledModelMatrix * glm::vec4(0.0, 0.0, 0.0, 1.0f)  * geom_param.panTranslation;
+	// Transformed click point and mouse drag point
+	glm::vec2 click_pt_t = (glm::vec2(click_pt.x - (mid_pt.x + x_transl), (mid_pt.y - y_transl) - click_pt.y ) / win_minsize);
+	glm::vec2 curr_pt_t = (glm::vec2(curr_pt.x - (mid_pt.x + x_transl), (mid_pt.y - y_transl) - curr_pt.y) / win_minsize);
 
 
 
-	glm::vec2 mid_pt = glm::vec2((geom_param.window_width), (geom_param.window_height)) * 0.5f;
-	float win_minsize = (std::min((geom_param.window_width), (geom_param.window_height))) * 0.5f;
-
-	glm::vec2 mouse_pt = (glm::vec2(click_pt.x - mid_pt.x, mid_pt.y - click_pt.y) / win_minsize);
+	// std::cout << "Mouse pt: " << click_pt_t.x << ", " << click_pt_t.y << std::endl;
+	//std::cout << "__________________________________________________________________" << std::endl;
 
 
-
-	glm::vec4 pt1 = glm::vec4(mouse_pt.x, mouse_pt.y, 0, 1.0f) * geom_param.panTranslation;
-
-
-	std::cout << "Zero pt: " << pt0.x << ", " << pt0.y << std::endl;
-	std::cout << "Mouse pt: " << mouse_pt.x << ", " << mouse_pt.y << std::endl;
-	std::cout << "Click pt transformed: " << pt1.x << ", " << pt1.y << std::endl;
-	std::cout << "__________________________________________________________________" << std::endl;
-
-	//glm::vec4 pt1 =  glm::vec4(mouse_pt.x, mouse_pt.y, 0, 1.0f)  * geom_param.panTranslation;
-
-	double rotation_angle = 0.0;
+	double rotation_angle = geom_parameters::calculateAngle_withOrigin(click_pt_t,curr_pt_t);
 
 
 	constrained_ring.rotate_constrained_ring(rotation_angle);
@@ -336,10 +309,22 @@ void geom_store::rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt)
 void geom_store::rotate_constraint_ends(glm::vec2& click_pt, glm::vec2& curr_pt)
 {
 	// Rotate ends for constraint ring & gyro model
-	// Convert the screen point to model point
+	// Transform the screen point to model point
+
+	glm::vec2 mid_pt = glm::vec2(geom_param.window_width, geom_param.window_height) * 0.5f;
+	float win_minsize = (std::min(geom_param.window_width, geom_param.window_height)) * 0.5f * geom_param.zoom_scale;
+	float win_maxsize = (std::max(geom_param.window_width, geom_param.window_height) * 0.5f);
+
+	float x_transl = geom_param.panTranslation[0][3] * win_maxsize;
+	float y_transl = geom_param.panTranslation[1][3] * win_maxsize;
+
+	// Transformed click point and mouse drag point
+	glm::vec2 click_pt_t = (glm::vec2(click_pt.x - (mid_pt.x + x_transl), (mid_pt.y - y_transl) - click_pt.y) / win_minsize);
+	glm::vec2 curr_pt_t = (glm::vec2(curr_pt.x - (mid_pt.x + x_transl), (mid_pt.y - y_transl) - curr_pt.y) / win_minsize);
 
 
-	double rotation_angle = 0.0;
+
+	double rotation_angle = geom_parameters::calculateAngle_withOrigin(click_pt_t, curr_pt_t);
 
 	constrained_ring.rotate_constrained_ring_ends(rotation_angle);
 	gyro_model.rotate_gyro_model_ends(rotation_angle);

@@ -282,22 +282,29 @@ void geom_store::rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt)
 	// Transform the screen point to model point
 	
 	glm::vec2 mid_pt = glm::vec2(geom_param.window_width, geom_param.window_height) * 0.5f;
-	float win_minsize = (std::min(geom_param.window_width, geom_param.window_height)) * 0.5f * geom_param.zoom_scale;
-	float win_maxsize = (std::max(geom_param.window_width, geom_param.window_height) * 0.5f);
+	double win_minsize = (std::min(geom_param.window_width, geom_param.window_height)) * 0.5f;
+	double win_maxsize = std::max(geom_param.window_width, geom_param.window_height) * 0.5f;
 
 	float x_transl = geom_param.panTranslation[0][3] * win_maxsize;
 	float y_transl = geom_param.panTranslation[1][3] * win_maxsize;
 
 	// Transformed click point and mouse drag point
-	glm::vec2 click_pt_t = (glm::vec2(click_pt.x - (mid_pt.x + x_transl), (mid_pt.y - y_transl) - click_pt.y ) / win_minsize);
-	glm::vec2 curr_pt_t = (glm::vec2(curr_pt.x - (mid_pt.x + x_transl), (mid_pt.y - y_transl) - curr_pt.y) / win_minsize);
+	glm::vec2 click_pt_t = (glm::vec2((click_pt.x + x_transl) - mid_pt.x, mid_pt.y - (click_pt.y + y_transl)) / 
+		static_cast<float>(win_minsize * geom_param.zoom_scale));
+
+	glm::vec2 curr_pt_t = (glm::vec2((curr_pt.x + x_transl) - mid_pt.x, mid_pt.y - (curr_pt.y + y_transl)) / 
+		static_cast<float>(win_minsize * geom_param.zoom_scale));
 
 
-
-	// std::cout << "Mouse pt: " << click_pt_t.x << ", " << click_pt_t.y << std::endl;
+	//std::cout << "Mouse pt: " << click_pt_t.x << ", " << click_pt_t.y << std::endl;
 	//std::cout << "__________________________________________________________________" << std::endl;
 
+	// model point
+	glm::vec2 model_pt = click_pt_t / static_cast<float>(1.8f * geom_param.geom_scale);
+	std::cout << "Mouse pt: " << model_pt.x << ", " << model_pt.y << std::endl;
 
+
+	// Get the rotation angle
 	double rotation_angle = geom_parameters::calculateAngle_withOrigin(click_pt_t,curr_pt_t);
 
 
@@ -312,18 +319,20 @@ void geom_store::rotate_constraint_ends(glm::vec2& click_pt, glm::vec2& curr_pt)
 	// Transform the screen point to model point
 
 	glm::vec2 mid_pt = glm::vec2(geom_param.window_width, geom_param.window_height) * 0.5f;
-	float win_minsize = (std::min(geom_param.window_width, geom_param.window_height)) * 0.5f * geom_param.zoom_scale;
-	float win_maxsize = (std::max(geom_param.window_width, geom_param.window_height) * 0.5f);
+	double win_minsize = (std::min(geom_param.window_width, geom_param.window_height)) * 0.5f;
+	double win_maxsize = (std::max(geom_param.window_width, geom_param.window_height) * 0.5f);
 
 	float x_transl = geom_param.panTranslation[0][3] * win_maxsize;
 	float y_transl = geom_param.panTranslation[1][3] * win_maxsize;
 
 	// Transformed click point and mouse drag point
-	glm::vec2 click_pt_t = (glm::vec2(click_pt.x - (mid_pt.x + x_transl), (mid_pt.y - y_transl) - click_pt.y) / win_minsize);
-	glm::vec2 curr_pt_t = (glm::vec2(curr_pt.x - (mid_pt.x + x_transl), (mid_pt.y - y_transl) - curr_pt.y) / win_minsize);
+	glm::vec2 click_pt_t = (glm::vec2((click_pt.x + x_transl) - mid_pt.x, mid_pt.y - (click_pt.y + y_transl)) / 
+		static_cast<float>(win_minsize * geom_param.zoom_scale));
 
+	glm::vec2 curr_pt_t = (glm::vec2((curr_pt.x + x_transl) - mid_pt.x, mid_pt.y - (curr_pt.y + y_transl)) / 
+		static_cast<float>(win_minsize * geom_param.zoom_scale));
 
-
+		// Get the rotation angle
 	double rotation_angle = geom_parameters::calculateAngle_withOrigin(click_pt_t, curr_pt_t);
 
 	constrained_ring.rotate_constrained_ring_ends(rotation_angle);
@@ -359,7 +368,7 @@ void geom_store::update_model_matrix()
 	geom_param.geom_scale = std::min(normalized_screen_width / geom_param.geom_bound.x,
 		normalized_screen_height / geom_param.geom_bound.y);
 
-	// Translation
+	// Geometry Translation
 	glm::vec3 geom_translation = glm::vec3(-1.0f * (geom_param.max_b.x + geom_param.min_b.x) * 0.5f * geom_param.geom_scale,
 		-1.0f * (geom_param.max_b.y + geom_param.min_b.y) * 0.5f * geom_param.geom_scale,
 		0.0f);

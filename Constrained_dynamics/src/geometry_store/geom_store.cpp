@@ -481,13 +481,25 @@ void geom_store::paint_geometry()
 	// Clean the back buffer and assign the new color to it
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	// Run the simulation
+	run_simulation();
+
 	// Paint the model
 	paint_model();
 
-	// Paint the results
-	paint_model_results();
 
 }
+
+
+void geom_store::run_simulation()
+{
+	// Run the simulation
+
+
+
+}
+
+
 
 void geom_store::paint_model()
 {
@@ -498,12 +510,5 @@ void geom_store::paint_model()
 	gyro_model.paint_gyro_model();
 
 }
-
-void geom_store::paint_model_results()
-{
-	// Paint the results
-	
-}
-
 
 

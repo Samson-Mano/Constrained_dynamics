@@ -84,7 +84,7 @@ private:
 	pulse_analysis_window* pulse_solver_window = nullptr;
 
 	void paint_model(); // Paint the model
-	void paint_model_results(); // Paint the results
+	void run_simulation(); // Run the dynamic simulation
 
 };
 

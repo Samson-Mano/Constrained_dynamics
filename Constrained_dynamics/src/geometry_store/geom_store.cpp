@@ -494,7 +494,7 @@ void geom_store::paint_geometry()
 void geom_store::run_simulation()
 {
 	// Run the simulation
-
+	gyro_model.run_simulation();
 
 
 }

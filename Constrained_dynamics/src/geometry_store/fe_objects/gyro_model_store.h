@@ -30,12 +30,18 @@ public:
 	void rotate_gyro_model(const double& rotation_angle);
 	void rotate_gyro_model_ends(const double& rotation_angle);
 
+	// Simulate the run
+	void run_simulation();
 
 	void set_buffer();
 	void paint_gyro_model();
 	void update_geometry_matrices(bool set_modelmatrix, bool set_pantranslation, bool set_zoomtranslation, bool set_transparency, bool set_deflscale);
 
 private:
+	const double delta_t = 0.001; // delta time
+	double time_at = 0.0; // time t
+	double accl_freq = 2.0; // Acceleration frequency
+
 	geom_parameters* geom_param_ptr = nullptr;
 
 	springelement_store spring_elements; // Spring elements

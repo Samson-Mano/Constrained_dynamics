@@ -72,7 +72,7 @@ struct gyronode_store
 {
 	int gnode_id = 0; // Node ID
 	glm::vec2 gnode_pt = glm::vec2(0); // Node point
-
+	bool isFixed = false; // Node 
 };
 
 

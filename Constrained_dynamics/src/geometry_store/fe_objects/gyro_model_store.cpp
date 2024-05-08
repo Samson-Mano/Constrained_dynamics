@@ -114,6 +114,18 @@ void gyro_model_store::rotate_gyro_model_ends(const double& rotation_angle)
 
 }
 
+void gyro_model_store::run_simulation()
+{
+	// Run the simulation
+	// Step 1: Time integration (Velocity and Displacement)
+
+
+
+	// Step 2: Solver loop
+
+
+
+}
 
 void gyro_model_store::set_buffer()
 {

@@ -1,6 +1,6 @@
 #include "geom_store.h"
 
-geom_store::geom_store()
+geom_store::geom_store():start_time(std::chrono::steady_clock::now())// Initialize start time in constructor
 {
 	// Empty Constructor
 }
@@ -494,7 +494,14 @@ void geom_store::paint_geometry()
 void geom_store::run_simulation()
 {
 	// Run the simulation
-	gyro_model.run_simulation();
+	  // Get the current time
+	auto current_time = std::chrono::steady_clock::now();
+
+	// Calculate the elapsed time in seconds since the start time
+	double elapsed_time = std::chrono::duration<double>(current_time - start_time).count();
+
+
+	gyro_model.run_simulation(elapsed_time);
 
 
 }

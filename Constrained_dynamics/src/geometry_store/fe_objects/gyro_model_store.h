@@ -31,7 +31,7 @@ public:
 	void rotate_gyro_model_ends(const double& rotation_angle);
 
 	// Simulate the run
-	void run_simulation();
+	void run_simulation(double time_t);
 
 	void set_buffer();
 	void paint_gyro_model();

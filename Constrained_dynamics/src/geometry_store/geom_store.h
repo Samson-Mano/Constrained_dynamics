@@ -1,5 +1,6 @@
 #pragma once
 #include "geom_parameters.h"
+#include <chrono>
 
 // File system
 #include <fstream>
@@ -67,6 +68,8 @@ public:
 	// Functions to paint the geometry and results
 	void paint_geometry();
 private:
+	std::chrono::steady_clock::time_point start_time; // Variable to store the start time
+
 	dynamic_selrectangle_store selection_rectangle;
 
 	// Geometry objects

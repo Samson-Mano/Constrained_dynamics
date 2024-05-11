@@ -127,6 +127,15 @@ void gyro_model_store::run_simulation(double time_t)
 
 }
 
+double gyro_model_store::get_acceleration_at_t(const double& time_t)
+{
+	// get the acceleration at time t
+	// accl_freq = 2.0; // Acceleration frequency
+
+	return 1.0 * std::sin(time_t *2.0* geom_param_ptr->mPI * accl_freq);
+}
+
+
 void gyro_model_store::set_buffer()
 {
 	// Create the Rigid element geometry

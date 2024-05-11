@@ -143,6 +143,9 @@ public:
 	// Triangle mesh shrunk factor
 	const double traingle_shrunk_factor = 0.8;
 
+	// PI value
+	const double mPI = 3.14159265358979323; 
+
 	// File path
 	std::filesystem::path resourcePath = "";
 

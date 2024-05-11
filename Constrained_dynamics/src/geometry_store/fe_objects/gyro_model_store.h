@@ -32,6 +32,7 @@ public:
 
 	// Simulate the run
 	void run_simulation(double time_t);
+	double get_acceleration_at_t(const double& time_t);
 
 	void set_buffer();
 	void paint_gyro_model();
@@ -40,7 +41,7 @@ public:
 private:
 	const double delta_t = 0.001; // delta time
 	double time_at = 0.0; // time t
-	double accl_freq = 2.0; // Acceleration frequency
+	double accl_freq = 1.0; // Acceleration frequency
 
 	geom_parameters* geom_param_ptr = nullptr;
 

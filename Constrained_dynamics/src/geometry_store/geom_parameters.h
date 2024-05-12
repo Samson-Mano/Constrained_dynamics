@@ -73,6 +73,8 @@ struct gyronode_store
 	int gnode_id = 0; // Node ID
 	glm::vec2 gnode_pt = glm::vec2(0); // Node point
 	glm::vec2 gnode_velo = glm::vec2(0); // Node velocity
+	glm::vec2 gnode_normal = glm::vec2(0); // Node normal vector
+
 	bool isFixed = false; // Node 
 };
 

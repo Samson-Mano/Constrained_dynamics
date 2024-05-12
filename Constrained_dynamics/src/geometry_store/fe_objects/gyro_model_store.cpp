@@ -35,6 +35,7 @@ void gyro_model_store::add_gyronodes(int& node_id, double& nd_x, double& nd_y)
 	gyronode_store temp_node;
 	temp_node.gnode_id = node_id;
 	temp_node.gnode_pt = glm::vec2(nd_x, nd_y);
+	temp_node.gnode_normal = glm::normalize(temp_node.gnode_pt); // Normal to the vector
 
 	// Add to the node point list
 	g_nodepts.push_back(temp_node.gnode_pt);
@@ -87,8 +88,12 @@ void gyro_model_store::rotate_gyro_model(const double& rotation_angle)
 		double x = g_nodepts[i].x;
 		double y = g_nodepts[i].y;
 
+		// Update the node point
 		g_nodes[i].gnode_pt.x = x * cos(rotation_angle) - y * sin(rotation_angle);
 		g_nodes[i].gnode_pt.y = x * sin(rotation_angle) + y * cos(rotation_angle);
+
+		// Node normal vector towards origin
+		g_nodes[i].gnode_normal = glm::normalize(g_nodes[i].gnode_pt);
 	}
 
 	// Update the buffer
@@ -118,7 +123,20 @@ void gyro_model_store::run_simulation(double time_t)
 {
 	// Run the simulation
 	// Step 1: Time integration (Velocity and Displacement)
+	for (int i = 0; i< static_cast<int>(g_nodes.size()); i++)
+	{
+		// Get the node
+		gyronode_store nd = g_nodes[i];
 
+		// Acceleration vector
+		glm::vec2 accl_vec = static_cast<float>(get_acceleration_at_t(time_t)) * nd.gnode_normal;
+
+		// Velocity update
+		g_nodes[i].gnode_velo = g_nodes[i].gnode_velo + static_cast<float>( delta_t) * accl_vec;
+
+		// Update position
+		g_nodes[i].gnode_pt = g_nodes[i].gnode_pt + static_cast<float>(delta_t) * g_nodes[i].gnode_velo;
+	}
 
 
 	// Step 2: Solver loop
@@ -132,7 +150,7 @@ double gyro_model_store::get_acceleration_at_t(const double& time_t)
 	// get the acceleration at time t
 	// accl_freq = 2.0; // Acceleration frequency
 
-	return 1.0 * std::sin(time_t *2.0* geom_param_ptr->mPI * accl_freq);
+	return 1.0 * std::sin(time_t *2.0* (geom_param_ptr->mPI) * accl_freq);
 }
 
 

@@ -85,6 +85,8 @@ struct gyrospring_store
 	gyronode_store* gstart_node = nullptr; // Start node
 	gyronode_store* gend_node = nullptr; // End node
 
+	double alpha_i = 0.0; // alpha_i = 0.0 for rigid element
+
 };
 
 

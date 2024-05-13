@@ -51,6 +51,7 @@ void gyro_model_store::add_gyrosprings(int& sprg_id, int& startnd_id, int& endnd
 	temp_spring->gsprg_id = sprg_id;
 	temp_spring->gstart_node = &g_nodes[startnd_id];
 	temp_spring->gend_node = &g_nodes[endnd_id];
+	temp_spring->alpha_i = (1.0 / (delta_t * delta_t *  spring_stiff));
 
 	// Add to the spring list
 	g_springs.push_back(temp_spring);
@@ -63,6 +64,7 @@ void gyro_model_store::add_gyrorigids(int& rigd_id, int& startnd_id, int& endnd_
 	temp_rigid->grigd_id = rigd_id;
 	temp_rigid->gstart_node = &g_nodes[startnd_id];
 	temp_rigid->gend_node = &g_nodes[endnd_id];
+	temp_rigid->alpha_i = 0.0;
 
 	// Add to the rigid list
 	g_rigids.push_back(temp_rigid);
@@ -140,7 +142,17 @@ void gyro_model_store::run_simulation(double time_t)
 
 
 	// Step 2: Solver loop
+	for (int j = 0; j < 100; j++)
+	{
+		// Cycle through all the Spring element
+		for (int i = 0; i < static_cast<int>(g_springs.size()); i++)
+		{
 
+
+
+
+		}
+	}
 
 
 }

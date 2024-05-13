@@ -42,6 +42,7 @@ private:
 	const double delta_t = 0.001; // delta time
 	double time_at = 0.0; // time t
 	double accl_freq = 1.0; // Acceleration frequency
+	double spring_stiff = 1000; // Spring stiffness
 
 	geom_parameters* geom_param_ptr = nullptr;
 

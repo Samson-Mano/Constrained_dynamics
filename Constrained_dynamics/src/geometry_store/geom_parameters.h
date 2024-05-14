@@ -85,8 +85,8 @@ struct gyrospring_store
 	gyronode_store* gstart_node = nullptr; // Start node
 	gyronode_store* gend_node = nullptr; // End node
 
-	double alpha_i = 0.0; // alpha_i = 0.0 for rigid element
-
+	double alpha_i = 0.0; // alpha_i = 1.0 / (stiff * delta_t^2) for rigid element
+	double lamda_i = 0.0; // lamda_i 
 };
 
 
@@ -95,6 +95,8 @@ struct gyrorigid_store
 	int grigd_id = 0; // Rigid ID
 	gyronode_store* gstart_node = nullptr; // Start node
 	gyronode_store* gend_node = nullptr; // End node
+
+	double alpha_i = 0.0; // alpha_i = 0.0 for rigid element
 
 };
 

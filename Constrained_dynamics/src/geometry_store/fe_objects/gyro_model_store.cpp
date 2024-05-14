@@ -147,6 +147,9 @@ void gyro_model_store::run_simulation(double time_t)
 		// Cycle through all the Spring element
 		for (int i = 0; i < static_cast<int>(g_springs.size()); i++)
 		{
+			// Transform the Global co-ordinate to local co-ordinate
+
+
 
 
 

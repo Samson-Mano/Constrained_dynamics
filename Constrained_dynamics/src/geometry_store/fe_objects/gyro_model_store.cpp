@@ -26,7 +26,7 @@ void gyro_model_store::init(geom_parameters* geom_param_ptr)
 	// Gyro model
 	spring_elements.init(geom_param_ptr, &g_springs);
 	rigid_elements.init(geom_param_ptr, &g_rigids);
-	mass_elements.init(geom_param_ptr,&g_ptmass);
+	mass_elements.init(geom_param_ptr, &g_ptmass);
 }
 
 void gyro_model_store::add_gyronodes(int& node_id, double& nd_x, double& nd_y)
@@ -51,7 +51,7 @@ void gyro_model_store::add_gyrosprings(int& sprg_id, int& startnd_id, int& endnd
 	temp_spring->gsprg_id = sprg_id;
 	temp_spring->gstart_node = &g_nodes[startnd_id];
 	temp_spring->gend_node = &g_nodes[endnd_id];
-	temp_spring->alpha_i = (1.0 / (delta_t * delta_t *  spring_stiff));
+	temp_spring->alpha_i = (1.0 / (delta_t * delta_t * spring_stiff));
 
 	// Add to the spring list
 	g_springs.push_back(temp_spring);
@@ -125,7 +125,7 @@ void gyro_model_store::run_simulation(double time_t)
 {
 	// Run the simulation
 	// Step 1: Time integration (Velocity and Displacement)
-	for (int i = 0; i< static_cast<int>(g_nodes.size()); i++)
+	for (int i = 0; i < static_cast<int>(g_nodes.size()); i++)
 	{
 		// Get the node
 		gyronode_store nd = g_nodes[i];
@@ -134,7 +134,7 @@ void gyro_model_store::run_simulation(double time_t)
 		glm::vec2 accl_vec = static_cast<float>(get_acceleration_at_t(time_t)) * nd.gnode_normal;
 
 		// Velocity update
-		g_nodes[i].gnode_velo = g_nodes[i].gnode_velo + static_cast<float>( delta_t) * accl_vec;
+		g_nodes[i].gnode_velo = g_nodes[i].gnode_velo + static_cast<float>(delta_t) * accl_vec;
 
 		// Update position
 		g_nodes[i].gnode_pt = g_nodes[i].gnode_pt + static_cast<float>(delta_t) * g_nodes[i].gnode_velo;
@@ -148,10 +148,29 @@ void gyro_model_store::run_simulation(double time_t)
 		for (int i = 0; i < static_cast<int>(g_springs.size()); i++)
 		{
 			// Transform the Global co-ordinate to local co-ordinate
+			// Node 1 x,y coordinate
+			double x1 = g_springs[i]->gstart_node->gnode_pt.x;
+			double y1 = g_springs[i]->gstart_node->gnode_pt.y;
+
+			// Node 2 x,y coordinate
+			double x2 = g_springs[i]->gend_node->gnode_pt.x;
+			double y2 = g_springs[i]->gend_node->gnode_pt.y;
+
+			// Length of the element
+			double l_element = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
+
+			// Direction cosines
+			double l_cos = (x2 - x1) / l_element;
+			double m_sin = (y1 - y2) / l_element;
+
+			// Local co-ordinate Node 1 & 2
+			double l1 = (l_cos * x1) + (m_sin * y1);
+			double l2 = (l_cos * x2) + (m_sin * y2);
 
 
 
 
+			// 2.2 Constraint Gradients
 
 
 		}
@@ -165,7 +184,7 @@ double gyro_model_store::get_acceleration_at_t(const double& time_t)
 	// get the acceleration at time t
 	// accl_freq = 2.0; // Acceleration frequency
 
-	return 1.0 * std::sin(time_t *2.0* (geom_param_ptr->mPI) * accl_freq);
+	return 1.0 * std::sin(time_t * 2.0 * (geom_param_ptr->mPI) * accl_freq);
 }
 
 

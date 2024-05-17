@@ -167,6 +167,8 @@ void gyro_model_store::run_simulation(double time_t)
 			double l1 = (l_cos * x1) + (m_sin * y1);
 			double l2 = (l_cos * x2) + (m_sin * y2);
 
+			// 2.1 Compute Lagrange Multipliers
+
 
 
 

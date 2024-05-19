@@ -10,7 +10,7 @@ rigidelement_store::~rigidelement_store()
 {
 	// Empty destructor
 }
-void rigidelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyrorigid_store*>* g_rigids)
+void rigidelement_store::init(geom_parameters* geom_param_ptr, std::vector<gyrospring_store*>* g_rigids)
 {
 	// Set the geometry parameters
 	this->geom_param_ptr = geom_param_ptr;
@@ -40,9 +40,12 @@ void rigidelement_store::set_buffer()
 
 	for (auto& rigd_e : *g_rigids)
 	{
-		// Add the rigid element index buffer
-		get_rigd_index_buffer(rigd_vertex_indices, rigd_i_index);
-
+		if (rigd_e->is_rigid == true)
+		{
+			// Add the rigid element index buffer
+			get_rigd_index_buffer(rigd_vertex_indices, rigd_i_index);
+		}
+			
 	}
 
 	VertexBufferLayout rigd_layout;
@@ -80,11 +83,14 @@ void rigidelement_store::update_buffer()
 	// Update the rigid element vertex buffer
 	for (auto& rigd_e : *g_rigids)
 	{
-		glm::vec2 start_pt = rigd_e->gstart_node->gnode_pt; // get the start pt
-		glm::vec2 end_pt = rigd_e->gend_node->gnode_pt; // get the end pt
+		if (rigd_e->is_rigid == true)
+		{
+			glm::vec2 start_pt = rigd_e->gstart_node->gnode_pt; // get the start pt
+			glm::vec2 end_pt = rigd_e->gend_node->gnode_pt; // get the end pt
 
-		// Add the vertex buffer of rigid quad
-		get_rigd_vertex_buffer(start_pt, end_pt, rigd_vertices, rigd_v_index);
+			// Add the vertex buffer of rigid quad
+			get_rigd_vertex_buffer(start_pt, end_pt, rigd_vertices, rigd_v_index);
+		}
 
 	}
 

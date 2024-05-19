@@ -223,7 +223,7 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 			double ptmass_val = std::stod(fields[3]); // point mass value
 
 			// Add to the point mass map
-			this->gyro_model.add_gyroptmass(ptmass_id, node_id);
+			this->gyro_model.add_gyroptmass(ptmass_id, node_id,ptmass_val);
 		}
 
 		// Iterate line
@@ -299,9 +299,9 @@ void geom_store::rotate_constraint(glm::vec2& click_pt, glm::vec2& curr_pt)
 	//std::cout << "Mouse pt: " << click_pt_t.x << ", " << click_pt_t.y << std::endl;
 	//std::cout << "__________________________________________________________________" << std::endl;
 
-	// model point
-	glm::vec2 model_pt = click_pt_t / static_cast<float>(1.8f * geom_param.geom_scale);
-	std::cout << "Mouse pt: " << model_pt.x << ", " << model_pt.y << std::endl;
+	//// model point
+	//glm::vec2 model_pt = click_pt_t / static_cast<float>(1.8f * geom_param.geom_scale);
+	//std::cout << "Mouse pt: " << model_pt.x << ", " << model_pt.y << std::endl;
 
 
 	// Get the rotation angle

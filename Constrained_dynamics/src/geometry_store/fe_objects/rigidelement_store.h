@@ -12,7 +12,7 @@ public:
 	~rigidelement_store();
 
 
-	void init(geom_parameters* geom_param_ptr, std::vector<gyrorigid_store*>* g_rigids);
+	void init(geom_parameters* geom_param_ptr, std::vector<gyrospring_store*>* g_rigids);
 
 	void set_buffer();
 	void update_buffer();
@@ -23,7 +23,7 @@ private:
 	gBuffers rigd_buffer;
 	Shader rigd_shader;
 
-	std::vector<gyrorigid_store*>* g_rigids;
+	std::vector<gyrospring_store*>* g_rigids;
 
 	void get_rigd_vertex_buffer(glm::vec2 rigd_startpt, glm::vec2 rigd_endpt,
 		float* rigd_vertices, unsigned int& rigd_v_index);

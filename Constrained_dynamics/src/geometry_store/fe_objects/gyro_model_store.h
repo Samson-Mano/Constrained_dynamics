@@ -11,11 +11,8 @@ class gyro_model_store
 {
 public:
 	std::vector<glm::vec2> g_nodepts;
-	std::unordered_map<int, gyronode_store> g_nodes;
+	std::unordered_map<int, gyronode_store*> g_nodes;
 	std::vector<gyrospring_store*> g_springs;
-	std::vector<gyrorigid_store*> g_rigids;
-	std::vector<gyroptmass_store*> g_ptmass;
-
 
 	gyro_model_store();
 	~gyro_model_store();
@@ -25,7 +22,7 @@ public:
 	void add_gyronodes(int& node_id, double& nd_x, double& nd_y);
 	void add_gyrosprings(int& sprg_id, int& startnd_id, int& endnd_id);
 	void add_gyrorigids(int& rigd_id, int& startnd_id,int& endnd_id);
-	void add_gyroptmass(int& mass_id,int& mass_nd_id);
+	void add_gyroptmass(int& mass_id,int& mass_nd_id, double& ptmass_value);
 
 	void rotate_gyro_model(const double& rotation_angle);
 	void rotate_gyro_model_ends(const double& rotation_angle);
@@ -43,6 +40,7 @@ private:
 	double time_at = 0.0; // time t
 	double accl_freq = 1.0; // Acceleration frequency
 	double spring_stiff = 1000; // Spring stiffness
+	double spring_damp = 0.1; // Spring damping
 
 	geom_parameters* geom_param_ptr = nullptr;
 

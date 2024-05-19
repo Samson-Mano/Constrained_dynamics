@@ -12,7 +12,7 @@ masselement_store::~masselement_store()
 
 }
 
-void masselement_store::init(geom_parameters* geom_param_ptr, std::vector<gyroptmass_store*>* g_ptmass)
+void masselement_store::init(geom_parameters* geom_param_ptr, std::unordered_map<int, gyronode_store*>* g_ptmass)
 {
 	// Set the geometry parameters
 	this->geom_param_ptr = geom_param_ptr;
@@ -36,13 +36,6 @@ void masselement_store::init(geom_parameters* geom_param_ptr, std::vector<gyropt
 
 }
 
-//void masselement_store::add_ptmass_geom(glm::vec2 ptmass_pt)
-//{
-//	// Add to the point mass locations
-//	pt_mass_locations.push_back(ptmass_pt);
-//	ptmass_count++;
-//
-//}
 
 void masselement_store::set_buffer()
 {
@@ -92,10 +85,16 @@ void masselement_store::update_buffer()
 	// Update the point mass vertex buffer
 	for (auto& ptm : *g_ptmass)
 	{
-		// Add the texture vertex buffer
-		glm::vec2 ptm_loc = ptm->gmass_node->gnode_pt;
+		gyronode_store* node = ptm.second;
+		
+		if (node->isPtmassexist == true)
+		{
+			// Add the texture vertex buffer
+			glm::vec2 ptm_loc = node->gnode_pt;
 
-		get_masselement_vertex_buffer(ptm_loc, ptmass_vertices, ptmass_v_index);
+			get_masselement_vertex_buffer(ptm_loc, ptmass_vertices, ptmass_v_index);
+		}
+
 	}
 
 	unsigned int ptmass_vertex_size = ptmass_vertex_count * sizeof(float); // size of the ptmass vertex

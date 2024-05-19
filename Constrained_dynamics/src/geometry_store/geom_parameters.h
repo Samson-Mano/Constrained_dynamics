@@ -75,6 +75,9 @@ struct gyronode_store
 	glm::vec2 gnode_velo = glm::vec2(0); // Node velocity
 	glm::vec2 gnode_normal = glm::vec2(0); // Node normal vector
 
+	bool isPtmassexist = false; // Is point mass exist in the node or not
+	double gmass_value = 0.0; // Node mass value
+
 	bool isFixed = false; // Node 
 };
 
@@ -84,27 +87,13 @@ struct gyrospring_store
 	int gsprg_id = 0; // Spring ID
 	gyronode_store* gstart_node = nullptr; // Start node
 	gyronode_store* gend_node = nullptr; // End node
+	bool is_rigid = false;
 
-	double alpha_i = 0.0; // alpha_i = 1.0 / (stiff * delta_t^2) for rigid element
+	// alpha_i = 0.0 for rigid element
+	// alpha_i = 1.0 / (stiff * delta_t^2) for spring element
+	double alpha_i = 0.0; 
+
 	double lamda_i = 0.0; // lamda_i 
-};
-
-
-struct gyrorigid_store
-{
-	int grigd_id = 0; // Rigid ID
-	gyronode_store* gstart_node = nullptr; // Start node
-	gyronode_store* gend_node = nullptr; // End node
-
-	double alpha_i = 0.0; // alpha_i = 0.0 for rigid element
-
-};
-
-struct gyroptmass_store
-{
-	int gmass_id = 0; // Mass ID
-	gyronode_store* gmass_node = nullptr; // Mass node
-
 };
 
 

@@ -89,9 +89,18 @@ struct gyrospring_store
 	gyronode_store* gend_node = nullptr; // End node
 	bool is_rigid = false;
 
+	// Rest length
+	double rest_length = 0.0;
+
 	// alpha_i = 0.0 for rigid element
 	// alpha_i = 1.0 / (stiff * delta_t^2) for spring element
-	double alpha_i = 0.0; 
+	double alpha_i = 0.0;
+
+	// beta_i = delta_t^2 * damp for spring element
+	double beta_i = 0.0; 
+
+	// gamma_i = (alpha_i * beta_i) / delta_t
+	double gamma_i = 0.0;
 
 	double lamda_i = 0.0; // lamda_i 
 };

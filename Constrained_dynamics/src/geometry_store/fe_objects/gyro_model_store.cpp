@@ -50,7 +50,20 @@ void gyro_model_store::add_gyrosprings(int& sprg_id, int& startnd_id, int& endnd
 	temp_spring->gstart_node = g_nodes[startnd_id];
 	temp_spring->gend_node = g_nodes[endnd_id];
 	temp_spring->is_rigid = false;
+
+	// Rest length
+	double x1 = g_nodes[startnd_id]->gnode_pt.x;
+	double y1 = g_nodes[startnd_id]->gnode_pt.y;
+
+	double x2 = g_nodes[endnd_id]->gnode_pt.x;
+	double y2 = g_nodes[endnd_id]->gnode_pt.y;
+
+	temp_spring->rest_length = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
+	//-----------------------------------------------------------------
+
 	temp_spring->alpha_i = (1.0 / (delta_t * delta_t * spring_stiff));
+	temp_spring->beta_i = (delta_t * delta_t * spring_damp);
+	temp_spring->gamma_i = (temp_spring->alpha_i * temp_spring->beta_i) / delta_t;
 
 	// Add to the spring list
 	g_springs.push_back(temp_spring);
@@ -64,7 +77,20 @@ void gyro_model_store::add_gyrorigids(int& rigd_id, int& startnd_id, int& endnd_
 	temp_rigid->gstart_node = g_nodes[startnd_id];
 	temp_rigid->gend_node = g_nodes[endnd_id];
 	temp_rigid->is_rigid = true;
+	
+	// Rest length
+	double x1 = g_nodes[startnd_id]->gnode_pt.x;
+	double y1 = g_nodes[startnd_id]->gnode_pt.y;
+
+	double x2 = g_nodes[endnd_id]->gnode_pt.x;
+	double y2 = g_nodes[endnd_id]->gnode_pt.y;
+
+	temp_rigid->rest_length = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
+	//-----------------------------------------------------------------
+	
 	temp_rigid->alpha_i = 0.0;
+	temp_rigid->beta_i = 0.0;
+	temp_rigid->gamma_i = 0.0;
 
 	// Add to the rigid list
 	g_springs.push_back(temp_rigid);

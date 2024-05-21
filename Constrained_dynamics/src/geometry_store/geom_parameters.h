@@ -76,7 +76,12 @@ struct gyronode_store
 	glm::vec2 gnode_normal = glm::vec2(0); // Node normal vector
 
 	bool isPtmassexist = false; // Is point mass exist in the node or not
-	double gmass_value = 0.0; // Node mass value
+	double gmass_value = 0.001; // Node mass value
+
+	// Time integration values
+	glm::vec2 gnode_displ_hat = glm::vec2(0); // node displacement star
+	glm::vec2 gnode_velo_hat = glm::vec2(0); // node velocity star
+
 
 	bool isFixed = false; // Node 
 };
@@ -102,6 +107,9 @@ struct gyrospring_store
 	// gamma_i = (alpha_i * beta_i) / delta_t
 	double gamma_i = 0.0;
 
+
+	// XPBD Lagrange multipliers
+	double delta_lamda_i = 0.0; // delta lamda_i
 	double lamda_i = 0.0; // lamda_i 
 };
 

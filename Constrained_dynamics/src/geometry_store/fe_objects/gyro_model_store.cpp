@@ -154,13 +154,20 @@ void gyro_model_store::run_simulation(double time_t)
 		gyronode_store* nd = g_nodes[i];
 
 		// Acceleration vector
-		glm::vec2 accl_vec = static_cast<float>(get_acceleration_at_t(time_t)) * nd->gnode_normal;
+		glm::vec2 accl_vec = glm::vec2(0);
+		
+		if (nd->gnode_id == 38)
+		{
+			// Force is applied to only node at 
+			accl_vec = static_cast<float>(get_acceleration_at_t(time_t)) * nd->gnode_normal;
+		}
+		
 
-		// Velocity update
-		g_nodes[i]->gnode_velo = g_nodes[i]->gnode_velo + static_cast<float>(delta_t) * accl_vec;
+		// Velocity update v^ = v(t) + delta_t * accl
+		g_nodes[i]->gnode_velo_hat = g_nodes[i]->gnode_velo + (static_cast<float>(delta_t) * accl_vec);
 
-		// Update position
-		g_nodes[i]->gnode_pt = g_nodes[i]->gnode_pt + static_cast<float>(delta_t) * g_nodes[i]->gnode_velo;
+		// Update position x^ = x(t) + delta_t * v^
+		g_nodes[i]->gnode_displ_hat = g_nodes[i]->gnode_pt + (static_cast<float>(delta_t) * g_nodes[i]->gnode_velo_hat);
 	}
 
 
@@ -191,7 +198,7 @@ void gyro_model_store::run_simulation(double time_t)
 			double l2 = (l_cos * x2) + (m_sin * y2);
 
 			// 2.1 Compute Lagrange Multipliers
-
+			double cnstraint_x = l1 + l2;
 
 
 

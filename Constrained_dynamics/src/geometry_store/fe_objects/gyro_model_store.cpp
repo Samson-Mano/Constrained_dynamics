@@ -198,15 +198,45 @@ void gyro_model_store::run_simulation(double time_t)
 			double l2 = (l_cos * x2) + (m_sin * y2);
 
 			// 2.1 Compute Lagrange Multipliers
-			double cnstraint_x = l1 + l2;
+			double cnstraint_l = l1 + l2;
 
+			double delta_lamda_numerator = cnstraint_l - (g_springs[i]->alpha_i * g_springs[i]->lamda_i) - g_springs[i]->gamma_i;
+			double delta_lamda_denominator = (1 + g_springs[i]->gamma_i) * ((1.0 / g_springs[i]->gstart_node->gmass_value)+(1.0 / g_springs[i]->gend_node->gmass_value)) 
+				+ g_springs[i]->alpha_i;
 
+			double delta_lamda = delta_lamda_numerator / delta_lamda_denominator;
 
 			// 2.2 Constraint Gradients
+			double dc_l1 = (l1 - l2) / std::abs(l1 - l2);
+			double dc_l2 = (l2 - l1) / std::abs(l1 - l2);
 
+			// 2.3 Position correction
+			double delta_l1 = (1.0 / g_springs[i]->gstart_node->gmass_value) * dc_l1 * delta_lamda;
+			double delta_l2 = (1.0 / g_springs[i]->gend_node->gmass_value) * dc_l2 * delta_lamda;
+
+			// 2.4 Correction applied to x^
+			g_springs[i]->gstart_node->gnode_displ_hat = g_springs[i]->gstart_node->gnode_displ_hat + delta_l1;
 
 		}
 	}
+
+	// 3. Position and Velocity update
+	for (int i = 0; i < static_cast<int>(g_nodes.size()); i++)
+	{
+		// Get the node
+		gyronode_store* nd = g_nodes[i];
+
+
+		// Velocity update v(t + delta_t) = (x^ - x(t + delta_t))/ delta_t
+		g_nodes[i]->gnode_velo = (g_nodes[i]->gnode_displ_hat - g_nodes[i]->gnode_pt) / static_cast<float>(delta_t);
+
+		// Position update x(t + delta_t) = x^
+		g_nodes[i]->gnode_pt = g_nodes[i]->gnode_displ_hat;
+
+	}
+
+
+
 
 
 }

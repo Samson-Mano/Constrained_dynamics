@@ -57,17 +57,6 @@ struct frequency_reponse_data
 };
 
 
-struct material_data
-{
-	unsigned int material_id = 0;
-	std::string material_name = "";
-	double line_length = 0.0;
-	double line_tension = 0.0;
-	double material_density = 0.0;
-	int model_type = -1;
-};
-
-
 struct gyronode_store
 {
 	int gnode_id = 0; // Node ID

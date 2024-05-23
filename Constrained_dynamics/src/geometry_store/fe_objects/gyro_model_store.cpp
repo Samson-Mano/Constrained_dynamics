@@ -34,6 +34,7 @@ void gyro_model_store::add_gyronodes(int& node_id, double& nd_x, double& nd_y)
 	temp_node->gnode_id = node_id;
 	temp_node->gnode_pt = glm::vec2(nd_x, nd_y);
 	temp_node->gnode_normal = glm::normalize(temp_node->gnode_pt); // Normal to the vector
+	temp_node->isFixed = true; // Set all the nodes as fixed (change the fixed to free at point mass addition)
 
 	// Add to the node point list
 	g_nodepts.push_back(temp_node->gnode_pt);
@@ -101,6 +102,7 @@ void gyro_model_store::add_gyroptmass(int& mass_id, int& mass_nd_id, double& ptm
 {
 	// Update the point mass value
 	g_nodes[mass_nd_id]->isPtmassexist = true;
+	g_nodes[mass_nd_id]->isFixed = false;
 	g_nodes[mass_nd_id]->gmass_value = ptmass_value;
 
 }
@@ -172,81 +174,95 @@ void gyro_model_store::run_simulation(double time_t)
 
 
 	// Step 2: Solver loop
-	for (int j = 0; j < 100; j++)
-	{
+	//for (int j = 0; j < 10; j++)
+	//{
 		// Cycle through all the Spring element
 		for (int i = 0; i < static_cast<int>(g_springs.size()); i++)
 		{
-			// Transform the Global co-ordinate to local co-ordinate
-			// Node 1 x,y coordinate
-			double x1 = g_springs[i]->gstart_node->gnode_pt.x;
-			double y1 = g_springs[i]->gstart_node->gnode_pt.y;
+			// get the spring data
+			gyrospring_store* sprg = g_springs[i];
 
-			// Node 2 x,y coordinate
-			double x2 = g_springs[i]->gend_node->gnode_pt.x;
-			double y2 = g_springs[i]->gend_node->gnode_pt.y;
+			// Transform the Global co-ordinate to local co-ordinate
+			// Node x,y coordinate
+			glm::vec2 start_pos = sprg->gstart_node->gnode_displ_hat;
+			glm::vec2 end_pos = sprg->gend_node->gnode_displ_hat;
 
 			// Length of the element
-			double l_element = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
-
-			// Direction cosines
-			double l_cos = (x2 - x1) / l_element;
-			double m_sin = (y1 - y2) / l_element;
-
-			// Local co-ordinate Node 1 & 2
-			double l1 = (l_cos * x1) + (m_sin * y1);
-			double l2 = (l_cos * x2) + (m_sin * y2);
+			glm::vec2 delta_pos = end_pos - start_pos;
+			double l_element = glm::length(delta_pos);
 
 			// 2.1 Compute Lagrange Multipliers
-			double cnstraint_l = l1 + l2;
+			double cnstraint_l = l_element - sprg->rest_length;
 
-			double delta_lamda_numerator = cnstraint_l - (g_springs[i]->alpha_i * g_springs[i]->lamda_i) - g_springs[i]->gamma_i;
-			double delta_lamda_denominator = (1 + g_springs[i]->gamma_i) * ((1.0 / g_springs[i]->gstart_node->gmass_value)+(1.0 / g_springs[i]->gend_node->gmass_value)) 
-				+ g_springs[i]->alpha_i;
+			double delta_lamda_numerator = cnstraint_l - (sprg->alpha_i * sprg->lamda_i); // -sprg->gamma_i;
+			double mass_inv1 = 0.0;
+			double mass_inv2 = 0.0;
+
+			if (sprg->gstart_node->isFixed == false)
+			{
+				mass_inv1 = (1.0 / sprg->gstart_node->gmass_value);
+			}
+
+			if (sprg->gend_node->isFixed == false)
+			{
+				mass_inv2 = (1.0 / sprg->gend_node->gmass_value);
+			}
+
+			double delta_lamda_denominator = (mass_inv1 + mass_inv2) 
+				+ sprg->alpha_i;
 
 			double delta_lamda = delta_lamda_numerator / delta_lamda_denominator;
 
 			// 2.2 Constraint Gradients
-			double dc_l1 = (l1 - l2) / std::abs(l1 - l2);
-			double dc_l2 = (l2 - l1) / std::abs(l1 - l2);
+			glm::vec2 constraint_gradient = delta_pos / static_cast<float>(l_element);
 
 			// 2.3 Position correction
-			double delta_l1 = (1.0 / g_springs[i]->gstart_node->gmass_value) * dc_l1 * delta_lamda;
-			double delta_l2 = (1.0 / g_springs[i]->gend_node->gmass_value) * dc_l2 * delta_lamda;
+			glm::vec2 correction_start = static_cast<float>((1.0 / sprg->gstart_node->gmass_value) * delta_lamda) * constraint_gradient;
+			glm::vec2 correction_end = static_cast<float>(- (1.0 / sprg->gend_node->gmass_value) * delta_lamda) * constraint_gradient;
 
-			// 2.4 Correction applied to x^
-			g_springs[i]->gstart_node->gnode_displ_hat = g_springs[i]->gstart_node->gnode_displ_hat + delta_l1;
+			// Apply corrections
+			sprg->gstart_node->gnode_displ_hat += correction_start;
+			sprg->gend_node->gnode_displ_hat += correction_end;
+
+			// Update Lagrange multiplier
+			sprg->lamda_i += delta_lamda;
 
 		}
-	}
+	//}
 
 	// 3. Position and Velocity update
 	for (int i = 0; i < static_cast<int>(g_nodes.size()); i++)
 	{
 		// Get the node
-		gyronode_store* nd = g_nodes[i];
+		// gyronode_store* nd = g_nodes[i];
 
+		if (g_nodes[i]->isFixed == false)
+		{
 
-		// Velocity update v(t + delta_t) = (x^ - x(t + delta_t))/ delta_t
-		g_nodes[i]->gnode_velo = (g_nodes[i]->gnode_displ_hat - g_nodes[i]->gnode_pt) / static_cast<float>(delta_t);
+			// Velocity update v(t + delta_t) = (x^ - x(t + delta_t))/ delta_t
+			g_nodes[i]->gnode_velo = (g_nodes[i]->gnode_displ_hat - g_nodes[i]->gnode_pt) / static_cast<float>(delta_t);
 
-		// Position update x(t + delta_t) = x^
-		g_nodes[i]->gnode_pt = g_nodes[i]->gnode_displ_hat;
-
+			// Position update x(t + delta_t) = x^
+			g_nodes[i]->gnode_pt = g_nodes[i]->gnode_displ_hat;
+		}
 	}
 
 
 
-
+	// Update the buffer
+	mass_elements.update_buffer();
+	spring_elements.update_buffer();
+	rigid_elements.update_buffer();
 
 }
+
 
 double gyro_model_store::get_acceleration_at_t(const double& time_t)
 {
 	// get the acceleration at time t
 	// accl_freq = 2.0; // Acceleration frequency
 
-	return 1.0 * std::sin(time_t * 2.0 * (geom_param_ptr->mPI) * accl_freq);
+	return 100.0 * std::sin(time_t * 2.0 * (geom_param_ptr->mPI) * accl_freq);
 }
 
 

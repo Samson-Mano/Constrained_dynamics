@@ -250,18 +250,18 @@ void app_window::menu_events()
 		// Solve
 		if (ImGui::BeginMenu("Solve"))
 		{
-			if (ImGui::MenuItem("Modal Analysis Solve"))
-			{
-				// Modal Analysis Solve
-				sol_modal_window.execute_modal_open = true;
-				sol_modal_window.is_show_window = true;
-			}
-			if (ImGui::MenuItem("Pulse Analysis Solve"))
-			{
-				// Pulse Analysis Solve
-				sol_pulse_window.execute_pulse_open = true;
-				sol_pulse_window.is_show_window = true;
-			}
+			//if (ImGui::MenuItem("Modal Analysis Solve"))
+			//{
+			//	// Modal Analysis Solve
+			//	sol_modal_window.execute_modal_open = true;
+			//	sol_modal_window.is_show_window = true;
+			//}
+			//if (ImGui::MenuItem("Pulse Analysis Solve"))
+			//{
+			//	// Pulse Analysis Solve
+			//	sol_pulse_window.execute_pulse_open = true;
+			//	sol_pulse_window.is_show_window = true;
+			//}
 
 
 			ImGui::EndMenu();

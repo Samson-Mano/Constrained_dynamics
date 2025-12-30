@@ -1,4 +1,14 @@
-﻿using System;
+﻿// OpenTK library
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Input;
+using PBD_pendulum_simulation.other_windows;
+using PBD_pendulum_simulation.src.fe_objects;
+// Local resource
+using PBD_pendulum_simulation.src.global_variables;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,5 +26,11 @@ namespace PBD_pendulum_simulation
         {
             InitializeComponent();
         }
+
+
+
+
+
+
     }
 }

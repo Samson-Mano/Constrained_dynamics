@@ -12,28 +12,32 @@ namespace PBD_pendulum_simulation.src.fe_objects
 {
     public class elementmass_store
     {
-        const float ptmass_size = 100.0f; // Circle radius
+        float ptmass_size = 20.0f;
+      
         const int circle_pt_count = 30; // Circle segment count
 
         // Mass mesh data
         meshdata_store mass_drawingdata;
 
 
-        public elementmass_store(Vector2 mass_loc)
+        public elementmass_store(Vector2 mass_loc, float ptmass_size)
         {
+            // Point mass size
+            this.ptmass_size = ptmass_size;    
+
             //_____________________________________________________________________________________________
             // Mesh objects
             mass_drawingdata = new meshdata_store(false);
 
             // Add the origin point
-            mass_drawingdata.add_mesh_point(0, 0.0, 0.0, 0.0, -8);
+            mass_drawingdata.add_mesh_point(0, mass_loc.X, mass_loc.Y, 0.0, -8);
 
             for (int i = 0; i < circle_pt_count; i++)
             {
                 // Create the points for circle
                 double angle = (2.0 * Math.PI * i) / (double)circle_pt_count;
-                double x = 0.0d + (ptmass_size * Math.Cos(angle));
-                double y = 0.0d + (ptmass_size * Math.Sin(angle));
+                double x = mass_loc.X + (ptmass_size * Math.Cos(angle));
+                double y = mass_loc.Y + (ptmass_size * Math.Sin(angle));
 
                 mass_drawingdata.add_mesh_point(i + 1, x, y, 0.0, -8);
 

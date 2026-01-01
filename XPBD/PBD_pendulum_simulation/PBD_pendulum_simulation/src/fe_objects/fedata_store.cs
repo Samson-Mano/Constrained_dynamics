@@ -17,48 +17,25 @@ namespace PBD_pendulum_simulation.src.fe_objects
 
     public class fedata_store
     {
-        public elementmass_store fe_mass;
+        public pendulum_data_store pendulum_data;
+
+        
+        public elementfixedend_store fe_fixedend;
+        public elementmass_store fe_mass1;
+        public elementmass_store fe_mass2;
+        public elementmass_store fe_mass3;
+        public elementlink_store fe_rigidlink1;
+        public elementlink_store fe_rigidlink2;
+        public elementlink_store fe_rigidlink3;
+
+
         //public elementspring_store fe_spring;
-        //public elementfixedend_store fe_fixedend;
-
-        //// Drawing vectors
-        //public vector_store velo_vector;
-        //public vector_store accl_vector;
-
-        //// Drawing graphs
-        //public graph_store disp_graph;
-        //public graph_store velo_graph;
-        //public graph_store accl_graph;
 
         // Drawing labels
         public text_store time_label;
         public text_store disp_label;
         public text_store velo_label;
         public text_store accl_label;
-
-        //// Phase portrait
-        //public phaseportrait_store phase_portrait;
-
-        //// Portrait of delayed potential vectors
-        //const int num_x_grid = 100; // even number only 2,4,6,8,10
-        //const int num_potential_vectors = num_x_grid * num_x_grid; // square grid 1, 4, 9, 16, 25, 36 ...
-        //const float potential_vector_spacing = 10.0f;
-
-        //public vector_list_store potential_vectors = new vector_list_store();
-
-        //// Potential vector around unit circle
-        //const int num_circle_vectors = 360;
-        //const float ptmass_circle_radius = 100.0f; // Circle radius
-        //private float x_shift = 0.0f;
-        //private float y_shift = 0.0f;
-
-        //public vector_list_store potential_vectors_circle = new vector_list_store();
-
-        //public vector_store resultant_potential_vector;
-        //public graph_store resultant_potential_graph;
-
-        //// Drawing object for shadow trail
-        //public shadow_trail_store shadow_trail;
 
 
         // To control the drawing events
@@ -73,14 +50,8 @@ namespace PBD_pendulum_simulation.src.fe_objects
         public Vector3 max_bounds = new Vector3(1);
         public Vector3 geom_bounds = new Vector3(2);
 
-        //// Fe Results store
-        // public feresults_data_store feresults = new feresults_data_store();
 
         private bool isModelSet = false;
-
-        const double displextent = 100.0; // Extent of displacement for scaling
-        const double veloextent = 100.0; // Extent of velocity for scaling
-        const double acclextent = 100.0; // Extent of acceleration for scaling
 
 
         public fedata_store()
@@ -122,23 +93,15 @@ namespace PBD_pendulum_simulation.src.fe_objects
 
             gvariables_static.geom_size = this.geom_bounds.Length;
 
-            // To control the drawing graphics
-            // graphic_events_control = new drawing_events(this);
-
             // (Re)Initialize the data
-            fe_mass = new elementmass_store(new Vector2(0.0f, 0.0f));
-            //fe_spring = new elementspring_store(new Vector2(0.0f, -500.0f), new Vector2(0.0f, 0.0f));
-            //fe_fixedend = new elementfixedend_store(new Vector2(0.0f, -500.0f), 90.0f);
+            fe_fixedend = new elementfixedend_store(new Vector2(0.0f, 0.0f), 270.0f);
 
-            //// Set the Animation drawing objects
-            //// Set the vectors
-            //velo_vector = new vector_store(new Vector2(0.0f, 0.0f), new Vector2(0.0f, 0.0f), -9);
-            //accl_vector = new vector_store(new Vector2(0.0f, 0.0f), new Vector2(0.0f, 0.0f), -10);
+            // Set the pendulum model
+            double inital_angle1 = (90.0-45.0 / 180.0) * Math.PI;
+            double inital_angle2 = (90.0+0.0 / 180.0) * Math.PI;
+            double inital_angle3 = (90.0-45.0 / 180.0) * Math.PI;
 
-            //// Set the graphs
-            //disp_graph = new graph_store(-8);
-            //velo_graph = new graph_store(-9);
-            //accl_graph = new graph_store(-10);
+            set_triple_pendulum_model(10,12,15,100,120,130,inital_angle1, inital_angle2, inital_angle3);
 
             // Initialize the labels 
             time_label = new text_store("Time = 0.0000000 s", new Vector2(0.0f, -450.0f), -3); // Number of character  = 18
@@ -146,54 +109,81 @@ namespace PBD_pendulum_simulation.src.fe_objects
             velo_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -9); // Number of character  = 12
             accl_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -10); // Number of character  = 12
 
-            //// Initialize the phase portrait
-            //phase_portrait = new phaseportrait_store();
-
-            //// Initialize the potential vectors
-            //for (int i = 0; i < num_x_grid; i++)
-            //{
-            //    for (int j = 0; j < num_x_grid; j++)
-            //    {
-            //        int vec_id = i * num_x_grid + j;
-            //        float x_loc = (((float)i + 0.5f) - (float)(num_x_grid) / 2.0f) * potential_vector_spacing;
-            //        float y_loc = (((float)j + 0.5f) - (float)(num_x_grid) / 2.0f) * potential_vector_spacing;
-
-            //        potential_vectors.add_vector(vec_id, new Vector2(x_loc, y_loc), new Vector2(potential_vector_spacing + x_loc, y_loc), 0.0);
-
-            //    }
-            //}
-
-            //// Set the vectors visualization
-            //potential_vectors.set_vector_visualization();
-
-            //// Initialize the potential vectors around circle
-            //for (int i = 0; i < num_circle_vectors; i++)
-            //{
-            //    double angle = (2.0 * Math.PI * i) / (double)num_circle_vectors;
-            //    float x_loc = (float)(ptmass_circle_radius * Math.Cos(angle));
-            //    float y_loc = (float)(ptmass_circle_radius * Math.Sin(angle));
-            //    potential_vectors_circle.add_vector(i, new Vector2(x_loc, y_loc),
-            //        new Vector2(x_loc + (float)(5.0 * Math.Cos(angle)), y_loc + (float)(5.0 * Math.Sin(angle))), 0.0);
-            //}
-
-            //// Set the vectors visualization
-            //potential_vectors_circle.set_vector_visualization();
-
-            //resultant_potential_vector = new vector_store(new Vector2(0.0f, 0.0f), new Vector2(0.0f, 0.0f), -4);
-            //resultant_potential_graph = new graph_store(-4);
-
-            //// Set the shadow trail
-            //shadow_trail = new shadow_trail_store();
-            //shadow_trail.set_trail_visualization();
-
-
             isModelSet = true;
 
             update_openTK_uniforms(true, true, true);
 
         }
 
+        public void set_triple_pendulum_model(double mass1, double mass2, double mass3,
+            double length1, double length2, double length3,
+            double initial_angle1, double initial_angle2, double initial_angle3)
+        {
+            // Set the pendulum data
+            pendulum_data = new pendulum_data_store(mass1, mass2, mass3,
+                length1, length2, length3, initial_angle1, initial_angle2, initial_angle3);
 
+
+            // -------------------------------
+            // Constants
+            // -------------------------------
+            const float TOTAL_SCREEN_LENGTH = 400f;
+            const float MAX_MASS_SIZE = 50.0f;
+            const float MIN_MASS_SIZE = 0.01f;
+
+            // -------------------------------
+            // Mass scaling
+            // -------------------------------
+            double maxMass = Math.Max(mass1, Math.Max(mass2, mass3));
+
+
+            float screen_mass1_size = (float)gvariables_static.GetRemap(maxMass, 0.0, MAX_MASS_SIZE, MIN_MASS_SIZE, mass1);
+            float screen_mass2_size = (float)gvariables_static.GetRemap(maxMass, 0.0, MAX_MASS_SIZE, MIN_MASS_SIZE, mass2);
+            float screen_mass3_size = (float)gvariables_static.GetRemap(maxMass, 0.0, MAX_MASS_SIZE, MIN_MASS_SIZE, mass3);
+
+
+            // -------------------------------
+            // Length scaling
+            // -------------------------------
+            double total_length = length1 + length2 + length3;
+            
+            double length_ratio1 = (length1 / total_length) * TOTAL_SCREEN_LENGTH;
+            double length_ratio2 = (length2 / total_length) * TOTAL_SCREEN_LENGTH;
+            double length_ratio3 = (length3 / total_length) * TOTAL_SCREEN_LENGTH;
+
+            // -------------------------------
+            // Position helper
+            // -------------------------------
+            Vector2 NextPoint(Vector2 origin, double angle, double length)
+            {
+                return origin + new Vector2(
+                    -(float)(length * Math.Sin(angle)),
+                     (float)(length * Math.Cos(angle))
+                );
+            }
+
+            // -------------------------------
+            // Initial positions
+            // -------------------------------
+            Vector2 p0 = Vector2.Zero;
+            Vector2 p1 = NextPoint(p0, initial_angle1, length_ratio1);
+            Vector2 p2 = NextPoint(p1, initial_angle2, length_ratio2);
+            Vector2 p3 = NextPoint(p2, initial_angle3, length_ratio3);
+
+
+            // Set the drawing data
+            // Masses
+            fe_mass1 = new elementmass_store(p1, screen_mass1_size);
+            fe_mass2 = new elementmass_store(p2, screen_mass2_size);
+            fe_mass3 = new elementmass_store(p3, screen_mass3_size);
+
+            // Rigid link
+            fe_rigidlink1 = new elementlink_store(p0, p1);
+            fe_rigidlink2 = new elementlink_store(p1, p2);
+            fe_rigidlink3 = new elementlink_store(p2, p3);
+
+
+        }
 
 
         public void paint_model()
@@ -202,81 +192,21 @@ namespace PBD_pendulum_simulation.src.fe_objects
                 return;
 
 
-            // Paint the spring mass system
-            fe_mass.paint_pointmass();
-            //fe_fixedend.paint_fixedend();
-            //fe_spring.paint_spring();
+            // Paint the three pendulum system
+            fe_fixedend.paint_fixedend();
 
-            //if (feresults.isResultsStored && gvariables_static.animate_stop == false)
-            //{
-            //    gvariables_static.LineWidth = 3.0f;
+            // Paint the masses
+            fe_mass1.paint_pointmass();
+            fe_mass2.paint_pointmass();
+            fe_mass3.paint_pointmass();
 
-            //    // Paint the vectors
-            //    // Paint the velocity vector
-            //    if (gvariables_static.is_show_velocity_vector == true)
-            //        velo_vector.paint_vector();
+            // Paint the rigid link
+           gvariables_static.LineWidth = 4.0f;
+            fe_rigidlink1.paint_rigidlink();
+            fe_rigidlink2.paint_rigidlink();
+            fe_rigidlink3.paint_rigidlink();
 
-            //    // Paint the acceleration vector
-            //    if (gvariables_static.is_show_acceleration_vector == true)
-            //        accl_vector.paint_vector();
-
-            //    // Paint the graphs
-            //    // Paint the displacement graph
-            //    if (gvariables_static.is_show_displacement_graph == true)
-            //        disp_graph.paint_graph();
-
-            //    // Paint the velocity graph
-            //    if (gvariables_static.is_show_velocity_graph == true)
-            //        velo_graph.paint_graph();
-
-            //    // Paint the acceleration graph
-            //    if (gvariables_static.is_show_acceleration_graph == true)
-            //        accl_graph.paint_graph();
-
-            //    gvariables_static.LineWidth = 1.0f;
-
-            //    // Paint the labels
-            //    // Paint time label
-            //    if (gvariables_static.is_show_time_label == true)
-            //        time_label.paint_dynamic_text();
-
-            //    // Paint displacement label
-            //    if (gvariables_static.is_show_displacement_label == true)
-            //        disp_label.paint_dynamic_text();
-
-            //    // Paint velocity label
-            //    if (gvariables_static.is_show_velocity_label == true)
-            //        velo_label.paint_dynamic_text();
-
-            //    // Paint acceleration label
-            //    if (gvariables_static.is_show_acceleration_label == true)
-            //        accl_label.paint_dynamic_text();
-
-
-            //    // Paint the phase portrait
-            //    if (gvariables_static.is_show_phaseportrait == true)
-            //        phase_portrait.paint_graph();
-
-            //    // Paint the potential vectors
-            //    if (gvariables_static.is_show_larmour_field == true)
-            //        potential_vectors.paint_vectors();
-
-            //    // Paint the potential vectors around circle
-            //    if (gvariables_static.is_show_field_around_circle == true)
-            //    {
-            //        potential_vectors_circle.paint_vectors();
-            //        // resultant_potential_vector.paint_vector();
-            //        // resultant_potential_graph.paint_graph();
-
-            //    }
-
-
-            //    // Paint the shadow trail
-            //    if(gvariables_static.is_show_masstrail == true)
-            //        shadow_trail.paint_shadow_trail();
-
-
-            //}
+            gvariables_static.LineWidth = 1.0f;
 
         }
 
@@ -383,199 +313,6 @@ namespace PBD_pendulum_simulation.src.fe_objects
 
 
         }
-
-
-        private void update_potential_vectors()
-        {
-            // Potential vectors update
-            const double waveSpeedC = 300.0; // wave speed
-            Vector2 refZero = new Vector2(-100000, -100000); // Reference point far away
-
-
-            // First pass — compute all E-vectors and track min/max magnitude.
-            Dictionary<int, (Vector2 eVec, double mag)> eData = new Dictionary<int, (Vector2 eVec, double mag)>();
-
-            double minMag = double.PositiveInfinity;
-            double maxMag = double.NegativeInfinity;
-
-            //foreach (var vec in potential_vectors.vectorMap.Values)
-            //{
-
-            //    // Delayed index for finite propagation
-            //    int delayedIndex = get_delyed_index(vec.tail_pt, time_step, feresults.dt, waveSpeedC);
-
-            //    // Acceleration at delayed time
-            //    double accVal = feresults.acceleration[delayedIndex];
-            //    Vector2 accAtT = new Vector2(0, (float)accVal);
-
-            //    // W-vector (mass displacement)
-            //    Vector2 locNow = new Vector2(0, (float)feresults.displacement[time_step]);
-            //    Vector2 wVec = locNow - refZero;
-
-            //    // Compute the E-field using your Larmour function
-            //    Vector2 eVec = gvariables_static.larmour_field(
-            //        vec.tail_pt,      // grid point
-            //        accAtT,           // acceleration
-            //        waveSpeedC,       // c
-            //        wVec,             // w vector
-            //        refZero           // reference point
-            //    );
-
-            //    double magnitude = eVec.Length;
-
-            //    // Store
-            //    eData[vec.vector_id] = (eVec, magnitude);
-
-            //    // Track min and max
-            //    if (magnitude > maxMag) maxMag = magnitude;
-            //    if (magnitude < minMag) minMag = magnitude;
-            //}
-
-            //// Second pass — normalize magnitudes and update vectors
-            //foreach (var vec in potential_vectors.vectorMap.Values)
-            //{
-            //    var (eVec, magnitude) = eData[vec.vector_id];
-
-            //    // Avoid div-by-zero if all magnitudes identical
-            //    double normalizedMag = (maxMag != minMag)
-            //        ? gvariables_static.GetRemap(maxMag, minMag, 1.0, 0.0, magnitude)
-            //        : 0.0;
-
-            //    // Unit direction
-            //    Vector2 direction = eVec != Vector2.Zero
-            //        ? Vector2.Normalize(eVec)
-            //        : Vector2.Zero;
-
-            //    // Tail + arrow
-            //    Vector2 arrowPt = vec.tail_pt + direction * potential_vector_spacing; //* (float)normalizedMag
-
-            //    potential_vectors.update_vector(
-            //        vec.vector_id,
-            //        vec.tail_pt,
-            //        arrowPt,
-            //        normalizedMag
-            //    );
-            //}
-
-        }
-
-
-        private void update_potential_vectors_circle(Vector2 new_mass_loc)
-        {
-            // Potential vectors update
-            const double waveSpeedC = 300.0; // wave speed
-            Vector2 refZero = new Vector2(-100000, -100000); // Reference point far away
-
-
-            // First pass — compute all E-vectors and track min/max magnitude.
-            Dictionary<int, (Vector2 eVec, double mag)> eData = new Dictionary<int, (Vector2 eVec, double mag)>();
-
-            double minMag = double.PositiveInfinity;
-            double maxMag = double.NegativeInfinity;
-
-            //// Initialize the potential vectors around circle
-            //for (int i = 0; i < num_circle_vectors; i++)
-            //{
-            //    double angle = (2.0 * Math.PI * i) / (double)num_circle_vectors;
-            //    float x_loc = new_mass_loc.X + x_shift + (float)(ptmass_circle_radius * Math.Cos(angle));
-            //    float y_loc = new_mass_loc.Y + y_shift + (float)(ptmass_circle_radius * Math.Sin(angle));
-
-            //    Vector2 new_tail_pt = new Vector2(x_loc, y_loc);
-
-            //    // Delayed index for finite propagation
-            //    int delayedIndex = get_delyed_index(new_tail_pt, time_step, feresults.dt, waveSpeedC);
-
-            //    // Acceleration at delayed time
-            //    double accVal = feresults.acceleration[delayedIndex];
-            //    Vector2 accAtT = new Vector2(0, (float)accVal);
-
-            //    // W-vector (mass displacement)
-            //    Vector2 locNow = new Vector2(0, (float)feresults.displacement[time_step]);
-            //    Vector2 wVec = locNow - refZero;
-
-            //    // Compute the E-field using your Larmour function
-            //    Vector2 eVec = gvariables_static.larmour_field(
-            //        new_tail_pt,      // grid point
-            //        accAtT,           // acceleration
-            //        waveSpeedC,       // c
-            //        wVec,             // w vector
-            //        refZero           // reference point
-            //    );
-
-            //    double magnitude = eVec.Length;
-
-            //    // Store
-            //    eData[i] = (eVec, magnitude);
-
-            //    // Track min and max
-            //    if (magnitude > maxMag) maxMag = magnitude;
-            //    if (magnitude < minMag) minMag = magnitude;
-
-            //}
-
-            //Vector2 resultant = Vector2.Zero;
-
-            //// Second pass — normalize magnitudes and update vectors
-            //for (int i = 0; i < num_circle_vectors; i++)
-            //{
-            //    double angle = (2.0 * Math.PI * i) / (double)num_circle_vectors;
-            //    float x_loc = new_mass_loc.X + x_shift + (float)(ptmass_circle_radius * Math.Cos(angle));
-            //    float y_loc = new_mass_loc.Y + y_shift + (float)(ptmass_circle_radius * Math.Sin(angle));
-
-            //    Vector2 new_tail_pt = new Vector2(x_loc, y_loc);
-
-            //    var (eVec, magnitude) = eData[i];
-
-            //    // Avoid div-by-zero if all magnitudes identical
-            //    double normalizedMag = (maxMag != minMag)
-            //        ? gvariables_static.GetRemap(maxMag, minMag, 1.0, 0.0, magnitude)
-            //        : 0.0;
-
-            //    // Unit direction
-            //    Vector2 direction = eVec != Vector2.Zero
-            //        ? Vector2.Normalize(eVec)
-            //        : Vector2.Zero;
-
-            //    // RESULTANT contribution
-            //    Vector2 v = direction * (float)normalizedMag;
-            //    resultant += v;
-
-
-            //    // Tail + arrow
-            //    Vector2 arrowPt = new_tail_pt + 10.0f * direction * (float)normalizedMag * potential_vector_spacing; //* (float)normalizedMag
-
-            //    potential_vectors_circle.update_vector(
-            //        i,
-            //        new_tail_pt,
-            //        arrowPt,
-            //        normalizedMag
-            //    );
-            //}
-
-            //resultant_potential_vector.update_vector(new_mass_loc, new_mass_loc + resultant);
-            //resultant_potential_graph.update_graph(resultant.Length);
-
-        }
-
-
-        private int get_delyed_index(Vector2 grid_node_pt, int step_i, double time_interval, double wave_speed_c)
-        {
-            // Delayed time
-            double location_from_origin = grid_node_pt.Length; // Location from length
-
-            double delayed_time = (step_i * time_interval) - (location_from_origin / wave_speed_c);
-
-            if (delayed_time < 0)
-            {
-                delayed_time = 0;
-            }
-
-
-            // Find the index of acceleration at delayed time
-            return (int)(Math.Round(delayed_time / time_interval));
-
-        }
-
 
 
         private string convert_value_to_label(double value, int num_char)
@@ -698,69 +435,55 @@ namespace PBD_pendulum_simulation.src.fe_objects
             // Update the openTK uniforms of spring mass objects
 
             // Update mass openTK uniforms
-            fe_mass.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            fe_mass1.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
+            fe_mass2.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
+            fe_mass3.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control.projectionMatrix,
                 graphic_events_control.modelMatrix,
                 graphic_events_control.viewMatrix,
                 gvariables_static.geom_transparency);
 
 
-            //// Update fixed end openTK uniforms
-            //fe_fixedend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
+            // Update fixed end openTK uniforms
+            fe_fixedend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
+
+            // Update the rigid link
+            fe_rigidlink1.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
+            fe_rigidlink2.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
+            fe_rigidlink3.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
 
 
             //// Update spring openTK uniforms
             //fe_spring.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
-
-
-            //// Update the animation objects openTK uniforms
-            //// Update vector openTK uniforms
-            //velo_vector.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
-
-            //accl_vector.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
-
-
-            //// Update graph openTK uniforms
-            //// Update displacement graph openTK uniforms
-            //disp_graph.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //     graphic_events_control.projectionMatrix,
-            //     graphic_events_control.modelMatrix,
-            //     graphic_events_control.viewMatrix,
-            //     gvariables_static.geom_transparency);
-
-            //// Update velocity graph openTK uniforms
-            //velo_graph.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
-
-            //// Update acceleration graph openTK uniforms
-            //accl_graph.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
-
-
-            //// Update the phase portrait openTK uniforms
-            //phase_portrait.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
             //    graphic_events_control.projectionMatrix,
             //    graphic_events_control.modelMatrix,
             //    graphic_events_control.viewMatrix,
@@ -779,33 +502,6 @@ namespace PBD_pendulum_simulation.src.fe_objects
 
             accl_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control);
-
-
-            //// update potential vectors openTK uniforms
-            //potential_vectors.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control);
-
-            //// update potential vectors around circle openTK uniforms
-            //potential_vectors_circle.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control);
-
-            //resultant_potential_vector.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
-
-            //resultant_potential_graph.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
-
-            //// Update the shadow trail 
-            //shadow_trail.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control);
-
-
 
         }
 

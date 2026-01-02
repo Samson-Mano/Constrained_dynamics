@@ -30,7 +30,7 @@ namespace PBD_pendulum_simulation.src.fe_objects
             mass_drawingdata = new meshdata_store(false);
 
             // Add the origin point
-            mass_drawingdata.add_mesh_point(0, mass_loc.X, mass_loc.Y, 0.0, -8);
+            mass_drawingdata.add_mesh_point(0, mass_loc.X, mass_loc.Y, 0.0, -4);
 
             for (int i = 0; i < circle_pt_count; i++)
             {
@@ -39,21 +39,21 @@ namespace PBD_pendulum_simulation.src.fe_objects
                 double x = mass_loc.X + (ptmass_size * Math.Cos(angle));
                 double y = mass_loc.Y + (ptmass_size * Math.Sin(angle));
 
-                mass_drawingdata.add_mesh_point(i + 1, x, y, 0.0, -8);
+                mass_drawingdata.add_mesh_point(i + 1, x, y, 0.0, -4);
 
             }
 
             // Add Triangle and lines
             for (int i = 0; i < circle_pt_count - 1;i++)
             {
-                mass_drawingdata.add_mesh_lines(i, i + 1, i + 2, -8);
-                mass_drawingdata.add_mesh_tris(i, 0, i + 1, i + 2, -8);
+                mass_drawingdata.add_mesh_lines(i, i + 1, i + 2, -4);
+                mass_drawingdata.add_mesh_tris(i, 0, i + 1, i + 2, -4);
 
             }
 
             // Final segment
-            mass_drawingdata.add_mesh_lines(circle_pt_count - 1, circle_pt_count, 1, -8);
-            mass_drawingdata.add_mesh_tris(circle_pt_count - 1, 0, circle_pt_count, 1, -8);
+            mass_drawingdata.add_mesh_lines(circle_pt_count - 1, circle_pt_count, 1, -4);
+            mass_drawingdata.add_mesh_tris(circle_pt_count - 1, 0, circle_pt_count, 1, -4);
 
             // Set the shader
             mass_drawingdata.set_shader();

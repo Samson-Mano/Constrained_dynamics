@@ -35,10 +35,13 @@ namespace PBD_pendulum_simulation
         public fedata_store fedata;
 
         // Forms
+        private setmodel_frm model_Form;
         // private animation_control_frm animation_Form;
         private option_frm option_Form;
 
         private int frameCount = 0;
+
+
 
         public main_frm()
         {
@@ -349,7 +352,7 @@ namespace PBD_pendulum_simulation
         {
             while (IsApplicationIdle())
             {
-                //  fedata.UpdateAnimationStep();   // Update animation
+                fedata.UpdateAnimationStep();   // Update animation
                 glControl_main_panel.Invalidate(); // Redraw
             }
         }
@@ -360,6 +363,46 @@ namespace PBD_pendulum_simulation
         }
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void updateModelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Update model
+
+
+            // Check if model_Form is null or disposed
+            if (model_Form == null || model_Form.IsDisposed)
+            {
+                model_Form = new setmodel_frm(ref this.fedata);
+
+                // Make it behave like a tool window
+                model_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                model_Form.ShowInTaskbar = false;
+                model_Form.TopLevel = true;
+                model_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - model_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - model_Form.Height) / 2;
+                model_Form.StartPosition = FormStartPosition.Manual;
+                model_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+            model_Form.initialize_model_form();
+
+            model_Form.Show(this);
+            model_Form.BringToFront();
+
+            glControl_main_panel.Invalidate();
+
+
+        }
+
+        private void animationControlToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }

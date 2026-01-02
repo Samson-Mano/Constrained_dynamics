@@ -35,9 +35,11 @@
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel_IsRefresh = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel_zoom_value = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel_IsRefresh = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusFPSLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.updateModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.animationControlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -75,6 +77,8 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.updateModelToolStripMenuItem,
+            this.animationControlToolStripMenuItem,
             this.optionsToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -107,23 +111,37 @@
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // toolStripStatusLabel_IsRefresh
-            // 
-            this.toolStripStatusLabel_IsRefresh.Name = "toolStripStatusLabel_IsRefresh";
-            this.toolStripStatusLabel_IsRefresh.Size = new System.Drawing.Size(10, 17);
-            this.toolStripStatusLabel_IsRefresh.Text = " ";
-            // 
             // toolStripStatusLabel_zoom_value
             // 
             this.toolStripStatusLabel_zoom_value.Name = "toolStripStatusLabel_zoom_value";
             this.toolStripStatusLabel_zoom_value.Size = new System.Drawing.Size(73, 17);
             this.toolStripStatusLabel_zoom_value.Text = "Zoom: 100%";
             // 
+            // toolStripStatusLabel_IsRefresh
+            // 
+            this.toolStripStatusLabel_IsRefresh.Name = "toolStripStatusLabel_IsRefresh";
+            this.toolStripStatusLabel_IsRefresh.Size = new System.Drawing.Size(10, 17);
+            this.toolStripStatusLabel_IsRefresh.Text = " ";
+            // 
             // toolStripStatusFPSLabel
             // 
             this.toolStripStatusFPSLabel.Name = "toolStripStatusFPSLabel";
             this.toolStripStatusFPSLabel.Size = new System.Drawing.Size(38, 17);
             this.toolStripStatusFPSLabel.Text = "FPS: 0";
+            // 
+            // updateModelToolStripMenuItem
+            // 
+            this.updateModelToolStripMenuItem.Name = "updateModelToolStripMenuItem";
+            this.updateModelToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.updateModelToolStripMenuItem.Text = "Update model";
+            this.updateModelToolStripMenuItem.Click += new System.EventHandler(this.updateModelToolStripMenuItem_Click);
+            // 
+            // animationControlToolStripMenuItem
+            // 
+            this.animationControlToolStripMenuItem.Name = "animationControlToolStripMenuItem";
+            this.animationControlToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.animationControlToolStripMenuItem.Text = "Animation control";
+            this.animationControlToolStripMenuItem.Click += new System.EventHandler(this.animationControlToolStripMenuItem_Click);
             // 
             // main_frm
             // 
@@ -158,6 +176,8 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_zoom_value;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_IsRefresh;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusFPSLabel;
+        private System.Windows.Forms.ToolStripMenuItem updateModelToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem animationControlToolStripMenuItem;
     }
 }
 

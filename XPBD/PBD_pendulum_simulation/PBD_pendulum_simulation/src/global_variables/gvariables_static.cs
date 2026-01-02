@@ -73,6 +73,15 @@ namespace PBD_pendulum_simulation.src.global_variables
 
                 Color color;
 
+                // Color.FromRgb(48, 84, 150)   // Blue accent 1, Darker 25% #305496
+                // Color.FromRgb(32, 56, 100)   // Blue accent 1, Darker 50% #203864
+                // Color.FromRgb(84, 130, 53)   // Green accent 1, Darker 25% #548235
+                // Color.FromRgb(55, 86, 35)    // Green accent 1, Darker 50% #375623
+                // Color.FromRgb(197, 90, 17)   // Orange accent 1, Darker 25% #C55A11
+                // Color.FromRgb(132, 60, 12)   // Orange accent 1, Darker 50% #843C0C
+                // Color.FromRgb(127, 127, 127) // Gray, Accent 3, Darker 25% #7F7F7F
+
+
                 switch (colorId)
                 {
                     case -1:
@@ -84,16 +93,16 @@ namespace PBD_pendulum_simulation.src.global_variables
                         color = Color.Red;
                         break;
                     case -3:
-                        // Spring Color
-                        color = Color.BlueViolet;
+                        // Rigid link
+                        color = Color.FromArgb(55, 86, 35); // Green accent 1, Darker 50%
                         break;
                     case -4:
                         // Mass color
-                        color = Color.Magenta;
+                        color = Color.FromArgb(28, 28, 230); // MS Blue accent 1 Darker 50%
                         break;
                     case -5:
                         // Fixed end color
-                        color = Color.MediumVioletRed;
+                        color = Color.FromArgb(127, 127, 127);
                         break;
                     case -6:
                         // Mass chart color

@@ -33,8 +33,8 @@ namespace PBD_pendulum_simulation.src.fe_objects
         public drawing_events graphic_events_control { get; private set; }
 
         public System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-        private double accumulatedTime = 0.0;
-        private int time_step = 0;
+        // private double accumulatedTime = 0.0;
+        // private int time_step = 0;
 
         // Drawing bound data
         public Vector3 min_bounds = new Vector3(-1);
@@ -107,10 +107,20 @@ namespace PBD_pendulum_simulation.src.fe_objects
             double initial_angle1, double initial_angle2, double initial_angle3)
         {
             // Set the pendulum data
-            pendulum_data = new pendulum_data_store(mass1, mass2, mass3,
-                length1, length2, length3, initial_angle1, initial_angle2, initial_angle3);
+            List<double> masses = new List<double>() { mass1, mass2, mass3 };
+            List<double> lengths = new List<double>() { length1, length2, length3 };
+            List<double> initial_angles_deg = new List<double>() { initial_angle1, initial_angle2, initial_angle3 };
+
+
+            pendulum_data = new pendulum_data_store(masses, lengths, initial_angles_deg);
 
             update_openTK_uniforms(true, true, true);
+
+            gvariables_static.animate_play = true;
+            gvariables_static.animate_pause = false;
+            gvariables_static.animate_stop = false; 
+
+            start_animation();
         }
 
 
@@ -126,14 +136,16 @@ namespace PBD_pendulum_simulation.src.fe_objects
             // Paint the pendulum
             pendulum_data.paint_pendulum();
 
+            // Paint the animation time
+            time_label.paint_dynamic_text();
+
         }
 
 
         public void start_animation()
         {
             // Restart the animation stopwatch
-            time_step = 0;
-            stopwatch.Restart();
+            stopwatch.Start();
 
         }
 
@@ -145,92 +157,37 @@ namespace PBD_pendulum_simulation.src.fe_objects
 
         }
 
+        public void stop_animation()
+        {
+            if (!isModelSet)
+                return;
+
+            // Reset the animation stopwatch and time step
+            stopwatch.Reset();
+            stopwatch.Stop();
+
+            pendulum_data.reset_simulation();
+          
+        }
+
 
         public void UpdateAnimationStep()
         {
-            //if (!isModelSet || !feresults.isResultsStored || !gvariables_static.animate_play)
-            //    return;
+            if (!isModelSet)
+                return;
 
-            //// Results are stored, update the mass position
-            //double elapsedRealTime = stopwatch.Elapsed.TotalSeconds;
-
-            //// How much simulated time should pass this frame?
-            //double desiredSimTime = elapsedRealTime * gvariables_static.animation_speed;
-
-            //// How many FE time steps must we advance?
-            //int stepsToAdvance = (int)(desiredSimTime / feresults.dt);
-
-            //if (stepsToAdvance <= 0) return;
-
-            //// Advance the time step
-            //stopwatch.Restart();
-            //time_step = time_step + stepsToAdvance;
+            // Results are stored, update the mass position
+            double elapsedRealTime = stopwatch.Elapsed.TotalSeconds;
 
 
-            //if (time_step >= feresults.time_step_count)
-            //{
-            //    time_step = 0;
+            if(gvariables_static.animate_play == true)
+            {
+                time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(0.0f, 65.0f)); 
 
-            //    // Reset the graphs
-            //    disp_graph.reset_graph();
-            //    velo_graph.reset_graph();
-            //    accl_graph.reset_graph();
+                pendulum_data.simulate(elapsedRealTime);
 
-            //    phase_portrait.reset_graph();
-
-            //    resultant_potential_graph.reset_graph();
-
-            //}
-
-
-            //// Get the results at time step
-            //double disp = gvariables_static.GetRemap(feresults.max_displacement, feresults.min_displacement,
-            //    1.0, -1.0, feresults.displacement[time_step]);
-            //double velo = gvariables_static.GetRemap(feresults.max_velocity, feresults.min_velocity,
-            //    1.0, -1.0, feresults.velocity[time_step]);
-            //double accl = gvariables_static.GetRemap(feresults.max_acceleration, feresults.min_acceleration,
-            //    1.0, -1.0, feresults.acceleration[time_step]);
-
-            //// Create the screen points
-            //float displ_screenpt = (float)(disp * (displextent * gvariables_static.displacement_scale));
-            //float velo_screenpt = (float)(velo * (veloextent * gvariables_static.velocity_scale));
-            //float accl_screenpt = (float)(accl * (acclextent * gvariables_static.acceleration_scale));
-
-            //// Update the mass position
-            //Vector2 new_mass_loc = new Vector2(0.0f, displ_screenpt);
-            //fe_mass.update_pointmass(new_mass_loc, 1.0f);
-
-            //// update the spring 
-            //fe_spring.update_spring(new_mass_loc, new Vector2(0.0f, -500.0f));
-
-            //// Update the animation vectors
-            //velo_vector.update_vector(new_mass_loc, new_mass_loc + new Vector2(0.0f, 2.0f * velo_screenpt));
-            //accl_vector.update_vector(new_mass_loc, new_mass_loc + new Vector2(0.0f, 2.0f * accl_screenpt));
-
-            //// Update the graphs
-            //disp_graph.update_graph(displ_screenpt);
-            //velo_graph.update_graph(velo_screenpt);
-            //accl_graph.update_graph(accl_screenpt);
-
-            //// Update the phase portrait
-            //float intensity = (float)Math.Abs(velo);
-            //phase_portrait.update_graph(2.0f * velo_screenpt, 2.0f * displ_screenpt, intensity);
-
-            //// Update the labels
-            //time_label.update_text($"Time = {convert_value_to_label(time_step * feresults.dt, 9)} s", new Vector2(0.0f, -450.0f)); ;
-            //disp_label.update_text($"{convert_value_to_label(feresults.displacement[time_step], 12)}", new Vector2(0.0f, displ_screenpt));
-            //velo_label.update_text($"{convert_value_to_label(feresults.velocity[time_step], 12)}", new_mass_loc + new Vector2(0.0f, 2.0f * velo_screenpt));
-            //accl_label.update_text($"{convert_value_to_label(feresults.acceleration[time_step], 12)}", new_mass_loc + new Vector2(0.0f, 2.0f * accl_screenpt));
-
-            //update_potential_vectors();
-
-            //update_potential_vectors_circle(new_mass_loc);
-
-            //// Update the shadow trails
-            //shadow_trail.update_trail_data(new_mass_loc, feresults.velocity[time_step], feresults.acceleration[time_step]);
-
-
-
+            }
+            
         }
 
 
@@ -258,50 +215,6 @@ namespace PBD_pendulum_simulation.src.fe_objects
         }
 
 
-        public void stop_animation()
-        {
-            if (!isModelSet)
-                return;
-            // Reset the animation stopwatch and time step
-            stopwatch.Reset();
-            stopwatch.Stop();
-
-            time_step = 0;
-
-            //// Reset the graphs
-            //disp_graph.reset_graph();
-            //velo_graph.reset_graph();
-            //accl_graph.reset_graph();
-
-            //phase_portrait.reset_graph();
-
-            //// Get the results at time step
-            //double disp = feresults.displacement[time_step] / feresults.displacement_range;
-            //double velo = feresults.velocity[time_step] / feresults.velocity_range;
-            //double accl = feresults.acceleration[time_step] / feresults.acceleration_range;
-
-            //// Create the screen points
-            //float displ_screenpt = (float)(disp * (displextent * gvariables_static.displacement_scale));
-            //float velo_screenpt = (float)(velo * (veloextent * gvariables_static.velocity_scale));
-            //float accl_screenpt = (float)(accl * (acclextent * gvariables_static.acceleration_scale));
-
-            //// Update the mass position
-            //Vector2 new_mass_loc = new Vector2(0.0f, displ_screenpt);
-            //fe_mass.update_pointmass(new_mass_loc, 1.0f);
-
-            //// update the spring 
-            //fe_spring.update_spring(new_mass_loc, new Vector2(0.0f, -500.0f));
-
-            //// Update the animation vectors
-            //velo_vector.update_vector(new_mass_loc, new Vector2(0.0f, velo_screenpt));
-            //accl_vector.update_vector(new_mass_loc, new Vector2(0.0f, accl_screenpt));
-
-            //// Update the phase portrait
-            //phase_portrait.update_graph(velo_screenpt, displ_screenpt, 0.0f);
-
-        }
-
-
 
         public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency)
         {
@@ -325,15 +238,6 @@ namespace PBD_pendulum_simulation.src.fe_objects
 
             // Update text label openTK uniforms
             time_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-                graphic_events_control);
-
-            disp_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-                graphic_events_control);
-
-            velo_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-                graphic_events_control);
-
-            accl_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control);
 
         }

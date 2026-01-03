@@ -111,11 +111,6 @@ namespace PBD_pendulum_simulation.src.fe_objects
             Vector2 p3 = end_pt - (normal * halfWidth);
             Vector2 p4 = start_pt - (normal * halfWidth);
 
-
-
-            rigidlink_drawingdata = new meshdata_store(false);
-
-
             rigidlink_drawingdata.update_mesh_point(0, p1.X, p1.Y, 0.0, -3);
             rigidlink_drawingdata.update_mesh_point(1, p2.X, p2.Y, 0.0, -3);
             rigidlink_drawingdata.update_mesh_point(2, p3.X, p3.Y, 0.0, -3);

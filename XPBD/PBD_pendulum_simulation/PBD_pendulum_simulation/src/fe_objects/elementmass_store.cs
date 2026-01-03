@@ -68,7 +68,7 @@ namespace PBD_pendulum_simulation.src.fe_objects
         {
             // Update the point mass displacement, velocity and acceleration
 
-            float updated_mass_size = ptmass_size * scaled_mass_size;
+            float updated_mass_size = scaled_mass_size;
 
 
             // Update the origin point

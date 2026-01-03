@@ -36,7 +36,7 @@ namespace PBD_pendulum_simulation
 
         // Forms
         private setmodel_frm model_Form;
-        // private animation_control_frm animation_Form;
+        private animation_frm animation_Form;
         private option_frm option_Form;
 
         private int frameCount = 0;
@@ -404,6 +404,34 @@ namespace PBD_pendulum_simulation
 
         private void animationControlToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Control the animation
+
+            // Check if animation_Form is null or disposed
+            if (animation_Form == null || animation_Form.IsDisposed)
+            {
+                animation_Form = new animation_frm(ref this.fedata);
+
+                // Make it behave like a tool window
+                animation_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                animation_Form.ShowInTaskbar = false;
+                animation_Form.TopLevel = true;
+                animation_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - animation_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - animation_Form.Height) / 2;
+                animation_Form.StartPosition = FormStartPosition.Manual;
+                animation_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+            animation_Form.initialize_animation_form();
+
+            animation_Form.Show(this);
+            animation_Form.BringToFront();
+
+            glControl_main_panel.Invalidate();
 
         }
     }

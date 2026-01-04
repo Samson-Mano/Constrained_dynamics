@@ -2,6 +2,7 @@
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using PBD_pendulum_simulation.Properties;
 using PBD_pendulum_simulation.src.events_handler;
 using PBD_pendulum_simulation.src.global_variables;
 using PBD_pendulum_simulation.src.opentk_control.opentk_bgdraw;
@@ -87,8 +88,19 @@ namespace PBD_pendulum_simulation.src.fe_objects
             // (Re)Initialize the data
             fe_fixedend = new elementfixedend_store(new Vector2(0.0f, 0.0f), 270.0f);
 
+            // Settings.Default.Reset();
+            
             // Set the pendulum model
-            set_triple_pendulum_model(10,12,15,100,120,130, 45.0, 80.0, 45.0);
+            set_triple_pendulum_model(Settings.Default.sett_mass1,
+                Settings.Default.sett_mass2, 
+                Settings.Default.sett_mass3, 
+                Settings.Default.sett_length1, 
+                Settings.Default.sett_length2, 
+                Settings.Default.sett_length3, 
+                Settings.Default.sett_initialangle1, 
+                Settings.Default.sett_initialangle2, 
+                Settings.Default.sett_initialangle3);
+
 
             // Initialize the labels 
             time_label = new text_store("Time = 0.0000000 s", new Vector2(0.0f, 0.0f), -3); // Number of character  = 18
@@ -115,6 +127,8 @@ namespace PBD_pendulum_simulation.src.fe_objects
             pendulum_data = new pendulum_data_store(masses, lengths, initial_angles_deg);
 
             update_openTK_uniforms(true, true, true);
+
+            stop_animation();
 
             gvariables_static.animate_play = true;
             gvariables_static.animate_pause = false;

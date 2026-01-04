@@ -3,31 +3,31 @@
   <Profiles />
   <Settings>
     <Setting Name="sett_mass1" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="sett_mass2" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">12</Value>
+      <Value Profile="(Default)">0.5</Value>
     </Setting>
     <Setting Name="sett_mass3" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">15</Value>
+      <Value Profile="(Default)">0.3</Value>
     </Setting>
     <Setting Name="sett_length1" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">0.1</Value>
     </Setting>
     <Setting Name="sett_length2" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">130</Value>
+      <Value Profile="(Default)">0.15</Value>
     </Setting>
     <Setting Name="sett_length3" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">110</Value>
+      <Value Profile="(Default)">0.2</Value>
     </Setting>
     <Setting Name="sett_initialangle1" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">45</Value>
+      <Value Profile="(Default)">90</Value>
     </Setting>
     <Setting Name="sett_initialangle2" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">80</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
     <Setting Name="sett_initialangle3" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">60</Value>
+      <Value Profile="(Default)">180</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -362,11 +362,6 @@ namespace PBD_pendulum_simulation
             Close();
         }
 
-        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void updateModelToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Update model

@@ -49,6 +49,8 @@ namespace PBD_pendulum_simulation.other_windows
 
             }
 
+            checkBox_showtrail.Checked = gvariables_static.is_show_masstrail;
+
         }
 
 
@@ -107,6 +109,11 @@ namespace PBD_pendulum_simulation.other_windows
             fe_data.stop_animation();
 
             label_status.Text = "Stopped";
+        }
+
+        private void checkBox_showtrail_CheckedChanged(object sender, EventArgs e)
+        {
+            gvariables_static.is_show_masstrail = checkBox_showtrail.Checked;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public double sett_mass1 {
             get {
                 return ((double)(this["sett_mass1"]));
@@ -37,7 +37,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("12")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.5")]
         public double sett_mass2 {
             get {
                 return ((double)(this["sett_mass2"]));
@@ -49,7 +49,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.3")]
         public double sett_mass3 {
             get {
                 return ((double)(this["sett_mass3"]));
@@ -61,7 +61,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.1")]
         public double sett_length1 {
             get {
                 return ((double)(this["sett_length1"]));
@@ -73,7 +73,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("130")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.15")]
         public double sett_length2 {
             get {
                 return ((double)(this["sett_length2"]));
@@ -85,7 +85,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("110")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.2")]
         public double sett_length3 {
             get {
                 return ((double)(this["sett_length3"]));
@@ -97,7 +97,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("45")]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
         public double sett_initialangle1 {
             get {
                 return ((double)(this["sett_initialangle1"]));
@@ -109,7 +109,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double sett_initialangle2 {
             get {
                 return ((double)(this["sett_initialangle2"]));
@@ -121,7 +121,7 @@ namespace PBD_pendulum_simulation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
         public double sett_initialangle3 {
             get {
                 return ((double)(this["sett_initialangle3"]));

@@ -203,9 +203,42 @@ namespace String_vibration_openTK
             }
         }
 
+        #region "Menu Items"
+        private void newModelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
 
+        }
 
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
 
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void initialConditionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void nodalLoadsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void modalAnalysisToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void responseAnalysisToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
 
     }
 }

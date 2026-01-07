@@ -29,22 +29,22 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.comboBox_inlcond_type = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.trackBar_startnode = new System.Windows.Forms.TrackBar();
-            this.label3 = new System.Windows.Forms.Label();
-            this.textBox_amplitude = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.comboBox_inerpolation = new System.Windows.Forms.ComboBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.trackBar_endnode = new System.Windows.Forms.TrackBar();
             this.button_add = new System.Windows.Forms.Button();
+            this.trackBar_endnode = new System.Windows.Forms.TrackBar();
+            this.label5 = new System.Windows.Forms.Label();
+            this.comboBox_inerpolation = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBox_amplitude = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.trackBar_startnode = new System.Windows.Forms.TrackBar();
+            this.label2 = new System.Windows.Forms.Label();
+            this.comboBox_inlcond_type = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.button_delete = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar_startnode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_endnode)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_startnode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -68,67 +68,30 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Initial Condition Data: ";
             // 
-            // label1
+            // button_add
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(24, 45);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(161, 17);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Initial condition type: ";
+            this.button_add.Location = new System.Drawing.Point(163, 293);
+            this.button_add.Name = "button_add";
+            this.button_add.Size = new System.Drawing.Size(182, 46);
+            this.button_add.TabIndex = 10;
+            this.button_add.Text = "Add Initial Condition";
+            this.button_add.UseVisualStyleBackColor = true;
             // 
-            // comboBox_inlcond_type
+            // trackBar_endnode
             // 
-            this.comboBox_inlcond_type.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_inlcond_type.FormattingEnabled = true;
-            this.comboBox_inlcond_type.Items.AddRange(new object[] {
-            "Displacement",
-            "Velocity"});
-            this.comboBox_inlcond_type.Location = new System.Drawing.Point(190, 42);
-            this.comboBox_inlcond_type.Name = "comboBox_inlcond_type";
-            this.comboBox_inlcond_type.Size = new System.Drawing.Size(195, 25);
-            this.comboBox_inlcond_type.TabIndex = 1;
+            this.trackBar_endnode.Location = new System.Drawing.Point(129, 232);
+            this.trackBar_endnode.Name = "trackBar_endnode";
+            this.trackBar_endnode.Size = new System.Drawing.Size(379, 45);
+            this.trackBar_endnode.TabIndex = 9;
             // 
-            // label2
+            // label5
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(27, 181);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(96, 17);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Start Node: ";
-            // 
-            // trackBar_startnode
-            // 
-            this.trackBar_startnode.Location = new System.Drawing.Point(129, 181);
-            this.trackBar_startnode.Name = "trackBar_startnode";
-            this.trackBar_startnode.Size = new System.Drawing.Size(379, 45);
-            this.trackBar_startnode.TabIndex = 3;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(95, 87);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(89, 17);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Amplitude: ";
-            // 
-            // textBox_amplitude
-            // 
-            this.textBox_amplitude.Location = new System.Drawing.Point(190, 84);
-            this.textBox_amplitude.Name = "textBox_amplitude";
-            this.textBox_amplitude.Size = new System.Drawing.Size(100, 24);
-            this.textBox_amplitude.TabIndex = 5;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(75, 130);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(109, 17);
-            this.label4.TabIndex = 6;
-            this.label4.Text = "Interpolation: ";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(36, 234);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(87, 17);
+            this.label5.TabIndex = 8;
+            this.label5.Text = "End Node: ";
             // 
             // comboBox_inerpolation
             // 
@@ -144,30 +107,67 @@
             this.comboBox_inerpolation.Size = new System.Drawing.Size(231, 25);
             this.comboBox_inerpolation.TabIndex = 7;
             // 
-            // label5
+            // label4
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(36, 234);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(87, 17);
-            this.label5.TabIndex = 8;
-            this.label5.Text = "End Node: ";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(75, 130);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(109, 17);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Interpolation: ";
             // 
-            // trackBar_endnode
+            // textBox_amplitude
             // 
-            this.trackBar_endnode.Location = new System.Drawing.Point(129, 232);
-            this.trackBar_endnode.Name = "trackBar_endnode";
-            this.trackBar_endnode.Size = new System.Drawing.Size(379, 45);
-            this.trackBar_endnode.TabIndex = 9;
+            this.textBox_amplitude.Location = new System.Drawing.Point(190, 84);
+            this.textBox_amplitude.Name = "textBox_amplitude";
+            this.textBox_amplitude.Size = new System.Drawing.Size(100, 24);
+            this.textBox_amplitude.TabIndex = 5;
             // 
-            // button_add
+            // label3
             // 
-            this.button_add.Location = new System.Drawing.Point(163, 293);
-            this.button_add.Name = "button_add";
-            this.button_add.Size = new System.Drawing.Size(182, 46);
-            this.button_add.TabIndex = 10;
-            this.button_add.Text = "Add Initial Condition";
-            this.button_add.UseVisualStyleBackColor = true;
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(95, 87);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(89, 17);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Amplitude: ";
+            // 
+            // trackBar_startnode
+            // 
+            this.trackBar_startnode.Location = new System.Drawing.Point(129, 181);
+            this.trackBar_startnode.Name = "trackBar_startnode";
+            this.trackBar_startnode.Size = new System.Drawing.Size(379, 45);
+            this.trackBar_startnode.TabIndex = 3;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(27, 181);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(96, 17);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Start Node: ";
+            // 
+            // comboBox_inlcond_type
+            // 
+            this.comboBox_inlcond_type.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_inlcond_type.FormattingEnabled = true;
+            this.comboBox_inlcond_type.Items.AddRange(new object[] {
+            "Displacement",
+            "Velocity"});
+            this.comboBox_inlcond_type.Location = new System.Drawing.Point(190, 42);
+            this.comboBox_inlcond_type.Name = "comboBox_inlcond_type";
+            this.comboBox_inlcond_type.Size = new System.Drawing.Size(195, 25);
+            this.comboBox_inlcond_type.TabIndex = 1;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(24, 45);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(161, 17);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Initial condition type: ";
             // 
             // dataGridView1
             // 
@@ -199,12 +199,14 @@
             this.Controls.Add(this.groupBox1);
             this.Font = new System.Drawing.Font("Verdana", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MinimumSize = new System.Drawing.Size(1032, 435);
             this.Name = "inlcond_frm";
+            this.Opacity = 0.85D;
             this.Text = "Initial Condition";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar_startnode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_endnode)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_startnode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 

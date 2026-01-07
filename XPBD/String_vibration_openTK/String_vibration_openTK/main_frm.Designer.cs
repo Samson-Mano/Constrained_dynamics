@@ -37,6 +37,13 @@
             this.toolStripStatusLabel_IsRefresh = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusFPSLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.glControl_main_panel = new OpenTK.GLControl();
+            this.newModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.preProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.initialConditionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nodalLoadsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.analysisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.modalAnalysisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.responseAnalysisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -44,7 +51,9 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.preProcessingToolStripMenuItem,
+            this.analysisToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(800, 24);
@@ -54,6 +63,7 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newModelToolStripMenuItem,
             this.optionsToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -63,14 +73,16 @@
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.optionsToolStripMenuItem.Text = "Options";
+            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -120,6 +132,59 @@
             this.glControl_main_panel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.glControl_main_panel_MouseMove);
             this.glControl_main_panel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.glControl_main_panel_MouseUp);
             // 
+            // newModelToolStripMenuItem
+            // 
+            this.newModelToolStripMenuItem.Name = "newModelToolStripMenuItem";
+            this.newModelToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newModelToolStripMenuItem.Text = "New Model";
+            this.newModelToolStripMenuItem.Click += new System.EventHandler(this.newModelToolStripMenuItem_Click);
+            // 
+            // preProcessingToolStripMenuItem
+            // 
+            this.preProcessingToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.initialConditionToolStripMenuItem,
+            this.nodalLoadsToolStripMenuItem});
+            this.preProcessingToolStripMenuItem.Name = "preProcessingToolStripMenuItem";
+            this.preProcessingToolStripMenuItem.Size = new System.Drawing.Size(98, 20);
+            this.preProcessingToolStripMenuItem.Text = "Pre-Processing";
+            // 
+            // initialConditionToolStripMenuItem
+            // 
+            this.initialConditionToolStripMenuItem.Name = "initialConditionToolStripMenuItem";
+            this.initialConditionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.initialConditionToolStripMenuItem.Text = "Initial Condition";
+            this.initialConditionToolStripMenuItem.Click += new System.EventHandler(this.initialConditionToolStripMenuItem_Click);
+            // 
+            // nodalLoadsToolStripMenuItem
+            // 
+            this.nodalLoadsToolStripMenuItem.Name = "nodalLoadsToolStripMenuItem";
+            this.nodalLoadsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.nodalLoadsToolStripMenuItem.Text = "Nodal Loads";
+            this.nodalLoadsToolStripMenuItem.Click += new System.EventHandler(this.nodalLoadsToolStripMenuItem_Click);
+            // 
+            // analysisToolStripMenuItem
+            // 
+            this.analysisToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.modalAnalysisToolStripMenuItem,
+            this.responseAnalysisToolStripMenuItem});
+            this.analysisToolStripMenuItem.Name = "analysisToolStripMenuItem";
+            this.analysisToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
+            this.analysisToolStripMenuItem.Text = "Analysis";
+            // 
+            // modalAnalysisToolStripMenuItem
+            // 
+            this.modalAnalysisToolStripMenuItem.Name = "modalAnalysisToolStripMenuItem";
+            this.modalAnalysisToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.modalAnalysisToolStripMenuItem.Text = "Modal Analysis";
+            this.modalAnalysisToolStripMenuItem.Click += new System.EventHandler(this.modalAnalysisToolStripMenuItem_Click);
+            // 
+            // responseAnalysisToolStripMenuItem
+            // 
+            this.responseAnalysisToolStripMenuItem.Name = "responseAnalysisToolStripMenuItem";
+            this.responseAnalysisToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.responseAnalysisToolStripMenuItem.Text = "Response Analysis";
+            this.responseAnalysisToolStripMenuItem.Click += new System.EventHandler(this.responseAnalysisToolStripMenuItem_Click);
+            // 
             // main_frm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -152,6 +217,13 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_IsRefresh;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusFPSLabel;
         private OpenTK.GLControl glControl_main_panel;
+        private System.Windows.Forms.ToolStripMenuItem newModelToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem preProcessingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem initialConditionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nodalLoadsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem analysisToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem modalAnalysisToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem responseAnalysisToolStripMenuItem;
     }
 }
 

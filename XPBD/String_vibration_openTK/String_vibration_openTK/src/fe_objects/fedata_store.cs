@@ -18,7 +18,7 @@ namespace String_vibration_openTK.src.fe_objects
 
     public class fedata_store
     {
-        public pendulum_data_store pendulum_data;
+        public stringdata_store stringintension_data;
 
         public elementfixedend_store fe_fixedend;
 

@@ -1,0 +1,58 @@
+﻿
+        //public string get_data_as_string()
+        //{
+        //    string str = "";
+
+        //    // String in tension model data
+        //    str = str + $"{no_of_nodes}\n";
+        //    str = str + $"{string_tension}\n";
+        //    str = str + $"{string_length}\n";
+        //    str = str + $"{string_density}\n";
+
+        //    // Initial Condition data
+        //    str = str + $"{inlcond_data.Count}\n";
+
+        //    foreach (initialconditiondata_store inldata in inlcond_data)
+        //    {
+        //        str = str + $"{inldata.inlcond_id}\n"; // initial condition id
+        //        str = str + $"{inldata.inlcond_type}\n"; // initial condition type
+
+        //        str = str + $"{inldata.inlcond_nodes.Count}\n"; // Number of nodes initial condition datas are applied to
+
+        //        for (int i = 0; i < inldata.inlcond_nodes.Count; i++)
+        //        {
+        //            str = str + $"{inldata.inlcond_nodes[i]}, {inldata.inlcond_values[i]}\n"; // initial condition node id and value
+        //        }
+
+        //    }
+
+
+        //    // Load data
+        //    str = str + $"{load_data.Count}\n";
+
+        //    foreach (loaddata_store lddata in load_data)
+        //    {
+        //        str = str + $"{lddata.load_id}\n"; // Load id
+        //        str = str + $"{lddata.load_type}\n"; // Load type
+
+        //        str = str + $"{lddata.load_start_time}\n"; // Load start time
+        //        str = str + $"{lddata.load_end_time}\n"; // Load end time
+
+        //        str = str + $"{lddata.load_nodes.Count}\n"; // Number of nodes load datas are applied to
+
+        //        for (int i = 0; i < lddata.load_nodes.Count; i++)
+        //        {
+        //            str = str + $"{lddata.load_nodes[i]}, {lddata.load_values[i]}\n"; // Load node id and value
+        //        }
+
+        //    }
+
+
+
+        //    return str;
+        //}
+
+
+
+
+

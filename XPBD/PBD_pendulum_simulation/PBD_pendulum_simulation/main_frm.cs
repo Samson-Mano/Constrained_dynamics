@@ -172,101 +172,77 @@ namespace PBD_pendulum_simulation
 
         private void glControl_main_panel_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            bool isRefresh = false;
+
             if (e.Button == MouseButtons.Left)
             {
                 // Left button down
-                isRefresh = fedata.graphic_events_control.handleMouseLeftButtonClick(true, e.X, e.Y);
+                fedata.graphic_events_control.handleMouseLeftButtonClick(true, e.X, e.Y);
 
             }
             else if (e.Button == MouseButtons.Right)
             {
                 // Right button down
-                isRefresh = fedata.graphic_events_control.handleMouseRightButtonClick(true, e.X, e.Y);
+                fedata.graphic_events_control.handleMouseRightButtonClick(true, e.X, e.Y);
 
             }
 
-            if (isRefresh == true)
-            {
                 glControl_main_panel.Invalidate();
-
-            }
 
         }
 
         private void glControl_main_panel_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             // Mouse wheel
-            bool isRefresh = fedata.graphic_events_control.handleMouseScroll(e.Delta, e.X, e.Y);
+            fedata.graphic_events_control.handleMouseScroll(e.Delta, e.X, e.Y);
 
-            if (isRefresh == true)
-            {
-                glControl_main_panel.Invalidate();
-
-            }
+            glControl_main_panel.Invalidate();
 
         }
 
         private void glControl_main_panel_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             // Mouse move 
-            bool isRefresh = fedata.graphic_events_control.handleMouseMove(e.X, e.Y);
+            fedata.graphic_events_control.handleMouseMove(e.X, e.Y);
 
-            if (isRefresh == true)
-            {
-                glControl_main_panel.Invalidate();
-
-            }
+            glControl_main_panel.Invalidate();
 
         }
 
         private void glControl_main_panel_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            bool isRefresh = false;
+
             if (e.Button == MouseButtons.Left)
             {
                 // Left button up
-                isRefresh = fedata.graphic_events_control.handleMouseLeftButtonClick(false, e.X, e.Y);
+                fedata.graphic_events_control.handleMouseLeftButtonClick(false, e.X, e.Y);
 
             }
             else if (e.Button == MouseButtons.Right)
             {
                 // Right button up
-                isRefresh = fedata.graphic_events_control.handleMouseRightButtonClick(false, e.X, e.Y);
+                fedata.graphic_events_control.handleMouseRightButtonClick(false, e.X, e.Y);
 
             }
 
-            if (isRefresh == true)
-            {
-                glControl_main_panel.Invalidate();
-            }
-
+            glControl_main_panel.Invalidate();
 
         }
 
         private void glControl_main_panel_KeyDown(object sender, KeyEventArgs e)
         {
             // Keyboard Key Down
-            bool isRefresh = fedata.graphic_events_control.handleKeyboardAction(true, e.KeyValue);
+            fedata.graphic_events_control.handleKeyboardAction(true, e.KeyValue);
 
-            if (isRefresh == true)
-            {
-                glControl_main_panel.Invalidate();
-
-            }
+            glControl_main_panel.Invalidate();
 
         }
 
         private void glControl_main_panel_KeyUp(object sender, KeyEventArgs e)
         {
             // Keyboard Key Up
-            bool isRefresh = fedata.graphic_events_control.handleKeyboardAction(false, e.KeyValue);
+            fedata.graphic_events_control.handleKeyboardAction(false, e.KeyValue);
 
-            if (isRefresh == true)
-            {
-                glControl_main_panel.Invalidate();
-
-            }
+            glControl_main_panel.Invalidate();
 
             // If zoom-to-fit started, start the timer
             if (fedata.graphic_events_control.isZoomToFitInProgress == true)

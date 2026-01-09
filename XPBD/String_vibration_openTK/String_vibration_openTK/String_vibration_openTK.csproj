@@ -122,6 +122,7 @@
     <Compile Include="src\events_handler\drawing_events.cs" />
     <Compile Include="src\events_handler\file_events.cs" />
     <Compile Include="src\fe_objects\elementfixedend_store.cs" />
+    <Compile Include="src\fe_objects\elementstringline_store.cs" />
     <Compile Include="src\fe_objects\fedata_store.cs" />
     <Compile Include="src\fe_objects\stringdata_store.cs" />
     <Compile Include="src\geom_objects\label_list_store.cs" />

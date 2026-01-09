@@ -54,18 +54,35 @@ namespace String_vibration_openTK.src.fe_objects
             Vector2 finalBottomRight = rotatedBottomRight + fixedend_loc;
 
 
+            // Find the points forming the triangle and fixed rectangle base
+            Vector2 tript1 = (finalTopLeft + finalTopRight) * 0.5f;
+
+            Vector2 rectpt_topleft = Vector2.Lerp(finalBottomLeft, finalTopLeft, 0.3f);
+            Vector2 rectpt_topright = Vector2.Lerp(finalBottomRight, finalTopRight, 0.3f);
+
+            Vector2 tript2 = Vector2.Lerp(rectpt_topleft, rectpt_topright, 0.2f);
+            Vector2 tript3 = Vector2.Lerp(rectpt_topleft, rectpt_topright, 0.8f);
+
+
             fixed_drawingdata = new meshdata_store(false);
 
             // Create the geometry
             // Fixed end point
-            fixed_drawingdata.add_mesh_point(0, finalTopLeft.X, finalTopLeft.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(1, finalTopRight.X, finalTopRight.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(2, finalBottomRight.X, finalBottomRight.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(3, finalBottomLeft.X, finalBottomLeft.Y, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(0, tript1.X, tript1.Y, 0.0, -5); // tri pt 1
+            fixed_drawingdata.add_mesh_point(1, tript2.X, tript2.Y, 0.0, -5); // tri pt 2
+            fixed_drawingdata.add_mesh_point(2, tript3.X, tript3.Y, 0.0, -5); // tri pt 3
+
+
+            fixed_drawingdata.add_mesh_point(3, rectpt_topleft.X, rectpt_topleft.Y, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(4, rectpt_topright.X, rectpt_topright.Y, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(5, finalBottomRight.X, finalBottomRight.Y, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(6, finalBottomLeft.X, finalBottomLeft.Y, 0.0, -5);
+
 
             // Fixed end 
             fixed_drawingdata.add_mesh_tris(0, 0, 1, 2, -5);
-            fixed_drawingdata.add_mesh_tris(1, 2, 3, 0, -5);
+            fixed_drawingdata.add_mesh_tris(1, 3, 4, 5, -5);
+            fixed_drawingdata.add_mesh_tris(2, 5, 6, 3, -5);
 
             // Set the shader
             fixed_drawingdata.set_shader();

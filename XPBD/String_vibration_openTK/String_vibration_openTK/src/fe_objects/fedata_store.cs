@@ -18,16 +18,16 @@ namespace String_vibration_openTK.src.fe_objects
 
     public class fedata_store
     {
+
         public stringdata_store stringintension_data;
 
-        public elementfixedend_store fe_fixedend;
+        public elementstringline_store elementstringline_data;
 
-
-        // Drawing labels
-        public text_store time_label;
-        public text_store disp_label;
-        public text_store velo_label;
-        public text_store accl_label;
+        //// Drawing labels
+        //public text_store time_label;
+        //public text_store disp_label;
+        //public text_store velo_label;
+        //public text_store accl_label;
 
 
         // To control the drawing events
@@ -42,8 +42,6 @@ namespace String_vibration_openTK.src.fe_objects
         public Vector3 max_bounds = new Vector3(1);
         public Vector3 geom_bounds = new Vector3(2);
 
-
-        private bool isModelSet = false;
 
 
         public fedata_store()
@@ -85,8 +83,6 @@ namespace String_vibration_openTK.src.fe_objects
 
             gvariables_static.geom_size = this.geom_bounds.Length;
 
-            // (Re)Initialize the data
-            fe_fixedend = new elementfixedend_store(new Vector2(0.0f, 0.0f), 270.0f);
 
             // Settings.Default.Reset();
             
@@ -102,15 +98,31 @@ namespace String_vibration_openTK.src.fe_objects
                 Settings.Default.sett_initialangle3);
 
 
-            // Initialize the labels 
-            time_label = new text_store("Time = 0.0000000 s", new Vector2(0.0f, 0.0f), -3); // Number of character  = 18
-            disp_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -8); // Number of character  = 12
-            velo_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -9); // Number of character  = 12
-            accl_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -10); // Number of character  = 12
-
-            isModelSet = true;
+            //// Initialize the labels 
+            //time_label = new text_store("Time = 0.0000000 s", new Vector2(0.0f, 0.0f), -3); // Number of character  = 18
+            //disp_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -8); // Number of character  = 12
+            //velo_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -9); // Number of character  = 12
+            //accl_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -10); // Number of character  = 12
 
             update_openTK_uniforms(true, true, true);
+
+        }
+
+        public void update_string_in_tension_model()
+        {
+
+        }
+
+        public void update_initial_condition()
+        {
+
+
+        }
+
+
+        public void update_load()
+        {
+
 
         }
 
@@ -140,18 +152,13 @@ namespace String_vibration_openTK.src.fe_objects
 
         public void paint_model()
         {
-            if (!isModelSet)
-                return;
 
-
-            // Paint the three pendulum system
-            fe_fixedend.paint_fixedend();
-
-            // Paint the pendulum
-            pendulum_data.paint_pendulum();
+            // Paint the string in tension
+            elementstringline_data.paint_elementstringline();
+ 
 
             // Paint the animation time
-            time_label.paint_dynamic_text();
+            // time_label.paint_dynamic_text();
 
         }
 
@@ -173,22 +180,18 @@ namespace String_vibration_openTK.src.fe_objects
 
         public void stop_animation()
         {
-            if (!isModelSet)
-                return;
 
             // Reset the animation stopwatch and time step
             stopwatch.Reset();
             stopwatch.Stop();
 
-            pendulum_data.reset_simulation();
+            // pendulum_data.reset_simulation();
           
         }
 
 
         public void UpdateAnimationStep()
         {
-            if (!isModelSet)
-                return;
 
             // Results are stored, update the mass position
             double elapsedRealTime = stopwatch.Elapsed.TotalSeconds;
@@ -198,7 +201,7 @@ namespace String_vibration_openTK.src.fe_objects
             {
                 time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(0.0f, 65.0f)); 
 
-                pendulum_data.simulate(elapsedRealTime);
+                // pendulum_data.simulate(elapsedRealTime);
 
             }
             
@@ -232,27 +235,32 @@ namespace String_vibration_openTK.src.fe_objects
 
         public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency)
         {
-            if (!isModelSet)
-                return;
 
-
-
-            // Update fixed end openTK uniforms
-            fe_fixedend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            // Update the string in tension openTK uniforms
+            elementstringline_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control.projectionMatrix,
                 graphic_events_control.modelMatrix,
                 graphic_events_control.viewMatrix,
                 gvariables_static.geom_transparency);
 
 
-            // Update pendulum openTK uniforms
-            pendulum_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-                graphic_events_control);
+
+            //// Update fixed end openTK uniforms
+            //fe_fixedend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            //    graphic_events_control.projectionMatrix,
+            //    graphic_events_control.modelMatrix,
+            //    graphic_events_control.viewMatrix,
+            //    gvariables_static.geom_transparency);
 
 
-            // Update text label openTK uniforms
-            time_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-                graphic_events_control);
+            //// Update pendulum openTK uniforms
+            //pendulum_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            //    graphic_events_control);
+
+
+            //// Update text label openTK uniforms
+            //time_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            //    graphic_events_control);
 
         }
 

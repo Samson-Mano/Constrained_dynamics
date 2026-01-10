@@ -1,6 +1,6 @@
 ﻿namespace String_vibration_openTK.other_windows
 {
-    partial class model_frm
+    partial class setmodel_frm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,16 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(setmodel_frm));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.button_update_model = new System.Windows.Forms.Button();
-            this.textBox_no_of_nodes = new System.Windows.Forms.TextBox();
-            this.textBox_tension = new System.Windows.Forms.TextBox();
-            this.textBox_length = new System.Windows.Forms.TextBox();
             this.textBox_density = new System.Windows.Forms.TextBox();
+            this.textBox_length = new System.Windows.Forms.TextBox();
+            this.textBox_tension = new System.Windows.Forms.TextBox();
+            this.textBox_no_of_nodes = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.button_update_model = new System.Windows.Forms.Button();
             this.button_cancel = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -59,41 +60,69 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "String in Tension (Fixed both ends)";
             // 
-            // label1
+            // textBox_density
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(54, 42);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(129, 16);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Number of nodes: ";
+            this.textBox_density.Location = new System.Drawing.Point(189, 126);
+            this.textBox_density.Name = "textBox_density";
+            this.textBox_density.Size = new System.Drawing.Size(100, 27);
+            this.textBox_density.TabIndex = 7;
             // 
-            // label2
+            // textBox_length
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(115, 71);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(68, 16);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Tension: ";
+            this.textBox_length.Location = new System.Drawing.Point(189, 97);
+            this.textBox_length.Name = "textBox_length";
+            this.textBox_length.Size = new System.Drawing.Size(100, 27);
+            this.textBox_length.TabIndex = 6;
             // 
-            // label3
+            // textBox_tension
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(120, 100);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(63, 16);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Length: ";
+            this.textBox_tension.Location = new System.Drawing.Point(189, 68);
+            this.textBox_tension.Name = "textBox_tension";
+            this.textBox_tension.Size = new System.Drawing.Size(100, 27);
+            this.textBox_tension.TabIndex = 5;
+            // 
+            // textBox_no_of_nodes
+            // 
+            this.textBox_no_of_nodes.Location = new System.Drawing.Point(189, 39);
+            this.textBox_no_of_nodes.Name = "textBox_no_of_nodes";
+            this.textBox_no_of_nodes.Size = new System.Drawing.Size(100, 27);
+            this.textBox_no_of_nodes.TabIndex = 4;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(120, 129);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(67, 16);
+            this.label4.Size = new System.Drawing.Size(88, 20);
             this.label4.TabIndex = 3;
             this.label4.Text = "Density: ";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(120, 100);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(82, 20);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Length: ";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(115, 71);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(87, 20);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Tension: ";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(54, 42);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(171, 20);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Number of nodes: ";
             // 
             // button_update_model
             // 
@@ -103,34 +132,7 @@
             this.button_update_model.TabIndex = 1;
             this.button_update_model.Text = "Update Model";
             this.button_update_model.UseVisualStyleBackColor = true;
-            // 
-            // textBox_no_of_nodes
-            // 
-            this.textBox_no_of_nodes.Location = new System.Drawing.Point(189, 39);
-            this.textBox_no_of_nodes.Name = "textBox_no_of_nodes";
-            this.textBox_no_of_nodes.Size = new System.Drawing.Size(100, 23);
-            this.textBox_no_of_nodes.TabIndex = 4;
-            // 
-            // textBox_tension
-            // 
-            this.textBox_tension.Location = new System.Drawing.Point(189, 68);
-            this.textBox_tension.Name = "textBox_tension";
-            this.textBox_tension.Size = new System.Drawing.Size(100, 23);
-            this.textBox_tension.TabIndex = 5;
-            // 
-            // textBox_length
-            // 
-            this.textBox_length.Location = new System.Drawing.Point(189, 97);
-            this.textBox_length.Name = "textBox_length";
-            this.textBox_length.Size = new System.Drawing.Size(100, 23);
-            this.textBox_length.TabIndex = 6;
-            // 
-            // textBox_density
-            // 
-            this.textBox_density.Location = new System.Drawing.Point(189, 126);
-            this.textBox_density.Name = "textBox_density";
-            this.textBox_density.Size = new System.Drawing.Size(100, 23);
-            this.textBox_density.TabIndex = 7;
+            this.button_update_model.Click += new System.EventHandler(this.button_update_model_Click);
             // 
             // button_cancel
             // 
@@ -140,19 +142,21 @@
             this.button_cancel.TabIndex = 2;
             this.button_cancel.Text = "Cancel";
             this.button_cancel.UseVisualStyleBackColor = true;
+            this.button_cancel.Click += new System.EventHandler(this.button_cancel_Click);
             // 
-            // model_frm
+            // setmodel_frm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(393, 311);
             this.Controls.Add(this.button_cancel);
             this.Controls.Add(this.button_update_model);
             this.Controls.Add(this.groupBox1);
             this.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MinimumSize = new System.Drawing.Size(409, 350);
-            this.Name = "model_frm";
+            this.Name = "setmodel_frm";
             this.Opacity = 0.85D;
             this.Text = "Update Model";
             this.groupBox1.ResumeLayout(false);

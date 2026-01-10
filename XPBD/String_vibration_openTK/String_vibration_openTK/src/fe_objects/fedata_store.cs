@@ -42,6 +42,7 @@ namespace String_vibration_openTK.src.fe_objects
         public Vector3 max_bounds = new Vector3(1);
         public Vector3 geom_bounds = new Vector3(2);
 
+        private bool isModelSet = false;
 
 
         public fedata_store()
@@ -64,10 +65,10 @@ namespace String_vibration_openTK.src.fe_objects
             // Create the boundary
             List<Vector3> nodePtsList = new List<Vector3>();
 
-            nodePtsList.Add(new Vector3(-500.0f, -500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(-500.0f, 500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(500.0f, 500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(500.0f, -500.0f, 0.0f));
+            nodePtsList.Add(new Vector3(-1250.0f, -400.0f, 0.0f));
+            nodePtsList.Add(new Vector3(-1250.0f, 400.0f, 0.0f));
+            nodePtsList.Add(new Vector3(1250.0f, 400.0f, 0.0f));
+            nodePtsList.Add(new Vector3(1250.0f, -400.0f, 0.0f));
 
 
             // Set the mesh boundaries
@@ -84,18 +85,28 @@ namespace String_vibration_openTK.src.fe_objects
             gvariables_static.geom_size = this.geom_bounds.Length;
 
 
-            // Settings.Default.Reset();
+            // Load the string in tension data
+            stringintension_data = stringdata_store.Load();
+
+
+            update_string_in_tension_model();
+            update_initial_condition();
+            update_load();
+
+            isModelSet = true;  
+
+            //// Settings.Default.Reset();
             
-            // Set the pendulum model
-            set_triple_pendulum_model(Settings.Default.sett_mass1,
-                Settings.Default.sett_mass2, 
-                Settings.Default.sett_mass3, 
-                Settings.Default.sett_length1, 
-                Settings.Default.sett_length2, 
-                Settings.Default.sett_length3, 
-                Settings.Default.sett_initialangle1, 
-                Settings.Default.sett_initialangle2, 
-                Settings.Default.sett_initialangle3);
+            //// Set the pendulum model
+            //set_triple_pendulum_model(Settings.Default.sett_mass1,
+            //    Settings.Default.sett_mass2, 
+            //    Settings.Default.sett_mass3, 
+            //    Settings.Default.sett_length1, 
+            //    Settings.Default.sett_length2, 
+            //    Settings.Default.sett_length3, 
+            //    Settings.Default.sett_initialangle1, 
+            //    Settings.Default.sett_initialangle2, 
+            //    Settings.Default.sett_initialangle3);
 
 
             //// Initialize the labels 
@@ -108,13 +119,51 @@ namespace String_vibration_openTK.src.fe_objects
 
         }
 
+
         public void update_string_in_tension_model()
         {
+            isModelSet = false;
+
+            // (Re)Create string in tension visualization data
+            Vector2 start_loc = new Vector2(-1000.0f, 0.0f);
+            Vector2 end_loc = new Vector2(1000.0f, 0.0f);
+            int segment_count = stringintension_data.no_of_nodes - 1;
+
+            elementstringline_data = new elementstringline_store(start_loc, end_loc, segment_count);
+
+            isModelSet = true;
+
+            update_openTK_uniforms(true, true, true);
 
         }
 
+
         public void update_initial_condition()
         {
+            // Find the absolute maximum displacement and absolute maximum velocity
+            double abs_max_displ_val = 0.0;
+            double abs_max_velo_val = 0.0;  
+
+            foreach( initialconditiondata_store inlcond in stringintension_data.inlcond_data)
+            {
+                if(inlcond.inlcond_type == 0)
+                {
+                    // Displacement
+                    abs_max_displ_val = Math.Max(abs_max_displ_val, inlcond.abs_max_value);
+
+                }
+
+                if(inlcond.inlcond_type == 1)
+                {
+                    // Velocity
+                    abs_max_velo_val = Math.Max(abs_max_velo_val, inlcond.abs_max_value);
+
+                }
+
+            }
+
+
+
 
 
         }
@@ -122,36 +171,48 @@ namespace String_vibration_openTK.src.fe_objects
 
         public void update_load()
         {
+            // Find the absolute maximum load
+            double abs_max_load_val = 0.0;
+
+            foreach ( loaddata_store ld in stringintension_data.load_data)
+            {
+                // Load value
+                abs_max_load_val = Math.Max(abs_max_load_val, ld.abs_max_value);
+
+            }
+
+
 
 
         }
 
-        public void set_triple_pendulum_model(double mass1, double mass2, double mass3,
-            double length1, double length2, double length3,
-            double initial_angle1, double initial_angle2, double initial_angle3)
-        {
-            // Set the pendulum data
-            List<double> masses = new List<double>() { mass1, mass2, mass3 };
-            List<double> lengths = new List<double>() { length1, length2, length3 };
-            List<double> initial_angles_deg = new List<double>() { initial_angle1, initial_angle2, initial_angle3 };
+        //public void set_triple_pendulum_model(double mass1, double mass2, double mass3,
+        //    double length1, double length2, double length3,
+        //    double initial_angle1, double initial_angle2, double initial_angle3)
+        //{
+        //    // Set the pendulum data
+        //    List<double> masses = new List<double>() { mass1, mass2, mass3 };
+        //    List<double> lengths = new List<double>() { length1, length2, length3 };
+        //    List<double> initial_angles_deg = new List<double>() { initial_angle1, initial_angle2, initial_angle3 };
 
 
-            pendulum_data = new pendulum_data_store(masses, lengths, initial_angles_deg);
+        //    pendulum_data = new pendulum_data_store(masses, lengths, initial_angles_deg);
 
-            update_openTK_uniforms(true, true, true);
+        //    update_openTK_uniforms(true, true, true);
 
-            stop_animation();
+        //    stop_animation();
 
-            gvariables_static.animate_play = true;
-            gvariables_static.animate_pause = false;
-            gvariables_static.animate_stop = false; 
+        //    gvariables_static.animate_play = true;
+        //    gvariables_static.animate_pause = false;
+        //    gvariables_static.animate_stop = false; 
 
-            start_animation();
-        }
+        //    start_animation();
+        //}
 
 
         public void paint_model()
         {
+            if (!isModelSet) return;
 
             // Paint the string in tension
             elementstringline_data.paint_elementstringline();
@@ -199,7 +260,7 @@ namespace String_vibration_openTK.src.fe_objects
 
             if(gvariables_static.animate_play == true)
             {
-                time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(0.0f, 65.0f)); 
+                // time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(0.0f, 65.0f)); 
 
                 // pendulum_data.simulate(elapsedRealTime);
 
@@ -235,6 +296,7 @@ namespace String_vibration_openTK.src.fe_objects
 
         public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency)
         {
+            if(!isModelSet) return;
 
             // Update the string in tension openTK uniforms
             elementstringline_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,

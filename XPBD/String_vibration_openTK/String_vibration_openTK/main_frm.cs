@@ -35,8 +35,11 @@ namespace String_vibration_openTK
         // main spring mass data store
         public fedata_store fedata;
 
-        //// Forms
-        //private setmodel_frm model_Form;
+        // Forms
+        private setmodel_frm setmodel_Form;
+        private inlcond_frm inlcond_Form;
+        private load_frm load_Form;
+
         //private animation_frm animation_Form;
         //private option_frm option_Form;
 
@@ -338,32 +341,123 @@ namespace String_vibration_openTK
         private void newModelToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+            // Check if model_Form is null or disposed
+            if (setmodel_Form == null || setmodel_Form.IsDisposed)
+            {
+                setmodel_Form = new setmodel_frm(ref this.fedata);
+
+                // Make it behave like a tool window
+                setmodel_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                setmodel_Form.ShowInTaskbar = false;
+                setmodel_Form.TopLevel = true;
+                setmodel_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - setmodel_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - setmodel_Form.Height) / 2;
+                setmodel_Form.StartPosition = FormStartPosition.Manual;
+                setmodel_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+            setmodel_Form.initialize_model_form();
+
+            setmodel_Form.Show(this);
+            setmodel_Form.BringToFront();
+
+            glControl_main_panel.Invalidate();
+
+
         }
+
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
 
+
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Close();
 
         }
+
 
         private void initialConditionToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+            // Check if inlcond_Form is null or disposed
+            if (inlcond_Form == null || inlcond_Form.IsDisposed)
+            {
+                inlcond_Form = new inlcond_frm(ref this.fedata);
+
+                // Make it behave like a tool window
+                inlcond_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                inlcond_Form.ShowInTaskbar = false;
+                inlcond_Form.TopLevel = true;
+                inlcond_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - inlcond_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - inlcond_Form.Height) / 2;
+                inlcond_Form.StartPosition = FormStartPosition.Manual;
+                inlcond_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+            inlcond_Form.initialize_initialcondition_form();
+
+            inlcond_Form.Show(this);
+            inlcond_Form.BringToFront();
+
+            inlcond_Form.Invalidate();
+
+
         }
+
 
         private void nodalLoadsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+            // Check if load_Form is null or disposed
+            if (load_Form == null || load_Form.IsDisposed)
+            {
+                load_Form = new load_frm(ref this.fedata);
+
+                // Make it behave like a tool window
+                load_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                load_Form.ShowInTaskbar = false;
+                load_Form.TopLevel = true;
+                load_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - load_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - load_Form.Height) / 2;
+                load_Form.StartPosition = FormStartPosition.Manual;
+                load_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+            load_Form.initialize_load_form();
+
+            load_Form.Show(this);
+            load_Form.BringToFront();
+
+            load_Form.Invalidate();
+
+
         }
+
 
         private void modalAnalysisToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
+
 
         private void responseAnalysisToolStripMenuItem_Click(object sender, EventArgs e)
         {

@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using String_vibration_openTK.src.geom_objects;
+using String_vibration_openTK.src.global_variables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +20,13 @@ namespace String_vibration_openTK.src.fe_objects
         public elementstringline_store(Vector2 start_loc, Vector2 end_loc, int segmentCount) 
         {
             const int node_color = -3;
-            const int linesegment_color = -3;
+            const int linesegment_color = -4;
+
+            stringline_drawingdata = new meshdata_store(false);
 
             stringline_drawingdata.add_mesh_point(0, start_loc.X, start_loc.Y, 0.0f, node_color);
 
-            float invSegments = 1.0f / segmentCount;
+            float invSegments = 1.0f / (float)segmentCount;
 
             for (int i = 0; i < segmentCount; i++)
             {
@@ -40,8 +43,8 @@ namespace String_vibration_openTK.src.fe_objects
             }
 
             // Set the fixed ends at the end of the string in tension
-            fixedend_left = new elementfixedend_store(start_loc, 90.0f);
-            fixedend_right = new elementfixedend_store(end_loc, 90.0f);
+            fixedend_left = new elementfixedend_store(start_loc, 0.0f);
+            fixedend_right = new elementfixedend_store(end_loc, 0.0f);
 
 
             // Set the shader
@@ -61,8 +64,14 @@ namespace String_vibration_openTK.src.fe_objects
             fixedend_right.paint_fixedend();
 
             // Paint the string in tension (Line and nodes)
+            gvariables_static.LineWidth = 2.0f;
+            gvariables_static.PointSize = 6.0f;
+
             stringline_drawingdata.paint_static_mesh_lines();
             stringline_drawingdata.paint_static_mesh_points();
+
+            gvariables_static.LineWidth = 1.0f;
+            gvariables_static.PointSize = 1.0f;
 
         }
 

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(modal_frm));
             this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -36,18 +37,19 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(43, 58);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(139, 16);
+            this.label1.Size = new System.Drawing.Size(181, 20);
             this.label1.TabIndex = 0;
             this.label1.Text = "Natural Frequency: ";
             // 
             // modal_frm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(609, 344);
             this.Controls.Add(this.label1);
             this.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "modal_frm";
             this.Text = "Modal Analysis Results";
             this.ResumeLayout(false);

@@ -55,6 +55,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>innx_icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -105,11 +108,11 @@
     <Compile Include="other_windows\modal_frm.Designer.cs">
       <DependentUpon>modal_frm.cs</DependentUpon>
     </Compile>
-    <Compile Include="other_windows\model_frm.cs">
+    <Compile Include="other_windows\setmodel_frm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="other_windows\model_frm.Designer.cs">
-      <DependentUpon>model_frm.cs</DependentUpon>
+    <Compile Include="other_windows\setmodel_frm.Designer.cs">
+      <DependentUpon>setmodel_frm.cs</DependentUpon>
     </Compile>
     <Compile Include="other_windows\resp_frm.cs">
       <SubType>Form</SubType>
@@ -119,6 +122,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Resource_font.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource_font.resx</DependentUpon>
+    </Compile>
     <Compile Include="src\events_handler\drawing_events.cs" />
     <Compile Include="src\events_handler\file_events.cs" />
     <Compile Include="src\fe_objects\elementfixedend_store.cs" />
@@ -152,8 +160,8 @@
     <EmbeddedResource Include="other_windows\modal_frm.resx">
       <DependentUpon>modal_frm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="other_windows\model_frm.resx">
-      <DependentUpon>model_frm.cs</DependentUpon>
+    <EmbeddedResource Include="other_windows\setmodel_frm.resx">
+      <DependentUpon>setmodel_frm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="other_windows\resp_frm.resx">
       <DependentUpon>resp_frm.cs</DependentUpon>
@@ -167,6 +175,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Resources\Resource_font.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource_font.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -178,14 +190,21 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\FreeSans.ttf" />
+    <None Include="Resources\HyperFont.ttf" />
+    <None Include="stringdata.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="freetype6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="innx_icon.ico" />
     <Content Include="src\global_variables\junk.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

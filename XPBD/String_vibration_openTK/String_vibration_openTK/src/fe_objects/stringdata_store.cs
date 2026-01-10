@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using OpenTK.Graphics.ES11;
+using SharpFont;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using OpenTK.Graphics.ES11;
 
 namespace String_vibration_openTK.src.fe_objects
 {
@@ -30,6 +30,8 @@ namespace String_vibration_openTK.src.fe_objects
         public List<int> inlcond_nodes { get; set; } = new List<int>(); // Initial condition nodes
         public List<double> inlcond_values { get; set; } = new List<double>(); // Initial condition values
 
+        public double abs_max_value { get; set; }
+
     }
 
 
@@ -46,6 +48,9 @@ namespace String_vibration_openTK.src.fe_objects
         public List<int> load_nodes { get; set; } = new List<int>(); // Load nodes
         public List<double> load_values { get; set; } = new List<double>(); // Load values
 
+
+        public double abs_max_value { get; set; }
+
     }
 
 
@@ -60,6 +65,23 @@ namespace String_vibration_openTK.src.fe_objects
 
         public List<initialconditiondata_store> inlcond_data { get; set; } = new List<initialconditiondata_store>();
         public List<loaddata_store> load_data { get; set; } = new List<loaddata_store>();
+
+
+       //public stringdata_store()
+       // {
+       //     stringdata_store st_data = Load();
+
+       //     // Load the data
+       //     this.no_of_nodes = st_data.no_of_nodes;
+       //     this.string_tension = st_data.string_tension;
+       //     this.string_length = st_data.string_length;
+       //     this.string_density = st_data.string_density;
+
+       //     this.inlcond_data = st_data.inlcond_data;
+       //     this.load_data = st_data.load_data;
+
+       // }
+
 
         // -------------------------
         // UPDATE MODEL
@@ -83,12 +105,20 @@ namespace String_vibration_openTK.src.fe_objects
         // -------------------------
         public void add_initial_condition(int inlcond_id, int inlcond_type, List<int> inlcond_nodes, List<double> inlcond_values)
         {
+            // Find the absolution maximum value in the input initial condition values
+            double abs_max_value = 0;
+            foreach (double ival in inlcond_nodes)
+            {
+                abs_max_value = Math.Max(abs_max_value,Math.Abs(ival));
+            }
+
             inlcond_data.Add(new initialconditiondata_store()
             {
                 inlcond_id = inlcond_id,
                 inlcond_type = inlcond_type,
                 inlcond_nodes = new List<int>(inlcond_nodes),
-                inlcond_values = new List<double>(inlcond_values)
+                inlcond_values = new List<double>(inlcond_values),
+                abs_max_value = abs_max_value
             });
         }
 
@@ -108,6 +138,13 @@ namespace String_vibration_openTK.src.fe_objects
         public void add_load(int load_id, int load_type, double load_start_time,
             double load_end_time, List<int> load_nodes, List<double> load_values)
         {
+            // Find the absolution maximum value in the input load values
+            double abs_max_value = 0;
+            foreach (double ldval in load_values)
+            {
+                abs_max_value = Math.Max(abs_max_value, Math.Abs(ldval));
+            }
+
             load_data.Add(new loaddata_store()
             {
                 load_id = load_id,
@@ -115,7 +152,8 @@ namespace String_vibration_openTK.src.fe_objects
                 load_start_time = load_start_time,
                 load_end_time = load_end_time,
                 load_nodes = new List<int>(load_nodes),
-                load_values = new List<double>(load_values)
+                load_values = new List<double>(load_values),
+                abs_max_value = abs_max_value
             });
         }
 
@@ -131,7 +169,7 @@ namespace String_vibration_openTK.src.fe_objects
         // -------------------------
         // DEFAULT INITIALIZATION
         // -------------------------
-        public static stringdata_store CreateDefault()
+        private static stringdata_store CreateDefault()
         {
             return new stringdata_store
             {
@@ -149,23 +187,25 @@ namespace String_vibration_openTK.src.fe_objects
         {
             try
             {
-                if (!Directory.Exists(AppPaths.AppFolder))
-                    Directory.CreateDirectory(AppPaths.AppFolder);
+                string filePath = Path.Combine(
+                    AppContext.BaseDirectory,
+                    "stringdata.json"   // <= your JSON file name
+                );
 
-                if (!File.Exists(AppPaths.StringDataFile))
+                if (!File.Exists(filePath))
                 {
-                    var def = CreateDefault();
-                    def.Save();
-                    return def;
+                    // JSON missing => fallback to defaults
+                    return CreateDefault();
                 }
 
-                string json = File.ReadAllText(AppPaths.StringDataFile);
+                string json = File.ReadAllText(filePath);
+
                 return JsonConvert.DeserializeObject<stringdata_store>(json)
                        ?? CreateDefault();
             }
-            catch
+            catch (Exception ex)
             {
-                // Failsafe
+                // Optional: log ex.Message for debugging
                 return CreateDefault();
             }
         }
@@ -175,11 +215,13 @@ namespace String_vibration_openTK.src.fe_objects
         // -------------------------
         public void Save()
         {
-            if (!Directory.Exists(AppPaths.AppFolder))
-                Directory.CreateDirectory(AppPaths.AppFolder);
+            string filePath = Path.Combine(
+                    AppContext.BaseDirectory,
+                    "stringdata.json"
+                );
 
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
-            File.WriteAllText(AppPaths.StringDataFile, json);
+            File.WriteAllText(filePath, json);
         }
 
     }

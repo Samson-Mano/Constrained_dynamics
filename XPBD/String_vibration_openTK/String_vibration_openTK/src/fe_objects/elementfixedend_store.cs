@@ -12,7 +12,7 @@ namespace String_vibration_openTK.src.fe_objects
 {
     public class elementfixedend_store
     {
-        const float fixed_end_width = 30.0f;
+        const float fixed_end_width = 60.0f;
 
         // Fixed end drawing data
         meshdata_store fixed_drawingdata;
@@ -66,23 +66,25 @@ namespace String_vibration_openTK.src.fe_objects
 
             fixed_drawingdata = new meshdata_store(false);
 
+            const int constraint_color_code = -5;
+
             // Create the geometry
             // Fixed end point
-            fixed_drawingdata.add_mesh_point(0, tript1.X, tript1.Y, 0.0, -5); // tri pt 1
-            fixed_drawingdata.add_mesh_point(1, tript2.X, tript2.Y, 0.0, -5); // tri pt 2
-            fixed_drawingdata.add_mesh_point(2, tript3.X, tript3.Y, 0.0, -5); // tri pt 3
+            fixed_drawingdata.add_mesh_point(0, tript1.X, tript1.Y, 0.0, constraint_color_code); // tri pt 1
+            fixed_drawingdata.add_mesh_point(1, tript2.X, tript2.Y, 0.0, constraint_color_code); // tri pt 2
+            fixed_drawingdata.add_mesh_point(2, tript3.X, tript3.Y, 0.0, constraint_color_code); // tri pt 3
 
 
-            fixed_drawingdata.add_mesh_point(3, rectpt_topleft.X, rectpt_topleft.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(4, rectpt_topright.X, rectpt_topright.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(5, finalBottomRight.X, finalBottomRight.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(6, finalBottomLeft.X, finalBottomLeft.Y, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(3, rectpt_topleft.X, rectpt_topleft.Y, 0.0, constraint_color_code);
+            fixed_drawingdata.add_mesh_point(4, rectpt_topright.X, rectpt_topright.Y, 0.0, constraint_color_code);
+            fixed_drawingdata.add_mesh_point(5, finalBottomRight.X, finalBottomRight.Y, 0.0, constraint_color_code);
+            fixed_drawingdata.add_mesh_point(6, finalBottomLeft.X, finalBottomLeft.Y, 0.0, constraint_color_code);
 
 
             // Fixed end 
-            fixed_drawingdata.add_mesh_tris(0, 0, 1, 2, -5);
-            fixed_drawingdata.add_mesh_tris(1, 3, 4, 5, -5);
-            fixed_drawingdata.add_mesh_tris(2, 5, 6, 3, -5);
+            fixed_drawingdata.add_mesh_tris(0, 0, 1, 2, constraint_color_code);
+            fixed_drawingdata.add_mesh_tris(1, 3, 4, 5, constraint_color_code);
+            fixed_drawingdata.add_mesh_tris(2, 5, 6, 3, constraint_color_code);
 
             // Set the shader
             fixed_drawingdata.set_shader();

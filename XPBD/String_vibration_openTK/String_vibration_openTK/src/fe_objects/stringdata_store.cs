@@ -149,7 +149,7 @@ namespace String_vibration_openTK.src.fe_objects
         // -------------------------
         // ADD/ DELETE LOAD
         // -------------------------
-        public void add_load(int load_id, int load_type, double load_start_time,
+        public void add_load(int load_type, double load_start_time,
             double load_end_time, List<int> load_nodes, List<double> load_values)
         {
             // Find the absolution maximum value in the input load values
@@ -158,6 +158,11 @@ namespace String_vibration_openTK.src.fe_objects
             {
                 abs_max_value = Math.Max(abs_max_value, Math.Abs(ldval));
             }
+
+            // Get unique load ID
+            int load_id = gvariables_static.get_unique_id(load_ids);
+            load_ids.Add(load_id);
+
 
             load_data.Add(new loaddata_store()
             {
@@ -176,6 +181,7 @@ namespace String_vibration_openTK.src.fe_objects
         {
 
             load_data.Remove(load_data.Find(e => e.load_id == load_id));
+            load_ids.Remove(load_id);
 
         }
 

@@ -26,6 +26,7 @@ namespace String_vibration_openTK.src.fe_objects
         public inlconddrawingdata_store inldispldrawing_data;
         public inlconddrawingdata_store inlvelodrawing_data;
 
+        public loaddrawingdata_store loaddrawing_data;
 
         //// Drawing labels
         //public text_store time_label;
@@ -136,6 +137,7 @@ namespace String_vibration_openTK.src.fe_objects
             elementstringline_data = new stringlinedrawingdata_store(start_loc, end_loc, segment_count);
 
             update_initial_condition();
+            update_load();
 
             isModelSet = true;
 
@@ -213,8 +215,22 @@ namespace String_vibration_openTK.src.fe_objects
 
             }
 
+            Vector2 start_loc = new Vector2(-1000.0f, 0.0f);
+            Vector2 end_loc = new Vector2(1000.0f, 0.0f);
 
 
+            loaddrawing_data = new loaddrawingdata_store(start_loc, end_loc, stringintension_data.no_of_nodes - 1);
+
+            // Reset the drawing data
+            foreach (loaddata_store load in stringintension_data.load_data)
+            {
+                    loaddrawing_data.add_load(load.load_id,
+                         load.load_nodes, load.load_values, abs_max_load_val);
+
+            }
+
+
+            update_openTK_uniforms(true, true, true);
 
         }
 
@@ -249,8 +265,12 @@ namespace String_vibration_openTK.src.fe_objects
             // Paint the string in tension
             elementstringline_data.paint_elementstringline();
             
+            // Paint the initial condition data
             inldispldrawing_data.paint_inlconddrawing();
             inlvelodrawing_data.paint_inlconddrawing();
+
+            // Paint the load data
+            loaddrawing_data.paint_loaddrawing();
 
             // Paint the animation time
             // time_label.paint_dynamic_text();
@@ -354,6 +374,11 @@ namespace String_vibration_openTK.src.fe_objects
                 gvariables_static.geom_transparency);
 
 
+            loaddrawing_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
 
 
             //// Update fixed end openTK uniforms

@@ -30,6 +30,8 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(load_frm));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label_endnode = new System.Windows.Forms.Label();
+            this.label_startnode = new System.Windows.Forms.Label();
             this.comboBox_pulse_option = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.textBox_endtime = new System.Windows.Forms.TextBox();
@@ -46,13 +48,18 @@
             this.trackBar_startnode = new System.Windows.Forms.TrackBar();
             this.label2 = new System.Windows.Forms.Label();
             this.button_delete = new System.Windows.Forms.Button();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.label_startnode = new System.Windows.Forms.Label();
-            this.label_endnode = new System.Windows.Forms.Label();
+            this.dataGridView_load = new System.Windows.Forms.DataGridView();
+            this.Column_loadid = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_loadtype = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_startnode = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_endnode = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_ampl = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_starttime = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_endtime = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_endnode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_startnode)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_load)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -80,6 +87,24 @@
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Loads Data: ";
+            // 
+            // label_endnode
+            // 
+            this.label_endnode.AutoSize = true;
+            this.label_endnode.Location = new System.Drawing.Point(486, 262);
+            this.label_endnode.Name = "label_endnode";
+            this.label_endnode.Size = new System.Drawing.Size(15, 16);
+            this.label_endnode.TabIndex = 18;
+            this.label_endnode.Text = "0";
+            // 
+            // label_startnode
+            // 
+            this.label_startnode.AutoSize = true;
+            this.label_startnode.Location = new System.Drawing.Point(487, 209);
+            this.label_startnode.Name = "label_startnode";
+            this.label_startnode.Size = new System.Drawing.Size(15, 16);
+            this.label_startnode.TabIndex = 17;
+            this.label_startnode.Text = "0";
             // 
             // comboBox_pulse_option
             // 
@@ -231,44 +256,88 @@
             this.button_delete.UseVisualStyleBackColor = true;
             this.button_delete.Click += new System.EventHandler(this.button_delete_Click);
             // 
-            // dataGridView1
+            // dataGridView_load
             // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(549, 29);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.Size = new System.Drawing.Size(455, 265);
-            this.dataGridView1.TabIndex = 4;
+            this.dataGridView_load.AllowUserToAddRows = false;
+            this.dataGridView_load.AllowUserToDeleteRows = false;
+            this.dataGridView_load.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_load.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column_loadid,
+            this.Column_loadtype,
+            this.Column_startnode,
+            this.Column_endnode,
+            this.Column_ampl,
+            this.Column_starttime,
+            this.Column_endtime});
+            this.dataGridView_load.Location = new System.Drawing.Point(549, 29);
+            this.dataGridView_load.Name = "dataGridView_load";
+            this.dataGridView_load.ReadOnly = true;
+            this.dataGridView_load.RowHeadersWidth = 51;
+            this.dataGridView_load.Size = new System.Drawing.Size(512, 265);
+            this.dataGridView_load.TabIndex = 4;
             // 
-            // label_startnode
+            // Column_loadid
             // 
-            this.label_startnode.AutoSize = true;
-            this.label_startnode.Location = new System.Drawing.Point(487, 209);
-            this.label_startnode.Name = "label_startnode";
-            this.label_startnode.Size = new System.Drawing.Size(15, 16);
-            this.label_startnode.TabIndex = 17;
-            this.label_startnode.Text = "0";
+            this.Column_loadid.FillWeight = 50F;
+            this.Column_loadid.HeaderText = "ID";
+            this.Column_loadid.Name = "Column_loadid";
+            this.Column_loadid.ReadOnly = true;
+            this.Column_loadid.Width = 50;
             // 
-            // label_endnode
+            // Column_loadtype
             // 
-            this.label_endnode.AutoSize = true;
-            this.label_endnode.Location = new System.Drawing.Point(486, 262);
-            this.label_endnode.Name = "label_endnode";
-            this.label_endnode.Size = new System.Drawing.Size(15, 16);
-            this.label_endnode.TabIndex = 18;
-            this.label_endnode.Text = "0";
+            this.Column_loadtype.HeaderText = "Load Type";
+            this.Column_loadtype.Name = "Column_loadtype";
+            this.Column_loadtype.ReadOnly = true;
+            // 
+            // Column_startnode
+            // 
+            this.Column_startnode.FillWeight = 50F;
+            this.Column_startnode.HeaderText = "Start Node";
+            this.Column_startnode.Name = "Column_startnode";
+            this.Column_startnode.ReadOnly = true;
+            this.Column_startnode.Width = 50;
+            // 
+            // Column_endnode
+            // 
+            this.Column_endnode.FillWeight = 50F;
+            this.Column_endnode.HeaderText = "End Node";
+            this.Column_endnode.Name = "Column_endnode";
+            this.Column_endnode.ReadOnly = true;
+            this.Column_endnode.Width = 50;
+            // 
+            // Column_ampl
+            // 
+            this.Column_ampl.FillWeight = 50F;
+            this.Column_ampl.HeaderText = "Amplitude";
+            this.Column_ampl.Name = "Column_ampl";
+            this.Column_ampl.ReadOnly = true;
+            this.Column_ampl.Width = 50;
+            // 
+            // Column_starttime
+            // 
+            this.Column_starttime.FillWeight = 50F;
+            this.Column_starttime.HeaderText = "Start Time";
+            this.Column_starttime.Name = "Column_starttime";
+            this.Column_starttime.ReadOnly = true;
+            this.Column_starttime.Width = 50;
+            // 
+            // Column_endtime
+            // 
+            this.Column_endtime.FillWeight = 50F;
+            this.Column_endtime.HeaderText = "End Time";
+            this.Column_endtime.Name = "Column_endtime";
+            this.Column_endtime.ReadOnly = true;
+            this.Column_endtime.Width = 50;
             // 
             // load_frm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1016, 415);
+            this.ClientSize = new System.Drawing.Size(1073, 415);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button_delete);
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.dataGridView_load);
             this.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
@@ -280,7 +349,7 @@
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_endnode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_startnode)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_load)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -302,10 +371,17 @@
         private System.Windows.Forms.TrackBar trackBar_startnode;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button_delete;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView dataGridView_load;
         private System.Windows.Forms.ComboBox comboBox_pulse_option;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label_endnode;
         private System.Windows.Forms.Label label_startnode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_loadid;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_loadtype;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_startnode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_endnode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_ampl;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_starttime;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_endtime;
     }
 }

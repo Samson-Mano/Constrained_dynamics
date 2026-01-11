@@ -221,7 +221,7 @@ namespace String_vibration_openTK.other_windows
                 mainForm.CallFrom_inpt_frms();
             }
 
-                    }
+        }
 
 
         private void button_delete_Click(object sender, EventArgs e)

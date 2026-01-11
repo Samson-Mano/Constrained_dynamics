@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 namespace String_vibration_openTK.src.fe_objects
 {
 
-
-
     public class inlconddrawingdata_store
     {
         // initial condition drawing data

@@ -47,12 +47,13 @@ namespace String_vibration_openTK.src.geom_objects
         public Shader label_shader;
 
 
-        public label_list_store()
+        public label_list_store(float font_size)
         {
             // (Re)Initialize the data
             labelMap = new Dictionary<int, label_store>();
             label_count = 0;
             total_char_count = 0;
+            this.font_size = font_size;
 
         }
 
@@ -198,31 +199,32 @@ namespace String_vibration_openTK.src.geom_objects
 
 
         public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency,
-                                    drawing_events graphic_events_control)
+                                      Matrix4 projectionMatrix, Matrix4 modelMatrix, Matrix4 viewMatrix,
+                                        float geom_transparency)
         {
 
             // Update the openGl uniform matrices
             if (set_modelmatrix == true)
             {
                 // Set the model matrix
-                label_shader.SetMatrix4("modelMatrix", graphic_events_control.modelMatrix);
+                label_shader.SetMatrix4("modelMatrix", modelMatrix);
 
                 // Set the projection matrix
-                label_shader.SetMatrix4("projectionMatrix", graphic_events_control.projectionMatrix);
+                label_shader.SetMatrix4("projectionMatrix", projectionMatrix);
 
             }
 
             if (set_viewmatrix == true)
             {
                 // Set the view matrix
-                label_shader.SetMatrix4("viewMatrix", graphic_events_control.viewMatrix);
+                label_shader.SetMatrix4("viewMatrix", viewMatrix);
 
             }
 
             if (set_transparency == true)
             {
                 // Set the transparency float
-                label_shader.SetFloat("vertexTransparency", gvariables_static.geom_transparency);
+                label_shader.SetFloat("vertexTransparency", geom_transparency);
 
             }
 

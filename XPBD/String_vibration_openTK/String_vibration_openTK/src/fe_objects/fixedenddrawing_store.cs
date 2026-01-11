@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace String_vibration_openTK.src.fe_objects
 {
-    public class elementfixedend_store
+    public class fixedenddrawing_store
     {
         const float fixed_end_width = 60.0f;
 
@@ -18,7 +18,7 @@ namespace String_vibration_openTK.src.fe_objects
         meshdata_store fixed_drawingdata;
 
 
-        public elementfixedend_store(Vector2 fixedend_loc, float fixedend_angle)
+        public fixedenddrawing_store(Vector2 fixedend_loc, float fixedend_angle)
         {
             // Convert angle to radians
             float angleRad = MathHelper.DegreesToRadians(fixedend_angle);

@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Serialization;
 using OpenTK.Graphics.ES11;
 using SharpFont;
+using String_vibration_openTK.src.global_variables;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,20 +13,22 @@ using System.Threading.Tasks;
 namespace String_vibration_openTK.src.fe_objects
 {
 
-    public static class AppPaths
-    {
-        public static readonly string AppFolder =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                         "StringVibrationOpenTK");
+    //public static class AppPaths
+    //{
+    //    public static readonly string AppFolder =
+    //        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+    //                     "StringVibrationOpenTK");
 
-        public static readonly string StringDataFile =
-            Path.Combine(AppFolder, "stringdata.json");
-    }
+    //    public static readonly string StringDataFile =
+    //        Path.Combine(AppFolder, "stringdata.json");
+    //}
 
     public class initialconditiondata_store
     {
         public int inlcond_id { get; set; }
         public int inlcond_type { get; set; } // 0 = Displacement, 1 = Velocity
+
+        public int inlcond_interpolation { get; set; }
 
         public List<int> inlcond_nodes { get; set; } = new List<int>(); // Initial condition nodes
         public List<double> inlcond_values { get; set; } = new List<double>(); // Initial condition values
@@ -67,6 +70,9 @@ namespace String_vibration_openTK.src.fe_objects
         public List<loaddata_store> load_data { get; set; } = new List<loaddata_store>();
 
 
+        public List<int> inlcond_ids = new List<int>();
+        public List<int> load_ids = new List<int>();
+
        //public stringdata_store()
        // {
        //     stringdata_store st_data = Load();
@@ -103,19 +109,25 @@ namespace String_vibration_openTK.src.fe_objects
         // -------------------------
         // ADD/ DELETE INITIAL CONDITION
         // -------------------------
-        public void add_initial_condition(int inlcond_id, int inlcond_type, List<int> inlcond_nodes, List<double> inlcond_values)
+        public void add_initial_condition(int inlcond_type, int interpolation_type, List<int> inlcond_nodes, List<double> inlcond_values)
         {
             // Find the absolution maximum value in the input initial condition values
-            double abs_max_value = 0;
-            foreach (double ival in inlcond_nodes)
+            double abs_max_value = 0.0;
+            foreach (double ival in inlcond_values)
             {
-                abs_max_value = Math.Max(abs_max_value,Math.Abs(ival));
+                abs_max_value = Math.Max(abs_max_value, Math.Abs(ival));
             }
+
+            // Get unique initial condition ID
+            int inlcond_id = gvariables_static.get_unique_id(inlcond_ids);
+            inlcond_ids.Add(inlcond_id);
+
 
             inlcond_data.Add(new initialconditiondata_store()
             {
                 inlcond_id = inlcond_id,
                 inlcond_type = inlcond_type,
+                inlcond_interpolation = interpolation_type,
                 inlcond_nodes = new List<int>(inlcond_nodes),
                 inlcond_values = new List<double>(inlcond_values),
                 abs_max_value = abs_max_value
@@ -127,6 +139,8 @@ namespace String_vibration_openTK.src.fe_objects
         {
 
             inlcond_data.Remove( inlcond_data.Find(e=>e.inlcond_id == inlcond_id) );
+            inlcond_ids.Remove( inlcond_id );   
+
 
         }
 

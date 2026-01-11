@@ -21,7 +21,11 @@ namespace String_vibration_openTK.src.fe_objects
 
         public stringdata_store stringintension_data;
 
-        public elementstringline_store elementstringline_data;
+        public stringlinedrawingdata_store elementstringline_data;
+
+        public inlconddrawingdata_store inldispldrawing_data;
+        public inlconddrawingdata_store inlvelodrawing_data;
+
 
         //// Drawing labels
         //public text_store time_label;
@@ -90,8 +94,8 @@ namespace String_vibration_openTK.src.fe_objects
 
 
             update_string_in_tension_model();
-            update_initial_condition();
-            update_load();
+            // update_initial_condition();
+            // update_load();
 
             isModelSet = true;  
 
@@ -129,7 +133,9 @@ namespace String_vibration_openTK.src.fe_objects
             Vector2 end_loc = new Vector2(1000.0f, 0.0f);
             int segment_count = stringintension_data.no_of_nodes - 1;
 
-            elementstringline_data = new elementstringline_store(start_loc, end_loc, segment_count);
+            elementstringline_data = new stringlinedrawingdata_store(start_loc, end_loc, segment_count);
+
+            update_initial_condition();
 
             isModelSet = true;
 
@@ -162,9 +168,35 @@ namespace String_vibration_openTK.src.fe_objects
 
             }
 
+            Vector2 start_loc = new Vector2(-1000.0f, 0.0f);
+            Vector2 end_loc = new Vector2(1000.0f, 0.0f);
 
 
+            inldispldrawing_data = new inlconddrawingdata_store(0, start_loc, end_loc, stringintension_data.no_of_nodes - 1);
+            inlvelodrawing_data = new inlconddrawingdata_store(1, start_loc, end_loc, stringintension_data.no_of_nodes - 1);
 
+            // Reset the drawing data
+            foreach (initialconditiondata_store inlcond in stringintension_data.inlcond_data)
+            {
+                if (inlcond.inlcond_type == 0)
+                {
+                    // Displacement
+                    inldispldrawing_data.add_initialcondition(inlcond.inlcond_id, 
+                        inlcond.inlcond_nodes, inlcond.inlcond_values, abs_max_displ_val);
+
+                }
+
+                if (inlcond.inlcond_type == 1)
+                {
+                    // Velocity
+                   inlvelodrawing_data.add_initialcondition(inlcond.inlcond_id,
+                        inlcond.inlcond_nodes, inlcond.inlcond_values, abs_max_velo_val);
+
+                }
+
+            }
+
+            update_openTK_uniforms(true, true, true);
 
         }
 
@@ -216,7 +248,9 @@ namespace String_vibration_openTK.src.fe_objects
 
             // Paint the string in tension
             elementstringline_data.paint_elementstringline();
- 
+            
+            inldispldrawing_data.paint_inlconddrawing();
+            inlvelodrawing_data.paint_inlconddrawing();
 
             // Paint the animation time
             // time_label.paint_dynamic_text();
@@ -304,6 +338,21 @@ namespace String_vibration_openTK.src.fe_objects
                 graphic_events_control.modelMatrix,
                 graphic_events_control.viewMatrix,
                 gvariables_static.geom_transparency);
+
+
+            inldispldrawing_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
+
+            inlvelodrawing_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
 
 
 

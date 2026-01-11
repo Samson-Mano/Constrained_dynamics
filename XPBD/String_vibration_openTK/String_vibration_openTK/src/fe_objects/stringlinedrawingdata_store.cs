@@ -9,15 +9,15 @@ using System.Threading.Tasks;
 
 namespace String_vibration_openTK.src.fe_objects
 {
-    public class elementstringline_store
+    public class stringlinedrawingdata_store
     {
-        elementfixedend_store fixedend_left;
-        elementfixedend_store fixedend_right;
+        fixedenddrawing_store fixedend_left;
+        fixedenddrawing_store fixedend_right;
 
         // Line in tension and nodes drawing data
         meshdata_store stringline_drawingdata;
 
-        public elementstringline_store(Vector2 start_loc, Vector2 end_loc, int segmentCount) 
+        public stringlinedrawingdata_store(Vector2 start_loc, Vector2 end_loc, int segmentCount) 
         {
             const int node_color = -3;
             const int linesegment_color = -4;
@@ -43,8 +43,8 @@ namespace String_vibration_openTK.src.fe_objects
             }
 
             // Set the fixed ends at the end of the string in tension
-            fixedend_left = new elementfixedend_store(start_loc, 0.0f);
-            fixedend_right = new elementfixedend_store(end_loc, 0.0f);
+            fixedend_left = new fixedenddrawing_store(start_loc, 0.0f);
+            fixedend_right = new fixedenddrawing_store(end_loc, 0.0f);
 
 
             // Set the shader

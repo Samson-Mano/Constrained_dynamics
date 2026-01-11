@@ -463,6 +463,17 @@ namespace String_vibration_openTK
         {
 
         }
+
+
+        public void CallFrom_inpt_frms()
+        {
+
+            // Refresh 
+            glControl_main_panel.Invalidate();
+
+        }
+
+
         #endregion
 
     }

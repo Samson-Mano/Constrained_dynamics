@@ -55,6 +55,11 @@ namespace String_vibration_openTK.other_windows
 
             fe_data.update_string_in_tension_model();
 
+            // Call to main form
+            if (this.Owner is main_frm mainForm)
+            {
+                mainForm.CallFrom_inpt_frms();
+            }
 
         }
 

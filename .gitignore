@@ -33,6 +33,19 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# ------------------------------------
+# Allow ONLY this specific Release folder
+# ------------------------------------
+!XPBD/
+!XPBD/PBD_pendulum_simulation/
+!XPBD/PBD_pendulum_simulation/PBD_pendulum_simulation/
+!XPBD/PBD_pendulum_simulation/PBD_pendulum_simulation/bin/
+!XPBD/PBD_pendulum_simulation/PBD_pendulum_simulation/bin/x64/
+!XPBD/PBD_pendulum_simulation/PBD_pendulum_simulation/bin/x64/Release/
+!XPBD/PBD_pendulum_simulation/PBD_pendulum_simulation/bin/x64/Release/**
+
+
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot

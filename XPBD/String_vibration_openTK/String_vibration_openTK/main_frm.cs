@@ -39,6 +39,7 @@ namespace String_vibration_openTK
         private setmodel_frm setmodel_Form;
         private inlcond_frm inlcond_Form;
         private load_frm load_Form;
+        private modal_frm modal_Form;
 
         //private animation_frm animation_Form;
         //private option_frm option_Form;
@@ -455,6 +456,33 @@ namespace String_vibration_openTK
 
         private void modalAnalysisToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Check if modal_Form is null or disposed
+            if (modal_Form == null || modal_Form.IsDisposed)
+            {
+                modal_Form = new modal_frm(ref this.fedata);
+
+                // Make it behave like a tool window
+                modal_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                modal_Form.ShowInTaskbar = false;
+                modal_Form.TopLevel = true;
+                modal_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - modal_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - modal_Form.Height) / 2;
+                modal_Form.StartPosition = FormStartPosition.Manual;
+                modal_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+            modal_Form.initialize_modal_form();
+
+            modal_Form.Show(this);
+            modal_Form.BringToFront();
+
+            modal_Form.Invalidate();
+
 
         }
 

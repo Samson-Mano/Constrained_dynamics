@@ -118,5 +118,17 @@ namespace String_vibration_openTK.Properties {
                 this["Sett_load_endtime"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Sett_modal_selected_index {
+            get {
+                return ((int)(this["Sett_modal_selected_index"]));
+            }
+            set {
+                this["Sett_modal_selected_index"] = value;
+            }
+        }
     }
 }

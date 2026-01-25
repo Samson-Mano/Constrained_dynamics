@@ -49,6 +49,10 @@ namespace String_vibration_openTK.src.fe_objects
 
         private bool isModelSet = false;
 
+        // Set whether the modal analysis is set
+        public bool isModalAnalysisPaint = false;
+        public int selected_mode_shape = 0;
+
 
         public fedata_store()
         {
@@ -272,6 +276,15 @@ namespace String_vibration_openTK.src.fe_objects
             // Paint the load data
             loaddrawing_data.paint_loaddrawing();
 
+
+            if(this.isModalAnalysisPaint == true)
+            {
+                // Paint the mode shape
+    
+
+            }
+
+
             // Paint the animation time
             // time_label.paint_dynamic_text();
 
@@ -346,6 +359,24 @@ namespace String_vibration_openTK.src.fe_objects
             return fixedStr.PadRight(num_char);
         }
 
+        public void update_model_transparency()
+        {
+            if (isModalAnalysisPaint == true)
+            {
+                // Set transparency for modal analysis
+                gvariables_static.geom_transparency = 0.2f;
+                update_openTK_uniforms(false, false, true);
+                
+            }
+            else
+            {
+                // Set transparency for normal drawing
+                gvariables_static.geom_transparency = 1.0f;
+                update_openTK_uniforms(false, false, true);
+
+            }
+
+        }
 
 
         public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency)

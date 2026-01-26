@@ -146,7 +146,7 @@ namespace String_vibration_openTK.other_windows
             }
 
             // Set the global variable
-            double value = gvariables_static.animation_speed;
+            double value = gvariables_static.modal_animation_speed;
 
             // Set label
             label_animation_speed.Text = value.ToString(CultureInfo.InvariantCulture);
@@ -156,6 +156,18 @@ namespace String_vibration_openTK.other_windows
             // Set the modal form is open
             this.fe_data.isModalAnalysisPaint = true;
             this.fe_data.update_model_transparency();
+
+            //___________________________________________________________________________________________________
+            // Animation control
+            this.fe_data.stop_animation();
+
+            gvariables_static.animate_play = true;
+            gvariables_static.animate_pause = false;
+            gvariables_static.animate_stop = false;
+
+            this.fe_data.start_animation();
+
+
 
             this.fe_data.selected_mode_shape = comboBox_modedata.SelectedIndex;
 
@@ -183,6 +195,14 @@ namespace String_vibration_openTK.other_windows
             // Stop painting modal analysis
             this.fe_data.isModalAnalysisPaint = false;
             this.fe_data.update_model_transparency();
+
+            //___________________________________________________________________________________________________
+            // Animation control
+            this.fe_data.stop_animation();
+
+            gvariables_static.animate_play = false;
+            gvariables_static.animate_pause = false;
+            gvariables_static.animate_stop = false;
 
             // Call to main form
             if (this.Owner is main_frm mainForm)
@@ -244,8 +264,8 @@ namespace String_vibration_openTK.other_windows
                 return; // Do not continue
             }
 
-            // Set the global variable
-            gvariables_static.animation_speed = value;
+            // Set the modal animation global variable
+            gvariables_static.modal_animation_speed = value;
 
             // Set label
             label_animation_speed.Text = value.ToString(CultureInfo.InvariantCulture);

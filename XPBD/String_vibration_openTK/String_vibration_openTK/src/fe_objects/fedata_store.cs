@@ -28,8 +28,13 @@ namespace String_vibration_openTK.src.fe_objects
 
         public loaddrawingdata_store loaddrawing_data;
 
-        //// Drawing labels
-        //public text_store time_label;
+
+        // Results painting data
+        public stringlinemodalresults_store stringlinemodalresults_data;
+
+
+        // Drawing labels
+        public text_store time_label;
         //public text_store disp_label;
         //public text_store velo_label;
         //public text_store accl_label;
@@ -38,9 +43,14 @@ namespace String_vibration_openTK.src.fe_objects
         // To control the drawing events
         public drawing_events graphic_events_control { get; private set; }
 
+
+
+        // Animation control data
         public System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-        // private double accumulatedTime = 0.0;
-        // private int time_step = 0;
+        private double accumulatedTime = 0.0;
+        private int time_step = 0;
+
+
 
         // Drawing bound data
         public Vector3 min_bounds = new Vector3(-1);
@@ -48,6 +58,12 @@ namespace String_vibration_openTK.src.fe_objects
         public Vector3 geom_bounds = new Vector3(2);
 
         private bool isModelSet = false;
+
+
+        const double displextent = 100.0; // Extent of displacement for scaling
+        const double veloextent = 100.0; // Extent of velocity for scaling
+        const double acclextent = 100.0; // Extent of acceleration for scaling
+
 
         // Set whether the modal analysis is set
         public bool isModalAnalysisPaint = false;
@@ -118,8 +134,8 @@ namespace String_vibration_openTK.src.fe_objects
             //    Settings.Default.sett_initialangle3);
 
 
-            //// Initialize the labels 
-            //time_label = new text_store("Time = 0.0000000 s", new Vector2(0.0f, 0.0f), -3); // Number of character  = 18
+            // Initialize the labels 
+            time_label = new text_store("Time = 0.0000000 s", new Vector2(0.0f, 0.0f), -3); // Number of character  = 18
             //disp_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -8); // Number of character  = 12
             //velo_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -9); // Number of character  = 12
             //accl_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -10); // Number of character  = 12
@@ -140,10 +156,16 @@ namespace String_vibration_openTK.src.fe_objects
 
             elementstringline_data = new stringlinedrawingdata_store(start_loc, end_loc, segment_count);
 
+            // Initialize the modal analysis results data
+            stringlinemodalresults_data = new stringlinemodalresults_store(start_loc, end_loc, segment_count);
+
+
             update_initial_condition();
             update_load();
 
             isModelSet = true;
+
+            time_label = new text_store("Time = 0.0000000 s", new Vector2(-1000.0f, 500.0f), -3); // Number of character  = 18
 
             update_openTK_uniforms(true, true, true);
 
@@ -280,7 +302,10 @@ namespace String_vibration_openTK.src.fe_objects
             if(this.isModalAnalysisPaint == true)
             {
                 // Paint the mode shape
-    
+                stringlinemodalresults_data.paint_modalanalysisresults();
+
+                // Paint the animation time
+                time_label.paint_dynamic_text();
 
             }
 
@@ -327,7 +352,16 @@ namespace String_vibration_openTK.src.fe_objects
 
             if(gvariables_static.animate_play == true)
             {
-                // time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(0.0f, 65.0f)); 
+                time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(-1000.0f, 500.0f)); 
+
+                if(isModalAnalysisPaint == true)
+                {
+                    double displ_scale = displextent * gvariables_static.displacement_scale;
+
+                    // Update the modal analysis results
+                    stringlinemodalresults_data.update_modalresults_time_step(elapsedRealTime, selected_mode_shape, displ_scale);
+                }
+
 
                 // pendulum_data.simulate(elapsedRealTime);
 
@@ -425,9 +459,18 @@ namespace String_vibration_openTK.src.fe_objects
             //    graphic_events_control);
 
 
-            //// Update text label openTK uniforms
-            //time_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control);
+            // Update modal analysis results openTK uniforms
+            stringlinemodalresults_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.rslt_transparency);
+
+
+
+            // Update text label openTK uniforms
+            time_label.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control);
 
         }
 

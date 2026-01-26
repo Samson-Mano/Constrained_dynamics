@@ -760,7 +760,9 @@ namespace String_vibration_openTK.src.geom_objects
         public void paint_dynamic_mesh_points()
         {
             // Paint the mesh points
+            GL.PointSize(gvariables_static.PointSize);
             mesh_points.paint_dynamic_points();
+            GL.PointSize(1.0f);
 
         }
 

@@ -160,6 +160,8 @@ namespace String_vibration_openTK.src.fe_objects
                 // Set the model matrix
                 text_shader.SetMatrix4("modelMatrix", graphic_events_control.modelMatrix);
 
+                // text_shader.SetMatrix4("modelMatrix", Matrix4.Identity);
+
                 // Set the projection matrix
                 text_shader.SetMatrix4("projectionMatrix", graphic_events_control.projectionMatrix);
 
@@ -170,12 +172,14 @@ namespace String_vibration_openTK.src.fe_objects
                 // Set the view matrix
                 text_shader.SetMatrix4("viewMatrix", graphic_events_control.viewMatrix);
 
+                // text_shader.SetMatrix4("viewMatrix", Matrix4.Identity);
+
             }
 
             if (set_transparency == true)
             {
                 // Set the transparency float
-                text_shader.SetFloat("vertexTransparency", gvariables_static.geom_transparency);
+                text_shader.SetFloat("vertexTransparency", gvariables_static.rslt_transparency);
 
             }
 

@@ -40,6 +40,7 @@ namespace String_vibration_openTK
         private inlcond_frm inlcond_Form;
         private load_frm load_Form;
         private modal_frm modal_Form;
+        private resp_frm resp_Form;
 
         //private animation_frm animation_Form;
         //private option_frm option_Form;
@@ -489,6 +490,33 @@ namespace String_vibration_openTK
 
         private void responseAnalysisToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
+            // Check if resp_Form is null or disposed
+            if (resp_Form == null || resp_Form.IsDisposed)
+            {
+                resp_Form = new resp_frm(ref this.fedata);
+
+                // Make it behave like a tool window
+                resp_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                resp_Form.ShowInTaskbar = false;
+                resp_Form.TopLevel = true;
+                resp_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - resp_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - resp_Form.Height) / 2;
+                resp_Form.StartPosition = FormStartPosition.Manual;
+                resp_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+             resp_Form.initialize_response_form();
+
+            resp_Form.Show(this);
+            resp_Form.BringToFront();
+
+            resp_Form.Invalidate();
 
         }
 

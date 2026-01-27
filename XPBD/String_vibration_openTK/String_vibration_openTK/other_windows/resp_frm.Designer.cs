@@ -36,21 +36,33 @@
             this.label_animation_speed = new System.Windows.Forms.Label();
             this.label_realtimeanim_speed = new System.Windows.Forms.Label();
             this.button_animation_speed = new System.Windows.Forms.Button();
+            this.label_acceleration_scale = new System.Windows.Forms.Label();
+            this.trackBar_acceleration_scale = new System.Windows.Forms.TrackBar();
+            this.label_velocity_scale = new System.Windows.Forms.Label();
+            this.trackBar_velocity_scale = new System.Windows.Forms.TrackBar();
+            this.label_deformation_scale = new System.Windows.Forms.Label();
+            this.trackBar_deformation_scale = new System.Windows.Forms.TrackBar();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button_close = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_acceleration_scale)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_velocity_scale)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_deformation_scale)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label_status
             // 
             this.label_status.AutoSize = true;
-            this.label_status.Location = new System.Drawing.Point(51, 302);
+            this.label_status.Location = new System.Drawing.Point(9, 319);
             this.label_status.Name = "label_status";
-            this.label_status.Size = new System.Drawing.Size(71, 20);
+            this.label_status.Size = new System.Drawing.Size(53, 16);
             this.label_status.TabIndex = 22;
             this.label_status.Text = "Playing";
             // 
             // button_stop
             // 
-            this.button_stop.Location = new System.Drawing.Point(54, 255);
+            this.button_stop.Location = new System.Drawing.Point(12, 272);
             this.button_stop.Name = "button_stop";
             this.button_stop.Size = new System.Drawing.Size(133, 33);
             this.button_stop.TabIndex = 21;
@@ -60,7 +72,7 @@
             // 
             // button_play_pause
             // 
-            this.button_play_pause.Location = new System.Drawing.Point(54, 216);
+            this.button_play_pause.Location = new System.Drawing.Point(12, 233);
             this.button_play_pause.Name = "button_play_pause";
             this.button_play_pause.Size = new System.Drawing.Size(133, 33);
             this.button_play_pause.TabIndex = 20;
@@ -73,9 +85,9 @@
             this.groupBox1.Controls.Add(this.label_animation_speed);
             this.groupBox1.Controls.Add(this.label_realtimeanim_speed);
             this.groupBox1.Controls.Add(this.button_animation_speed);
-            this.groupBox1.Location = new System.Drawing.Point(54, 339);
+            this.groupBox1.Location = new System.Drawing.Point(12, 356);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(433, 144);
+            this.groupBox1.Size = new System.Drawing.Size(468, 144);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Animation Speed: ";
@@ -85,7 +97,7 @@
             this.label_animation_speed.AutoSize = true;
             this.label_animation_speed.Location = new System.Drawing.Point(216, 30);
             this.label_animation_speed.Name = "label_animation_speed";
-            this.label_animation_speed.Size = new System.Drawing.Size(37, 20);
+            this.label_animation_speed.Size = new System.Drawing.Size(28, 16);
             this.label_animation_speed.TabIndex = 2;
             this.label_animation_speed.Text = "1.0";
             // 
@@ -94,7 +106,7 @@
             this.label_realtimeanim_speed.AutoSize = true;
             this.label_realtimeanim_speed.Location = new System.Drawing.Point(6, 73);
             this.label_realtimeanim_speed.Name = "label_realtimeanim_speed";
-            this.label_realtimeanim_speed.Size = new System.Drawing.Size(410, 20);
+            this.label_realtimeanim_speed.Size = new System.Drawing.Size(309, 16);
             this.label_realtimeanim_speed.TabIndex = 1;
             this.label_realtimeanim_speed.Text = "1 second in real time = 1 second in Animation";
             // 
@@ -108,11 +120,86 @@
             this.button_animation_speed.UseVisualStyleBackColor = true;
             this.button_animation_speed.Click += new System.EventHandler(this.button_animation_speed_Click);
             // 
+            // label_acceleration_scale
+            // 
+            this.label_acceleration_scale.AutoSize = true;
+            this.label_acceleration_scale.Location = new System.Drawing.Point(271, 135);
+            this.label_acceleration_scale.Name = "label_acceleration_scale";
+            this.label_acceleration_scale.Size = new System.Drawing.Size(168, 16);
+            this.label_acceleration_scale.TabIndex = 5;
+            this.label_acceleration_scale.Text = "Acceleration scale = 1.0";
+            // 
+            // trackBar_acceleration_scale
+            // 
+            this.trackBar_acceleration_scale.Location = new System.Drawing.Point(9, 135);
+            this.trackBar_acceleration_scale.Name = "trackBar_acceleration_scale";
+            this.trackBar_acceleration_scale.Size = new System.Drawing.Size(256, 45);
+            this.trackBar_acceleration_scale.TabIndex = 4;
+            // 
+            // label_velocity_scale
+            // 
+            this.label_velocity_scale.AutoSize = true;
+            this.label_velocity_scale.Location = new System.Drawing.Point(271, 84);
+            this.label_velocity_scale.Name = "label_velocity_scale";
+            this.label_velocity_scale.Size = new System.Drawing.Size(138, 16);
+            this.label_velocity_scale.TabIndex = 3;
+            this.label_velocity_scale.Text = "Velocity scale = 1.0";
+            // 
+            // trackBar_velocity_scale
+            // 
+            this.trackBar_velocity_scale.Location = new System.Drawing.Point(9, 84);
+            this.trackBar_velocity_scale.Name = "trackBar_velocity_scale";
+            this.trackBar_velocity_scale.Size = new System.Drawing.Size(256, 45);
+            this.trackBar_velocity_scale.TabIndex = 2;
+            // 
+            // label_deformation_scale
+            // 
+            this.label_deformation_scale.AutoSize = true;
+            this.label_deformation_scale.Location = new System.Drawing.Point(271, 33);
+            this.label_deformation_scale.Name = "label_deformation_scale";
+            this.label_deformation_scale.Size = new System.Drawing.Size(165, 16);
+            this.label_deformation_scale.TabIndex = 1;
+            this.label_deformation_scale.Text = "Deformation scale = 1.0";
+            // 
+            // trackBar_deformation_scale
+            // 
+            this.trackBar_deformation_scale.Location = new System.Drawing.Point(9, 33);
+            this.trackBar_deformation_scale.Name = "trackBar_deformation_scale";
+            this.trackBar_deformation_scale.Size = new System.Drawing.Size(256, 45);
+            this.trackBar_deformation_scale.TabIndex = 0;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.label_acceleration_scale);
+            this.groupBox2.Controls.Add(this.trackBar_acceleration_scale);
+            this.groupBox2.Controls.Add(this.label_velocity_scale);
+            this.groupBox2.Controls.Add(this.trackBar_velocity_scale);
+            this.groupBox2.Controls.Add(this.label_deformation_scale);
+            this.groupBox2.Controls.Add(this.trackBar_deformation_scale);
+            this.groupBox2.Location = new System.Drawing.Point(12, 12);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(468, 202);
+            this.groupBox2.TabIndex = 23;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Animation Scale: ";
+            // 
+            // button_close
+            // 
+            this.button_close.Location = new System.Drawing.Point(184, 518);
+            this.button_close.Name = "button_close";
+            this.button_close.Size = new System.Drawing.Size(125, 46);
+            this.button_close.TabIndex = 24;
+            this.button_close.Text = "Close";
+            this.button_close.UseVisualStyleBackColor = true;
+            this.button_close.Click += new System.EventHandler(this.button_close_Click);
+            // 
             // resp_frm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(693, 603);
+            this.ClientSize = new System.Drawing.Size(511, 576);
+            this.Controls.Add(this.button_close);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.label_status);
             this.Controls.Add(this.button_stop);
             this.Controls.Add(this.button_play_pause);
@@ -124,6 +211,11 @@
             this.Text = "Response Form";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_acceleration_scale)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_velocity_scale)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_deformation_scale)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -138,5 +230,13 @@
         private System.Windows.Forms.Label label_animation_speed;
         private System.Windows.Forms.Label label_realtimeanim_speed;
         private System.Windows.Forms.Button button_animation_speed;
+        private System.Windows.Forms.Label label_acceleration_scale;
+        private System.Windows.Forms.TrackBar trackBar_acceleration_scale;
+        private System.Windows.Forms.Label label_velocity_scale;
+        private System.Windows.Forms.TrackBar trackBar_velocity_scale;
+        private System.Windows.Forms.Label label_deformation_scale;
+        private System.Windows.Forms.TrackBar trackBar_deformation_scale;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button button_close;
     }
 }

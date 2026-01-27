@@ -94,7 +94,7 @@
             this.groupBox1.Controls.Add(this.button_animation_speed);
             this.groupBox1.Location = new System.Drawing.Point(46, 286);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(433, 144);
+            this.groupBox1.Size = new System.Drawing.Size(521, 144);
             this.groupBox1.TabIndex = 11;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Animation Speed: ";

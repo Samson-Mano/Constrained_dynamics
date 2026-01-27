@@ -71,7 +71,37 @@ namespace String_vibration_openTK.other_windows
         {
             // Initialie the Pulse Form data
 
+            // Update the scale labels based on current global variable values
+            trackBar_deformation_scale.Value = ComputeTrackBarFromScale(gvariables_static.displacement_scale);
 
+            UpdateScale(
+              trackBar_deformation_scale,
+              label_deformation_scale,
+              "Deformation scale",
+              v => v = gvariables_static.displacement_scale
+          );
+
+            trackBar_velocity_scale.Value = ComputeTrackBarFromScale(gvariables_static.velocity_scale);
+
+            UpdateScale(
+             trackBar_velocity_scale,
+             label_velocity_scale,
+             "Velocity scale",
+             v => gvariables_static.velocity_scale = v
+         );
+
+            trackBar_acceleration_scale.Value = ComputeTrackBarFromScale(gvariables_static.acceleration_scale);
+
+            UpdateScale(
+               trackBar_acceleration_scale,
+               label_acceleration_scale,
+               "Acceleration scale",
+               v => gvariables_static.acceleration_scale = v
+           );
+
+
+
+            //____________________________________________________________________________________________________
 
             if (gvariables_static.animate_play)
             {
@@ -132,8 +162,75 @@ namespace String_vibration_openTK.other_windows
         //__________________________________________________________________________________________________________
 
 
+        private void UpdateScale(TrackBar bar, Label label, string prefix, Action<double> setValue)
+        {
+            double value = ComputeScaleFromTrackBar(bar.Value);
+
+            label.Text = $"{prefix} = {value:F1}";
+            setValue(value);
+        }
+
+
+        private double ComputeScaleFromTrackBar(int value)
+        {
+            const int PIVOT_INTEGER = 10;
+
+            if (value <= PIVOT_INTEGER)
+            {
+                // --- Fine Control (0.7, 0.8, 0.9, 1.0) --- 
+                // The step is 0.1. 
+                // When I=3, difference is 0. 1.0 + 0 = 1.0 
+                // When I=2, difference is -1. 1.0 + (-1 * 0.1) = 0.9
+
+                int difference = value - PIVOT_INTEGER;
+                return 1.0 + (difference * 0.1);   // fine step
+            }
+            else
+            {
+                // --- Coarse Control (1.0, 2.0, 3.0, ... 8.0) --- 
+                // The step is 1.0. 
+                // When I=4, difference is 1. 1.0 + (1 * 1.0) = 2.0 
+                // When I=10 (Max), difference is 7. 1.0 + (7 * 1.0) = 8.0
+
+                int difference = value - PIVOT_INTEGER;
+                return 1.0 + (difference * 1.0);   // coarse step
+            }
+
+        }
+
+        private int ComputeTrackBarFromScale(double scale)
+        {
+            const int PIVOT_INTEGER = 10;
+
+            // Fine range: 0.7 → 1.0   (step 0.1)
+            if (scale <= 1.0)
+            {
+                // scale = 1.0 + (difference * 0.1)
+                // difference = (scale - 1.0) / 0.1
+                int difference = (int)Math.Round((scale - 1.0) / 0.1);
+                return PIVOT_INTEGER + difference;
+            }
+            else
+            {
+                // Coarse range: 1.0 → 8.0   (step 1.0)
+                // scale = 1.0 + (difference * 1.0)
+                // difference = scale - 1.0
+                int difference = (int)Math.Round(scale - 1.0);
+                return PIVOT_INTEGER + difference;
+            }
+        }
+
+
+
         private void button_animation_speed_Click(object sender, EventArgs e)
         {
+            // Position near the button
+            panelPopup.Location = new Point(button_animation_speed.Left, button_animation_speed.Bottom);
+
+            textPopup.Text = "";         // Clear previous input
+            panelPopup.Visible = true;   // Show popup
+            label_realtimeanim_speed.Visible = false;
+            textPopup.Focus();           // Focus for typing
 
         }
 
@@ -181,10 +278,60 @@ namespace String_vibration_openTK.other_windows
         private void button_play_pause_Click(object sender, EventArgs e)
         {
 
+            if (gvariables_static.animate_play)
+            {
+                // Currently playing, so pause
+                gvariables_static.animate_play = false;
+                gvariables_static.animate_pause = true;
+
+                fe_data.pause_animation();
+
+                // Set the status label
+                label_status.Text = "Paused";
+
+            }
+            else
+            {
+                // Currently paused/stopped, so play
+                gvariables_static.animate_play = true;
+                gvariables_static.animate_pause = false;
+
+                // Set the status label
+                label_status.Text = "Playing";
+
+            }
+
+            if (gvariables_static.animate_stop == true)
+            {
+                // Retart the animation from the beginning
+                gvariables_static.animate_stop = false;
+
+                // Restart the animation
+                fe_data.start_animation();
+
+            }
+
+
         }
 
         private void button_stop_Click(object sender, EventArgs e)
         {
+            // Stop the animation
+            gvariables_static.animate_play = false;
+            gvariables_static.animate_pause = false;
+            gvariables_static.animate_stop = true;
+
+            // Reset the animation to the beginning
+            fe_data.stop_animation();
+
+            label_status.Text = "Stopped";
+
+        }
+
+        private void button_close_Click(object sender, EventArgs e)
+        {
+            // Exit
+            this.Close();
 
         }
 

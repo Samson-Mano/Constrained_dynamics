@@ -69,6 +69,10 @@ namespace String_vibration_openTK.src.fe_objects
         public bool isModalAnalysisPaint = false;
         public int selected_mode_shape = 0;
 
+        // Flag to track the response analysis status
+        public bool isResponseAnalysisPaint = false;
+        public bool isResponseAnalysisRunning = false;
+
 
         public fedata_store()
         {
@@ -401,6 +405,13 @@ namespace String_vibration_openTK.src.fe_objects
                 gvariables_static.geom_transparency = 0.2f;
                 update_openTK_uniforms(false, false, true);
                 
+            }
+            else if(isResponseAnalysisPaint == true && isResponseAnalysisRunning == true)
+            {
+                // Set transparency for response analysis
+                gvariables_static.geom_transparency = 0.2f;
+                update_openTK_uniforms(false, false, true);
+
             }
             else
             {

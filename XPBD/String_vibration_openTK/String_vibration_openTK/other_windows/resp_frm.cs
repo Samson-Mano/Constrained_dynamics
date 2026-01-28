@@ -123,32 +123,50 @@ namespace String_vibration_openTK.other_windows
             }
 
             // Set the global variable
-            double value = gvariables_static.modal_animation_speed;
+            double value = gvariables_static.resp_animation_speed;
 
             // Set label
             label_animation_speed.Text = value.ToString(CultureInfo.InvariantCulture);
             label_realtimeanim_speed.Text = $"1 second in real time = {value.ToString(CultureInfo.InvariantCulture)} second in Animation";
 
-
-            // Set the modal form is open
-            this.fe_data.isModalAnalysisPaint = true;
-            this.fe_data.update_model_transparency();
-
-            //___________________________________________________________________________________________________
-            // Animation control
-            this.fe_data.stop_animation();
-
-            gvariables_static.animate_play = true;
-            gvariables_static.animate_pause = false;
-            gvariables_static.animate_stop = false;
-
-            this.fe_data.start_animation();
-
-
-            // Call to main form
-            if (this.Owner is main_frm mainForm)
+            if (this.fe_data.stringintension_data.load_data.Count > 0 ||
+                this.fe_data.stringintension_data.inlcond_data.Count > 0)
             {
-                mainForm.CallFrom_inpt_frms();
+
+                // Create the response analysis - initialize the load matrices
+                this.fe_data.create_response_analysis_load_matrices();
+
+                // Set the modal form is open
+                this.fe_data.isResponseAnalysisPaint = true;
+                this.fe_data.update_model_transparency();
+
+                //___________________________________________________________________________________________________
+                // Animation control
+                this.fe_data.stop_animation();
+
+                gvariables_static.animate_play = true;
+                gvariables_static.animate_pause = false;
+                gvariables_static.animate_stop = false;
+
+                this.fe_data.start_animation();
+
+
+                // Call to main form
+                if (this.Owner is main_frm mainForm)
+                {
+                    mainForm.CallFrom_inpt_frms();
+                }
+            }
+            else
+            {
+
+                this.fe_data.isResponseAnalysisPaint = false;
+
+                // Disable animation controls
+                button_animation_speed.Enabled = false;
+                button_play_pause.Enabled = false;
+                button_stop.Enabled = false;
+                label_status.Text = "No load or initial condition loaded.";
             }
 
 
@@ -258,7 +276,7 @@ namespace String_vibration_openTK.other_windows
             }
 
             // Set the modal animation global variable
-            gvariables_static.modal_animation_speed = value;
+            gvariables_static.resp_animation_speed = value;
 
             // Set label
             label_animation_speed.Text = value.ToString(CultureInfo.InvariantCulture);

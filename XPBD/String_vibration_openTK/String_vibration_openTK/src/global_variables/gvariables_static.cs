@@ -198,7 +198,7 @@ namespace String_vibration_openTK.src.global_variables
 
         // Animation speed control
         public static double modal_animation_speed = 1.0f; // real-time speed
-        public static double pulse_animation_speed = 1.0f; // real-time speed
+        public static double resp_animation_speed = 1.0f; // real-time speed
 
         // Deformation scale
         public static double displacement_scale = 1.0f;

@@ -31,7 +31,7 @@ namespace String_vibration_openTK.src.fe_objects
 
         // Results painting data
         public stringlinemodalresults_store stringlinemodalresults_data;
-
+        public stringlinerespresults_store stringlinerespresults_data;
 
         // Drawing labels
         public text_store time_label;
@@ -71,7 +71,7 @@ namespace String_vibration_openTK.src.fe_objects
 
         // Flag to track the response analysis status
         public bool isResponseAnalysisPaint = false;
-        public bool isResponseAnalysisRunning = false;
+        // public bool isResponseAnalysisRunning = false;
 
 
         public fedata_store()
@@ -160,8 +160,9 @@ namespace String_vibration_openTK.src.fe_objects
 
             elementstringline_data = new stringlinedrawingdata_store(start_loc, end_loc, segment_count);
 
-            // Initialize the modal analysis results data
+            // Initialize the modal and response analysis results data
             stringlinemodalresults_data = new stringlinemodalresults_store(start_loc, end_loc, segment_count);
+            stringlinerespresults_data = new stringlinerespresults_store(start_loc, end_loc, segment_count);
 
 
             update_initial_condition();
@@ -314,6 +315,17 @@ namespace String_vibration_openTK.src.fe_objects
             }
 
 
+            if(this.isResponseAnalysisPaint == true)
+            {
+                // Paint the response analysis results
+                stringlinerespresults_data.paint_responseanalysisresults();
+
+                // Paint the animation time
+                time_label.paint_dynamic_text();
+
+            }
+
+
             // Paint the animation time
             // time_label.paint_dynamic_text();
 
@@ -367,6 +379,21 @@ namespace String_vibration_openTK.src.fe_objects
                 }
 
 
+                if(isResponseAnalysisPaint == true)
+                {
+                    double displ_scale = displextent * gvariables_static.displacement_scale;
+                    double velo_scale = veloextent * gvariables_static.velocity_scale;
+                    double accl_scale = acclextent * gvariables_static.acceleration_scale;
+
+                    // Update the response analysis results
+                    stringlinerespresults_data.update_respresults_time_step(elapsedRealTime, 
+                        displ_scale, velo_scale, accl_scale);
+
+
+                }
+
+
+
                 // pendulum_data.simulate(elapsedRealTime);
 
             }
@@ -406,7 +433,7 @@ namespace String_vibration_openTK.src.fe_objects
                 update_openTK_uniforms(false, false, true);
                 
             }
-            else if(isResponseAnalysisPaint == true && isResponseAnalysisRunning == true)
+            else if(isResponseAnalysisPaint == true)
             {
                 // Set transparency for response analysis
                 gvariables_static.geom_transparency = 0.2f;
@@ -420,6 +447,15 @@ namespace String_vibration_openTK.src.fe_objects
                 update_openTK_uniforms(false, false, true);
 
             }
+
+        }
+        
+
+        public void create_response_analysis_load_matrices()
+        {
+            // Create the response analysis load matrices
+            // Called once when the response analysis is started
+            stringlinerespresults_data.initialize_response_matrices(this);  
 
         }
 
@@ -457,19 +493,6 @@ namespace String_vibration_openTK.src.fe_objects
                 gvariables_static.geom_transparency);
 
 
-            //// Update fixed end openTK uniforms
-            //fe_fixedend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
-
-
-            //// Update pendulum openTK uniforms
-            //pendulum_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control);
-
-
             // Update modal analysis results openTK uniforms
             stringlinemodalresults_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control.projectionMatrix,
@@ -477,6 +500,13 @@ namespace String_vibration_openTK.src.fe_objects
                 graphic_events_control.viewMatrix,
                 gvariables_static.rslt_transparency);
 
+
+            // Update response analysis results openTK uniforms
+            stringlinerespresults_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.rslt_transparency);
 
 
             // Update text label openTK uniforms

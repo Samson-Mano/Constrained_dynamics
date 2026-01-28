@@ -59,6 +59,9 @@
     <ApplicationIcon>innx_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -136,6 +139,7 @@
     <Compile Include="src\fe_objects\loaddrawingdata_store.cs" />
     <Compile Include="src\fe_objects\stringdata_store.cs" />
     <Compile Include="src\fe_objects\stringlinemodalresults_store.cs" />
+    <Compile Include="src\fe_objects\stringlinerespresults_store.cs" />
     <Compile Include="src\fe_objects\text_store.cs" />
     <Compile Include="src\geom_objects\label_list_store.cs" />
     <Compile Include="src\geom_objects\line_list_store.cs" />

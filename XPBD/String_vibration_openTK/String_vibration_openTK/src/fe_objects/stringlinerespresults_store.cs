@@ -1,13 +1,14 @@
-﻿using OpenTK;
+﻿using MathNet.Numerics;
+using OpenTK;
 using String_vibration_openTK.src.geom_objects;
 using String_vibration_openTK.src.global_variables;
+using String_vibration_openTK.src.solver;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using MathNet.Numerics;
 
 
 namespace String_vibration_openTK.src.fe_objects
@@ -25,6 +26,7 @@ namespace String_vibration_openTK.src.fe_objects
 
         //_________________________________________________________________________________________
         int number_of_nodes = 0;
+        MathNet.Numerics.LinearAlgebra.Vector<double> eigen_values;
         MathNet.Numerics.LinearAlgebra.Matrix<double> eigen_vectors;
         MathNet.Numerics.LinearAlgebra.Matrix<double> eigen_vectors_inverse;
 
@@ -100,12 +102,25 @@ namespace String_vibration_openTK.src.fe_objects
 
             int matrix_size = this.number_of_nodes - 2;
 
+            double line_length = fe_data.stringintension_data.string_length;
+            double line_tension = fe_data.stringintension_data.string_tension;
+            double material_density = fe_data.stringintension_data.string_density;
+
+            double c_param = Math.Sqrt(line_tension / material_density);
+
+            eigen_values = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(matrix_size);
             eigen_vectors = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.Dense(matrix_size, matrix_size);
 
             for (int i = 0; i < matrix_size; i++)
             {
                 // Mode number
                 int mode_number = i + 1;
+
+                double t_eigen = (mode_number * Math.PI * c_param) / line_length;
+
+                // Add to the eigen values vector
+                eigen_values[i] = t_eigen * t_eigen;
+
 
                 for (int j = 0; j < matrix_size; j++)
                 {
@@ -157,7 +172,7 @@ namespace String_vibration_openTK.src.fe_objects
                 }
                 // Apply the modal transformation
                 MathNet.Numerics.LinearAlgebra.Vector<double> modal_LoadAmplitudeVector
-                    = eigen_vectors * global_LoadAmplitudeVector;
+                    = eigen_vectors.Transpose() * global_LoadAmplitudeVector;
 
 
                 // Store the transformed load data
@@ -169,9 +184,6 @@ namespace String_vibration_openTK.src.fe_objects
                 t_load.modal_LoadAmplitudeVector = modal_LoadAmplitudeVector;
                 this.transformed_Loads.Add(t_load);
             }
-
-
-
 
         }
 
@@ -233,7 +245,160 @@ namespace String_vibration_openTK.src.fe_objects
             double velo_scale, double accl_scale)
         {
 
+            int matrix_size = this.number_of_nodes - 2;
 
+            // Modal Displacement Response store
+            MathNet.Numerics.LinearAlgebra.Vector<double> modal_displ_ampl_respMatrix
+                = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(matrix_size);
+
+            // Modal Velocity Response store
+            MathNet.Numerics.LinearAlgebra.Vector<double> modal_velo_ampl_respMatrix
+                = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(matrix_size);
+
+            // Modal Acceleration Response store
+            MathNet.Numerics.LinearAlgebra.Vector<double> modal_accl_ampl_respMatrix
+                = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(matrix_size);
+
+
+            double time_t = elapsedRealTime;
+
+            // 1D results for modal transformed Simple Harmonic Motion
+            for (int i = 0; i < matrix_size; i++)
+            {
+                double modal_mass = 1.0;
+                double modal_stiff = this.eigen_values[i];
+
+                // Displacement, Velocity and Acceleration response due to initial condition
+                double displ_resp_initial = 0.0;
+                double velo_resp_initial = 0.0;
+                double accl_resp_initial = 0.0;
+
+                shm_solver.get_steady_state_initial_condition_soln(
+                    ref displ_resp_initial,
+                    ref velo_resp_initial,
+                    ref accl_resp_initial,
+                    time_t,
+                    modal_mass,
+                    modal_stiff,
+                    modal_InitialDisplacementVector[i],
+                    modal_InitialVelocityVector[i]);
+
+
+                //_______________________________________________________________________
+                // Displacement, Velocity and Acceleration response due to force
+                double displ_resp_force = 0.0;
+                double velo_resp_force = 0.0;
+                double accl_resp_force = 0.0;
+
+                // Cycle through all the loads
+                foreach(transformed_load_data ld in this.transformed_Loads)
+                {
+
+                    // Check whether the load has values
+                    if (Math.Abs(ld.modal_LoadAmplitudeVector[i]) > 0.0001)
+                    {
+                        // Response due to this particular force
+                        double at_force_displ_resp = 0.0;
+                        double at_force_velo_resp = 0.0;
+                        double at_force_accl_resp = 0.0;
+
+                        switch (ld.load_type)
+                        {
+                            case 0: // Half Sine Pulse
+                                shm_solver.get_steady_state_half_sine_pulse_soln(
+                                    ref at_force_displ_resp,
+                                    ref at_force_velo_resp,
+                                    ref at_force_accl_resp,
+                                    time_t,
+                                    modal_mass,
+                                    modal_stiff,
+                                    ld.modal_LoadAmplitudeVector[i],
+                                    ld.load_start_time,
+                                    ld.load_end_time);
+                                break;
+                            case 1: // Rectangular Pulse
+                                shm_solver.get_steady_state_rectangular_pulse_soln(
+                                    ref at_force_displ_resp,
+                                    ref at_force_velo_resp,
+                                    ref at_force_accl_resp,
+                                    time_t,
+                                    modal_mass,
+                                    modal_stiff,
+                                    ld.modal_LoadAmplitudeVector[i],
+                                    ld.load_start_time,
+                                    ld.load_end_time);
+                                break;
+                            case 2: // Triangular Pulse
+                                shm_solver.get_steady_state_triangular_pulse_soln(
+                                    ref at_force_displ_resp,
+                                    ref at_force_velo_resp,
+                                    ref at_force_accl_resp,
+                                    time_t,
+                                    modal_mass,
+                                    modal_stiff,
+                                    ld.modal_LoadAmplitudeVector[i],
+                                    ld.load_start_time,
+                                    ld.load_end_time);
+                                break;
+                            case 3: // Step Force with Finite Rise
+                                shm_solver.get_steady_state_stepforce_finiterise_soln(
+                                    ref at_force_displ_resp,
+                                    ref at_force_velo_resp,
+                                    ref at_force_accl_resp,
+                                    time_t,
+                                    modal_mass,
+                                    modal_stiff,
+                                    ld.modal_LoadAmplitudeVector[i],
+                                    ld.load_start_time,
+                                    ld.load_end_time);
+                                break;
+                            case 4: // Harmonic excitation
+                                shm_solver.get_total_harmonic_soln(
+                                    ref at_force_displ_resp,
+                                    ref at_force_velo_resp,
+                                    ref at_force_accl_resp,
+                                    time_t,
+                                    modal_mass,
+                                    modal_stiff,
+                                    ld.modal_LoadAmplitudeVector[i],
+                                    ld.load_start_time,
+                                    ld.load_end_time);
+                                break;
+                            case 5: // Full Sine Pulse
+                                shm_solver.get_steady_state_full_sine_pulse_soln(
+                                    ref at_force_displ_resp,
+                                    ref at_force_velo_resp,
+                                    ref at_force_accl_resp,
+                                    time_t,
+                                    modal_mass,
+                                    modal_stiff,
+                                    ld.modal_LoadAmplitudeVector[i],
+                                    ld.load_start_time,
+                                    ld.load_end_time);
+                                break;
+
+                        }
+
+
+                        // Store the response
+                        displ_resp_force = displ_resp_force + at_force_displ_resp;
+                        velo_resp_force = velo_resp_force + at_force_velo_resp;
+                        accl_resp_force = accl_resp_force + at_force_accl_resp;
+
+                    }
+
+                }
+
+                // Store the modal results in vectors
+                modal_displ_ampl_respMatrix[i] = displ_resp_initial + displ_resp_force;
+                modal_velo_ampl_respMatrix[i] = velo_resp_initial + velo_resp_force;
+                modal_accl_ampl_respMatrix[i] = accl_resp_initial + accl_resp_force;
+
+            }
+
+
+
+            // Transform the Modal response to the global displacement, velocities and acceleration
 
 
 
@@ -271,7 +436,7 @@ namespace String_vibration_openTK.src.fe_objects
 
         }
 
-
+        
 
 
 

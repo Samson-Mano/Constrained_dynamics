@@ -19,6 +19,13 @@ namespace String_vibration_openTK.src.fe_objects
         // Line in tension and nodes modal results data
         meshdata_store stringline_resultsdata;
 
+        // Velocity and Acceleration vectors
+        vector_list_store velocity_vectors;
+        vector_list_store acceleration_vectors;
+
+        bool IsPaintVelocityVector = false;
+        bool IsPaintAccelerationVector = false;
+
         // Store the initialization data
         Vector2 start_loc = new Vector2(0.0f, 0.0f);
         Vector2 end_loc = new Vector2(0.0f, 0.0f);
@@ -34,9 +41,9 @@ namespace String_vibration_openTK.src.fe_objects
         MathNet.Numerics.LinearAlgebra.Vector<double> modal_InitialDisplacementVector;
         MathNet.Numerics.LinearAlgebra.Vector<double> modal_InitialVelocityVector;
 
-        List<transformed_load_data> transformed_Loads = new List<transformed_load_data>();   
+        List<transformed_load_data> transformed_Loads = new List<transformed_load_data>();
 
-         struct transformed_load_data
+        struct transformed_load_data
         {
             public int load_id;
             public double load_start_time;
@@ -65,6 +72,8 @@ namespace String_vibration_openTK.src.fe_objects
             const int linesegment_color = -4;
 
             stringline_resultsdata = new meshdata_store(true);
+            velocity_vectors = new vector_list_store();
+            acceleration_vectors = new vector_list_store();
 
             stringline_resultsdata.add_mesh_point(0, start_loc.X, start_loc.Y, 0.0f, node_color);
 
@@ -82,6 +91,13 @@ namespace String_vibration_openTK.src.fe_objects
                 // Add the line segment
                 stringline_resultsdata.add_mesh_lines(i, i, i + 1, linesegment_color);
 
+                if(i != segmentCount - 1)
+                {
+                    // Initialize the velocity and acceleration vectors
+                    velocity_vectors.add_vector(i, p, p, 0.0);
+                    acceleration_vectors.add_vector(i, p, p, 0.0);
+                }
+                
             }
 
             // Set the shader
@@ -89,6 +105,14 @@ namespace String_vibration_openTK.src.fe_objects
 
             // Set the buffer
             stringline_resultsdata.set_buffer();
+
+
+            // Set the vector visualization
+            velocity_vectors.set_vector_visualization();
+            acceleration_vectors.set_vector_visualization();
+
+            this.IsPaintVelocityVector = false;
+            this.IsPaintAccelerationVector = false;
 
 
         }
@@ -167,8 +191,11 @@ namespace String_vibration_openTK.src.fe_objects
                 int i = 0;
                 foreach (int nd in load.load_nodes)
                 {
-                    global_LoadAmplitudeVector[nd] += load.load_values[i];
-                    i++;
+                    if (nd != 0 && nd != matrix_size + 1)
+                    {
+                        global_LoadAmplitudeVector[nd - 1] += load.load_values[i];
+                        i++;
+                    }
                 }
                 // Apply the modal transformation
                 MathNet.Numerics.LinearAlgebra.Vector<double> modal_LoadAmplitudeVector
@@ -212,9 +239,11 @@ namespace String_vibration_openTK.src.fe_objects
                     int i = 0;
                     foreach (int nd in inlcond.inlcond_nodes)
                     {
-                        global_InitialDisplacementVector[nd] += inlcond.inlcond_values[i];
-                        i++;
-
+                        if(nd != 0 && nd != matrix_size + 1)
+                        {
+                            global_InitialDisplacementVector[nd - 1] += inlcond.inlcond_values[i];
+                            i++;
+                        }
                     }
 
                 }
@@ -224,9 +253,11 @@ namespace String_vibration_openTK.src.fe_objects
                     int i = 0;
                     foreach (int nd in inlcond.inlcond_nodes)
                     {
-                        global_InitialVelocityVector[nd] += inlcond.inlcond_values[i];
-                        i++;
-
+                        if (nd != 0 && nd != matrix_size + 1)
+                        {
+                            global_InitialVelocityVector[nd - 1] += inlcond.inlcond_values[i];
+                            i++;
+                        }
                     }
 
                 }
@@ -260,7 +291,7 @@ namespace String_vibration_openTK.src.fe_objects
                 = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(matrix_size);
 
 
-            double time_t = elapsedRealTime;
+            double time_t = elapsedRealTime * gvariables_static.resp_animation_speed;
 
             // 1D results for modal transformed Simple Harmonic Motion
             for (int i = 0; i < matrix_size; i++)
@@ -291,7 +322,7 @@ namespace String_vibration_openTK.src.fe_objects
                 double accl_resp_force = 0.0;
 
                 // Cycle through all the loads
-                foreach(transformed_load_data ld in this.transformed_Loads)
+                foreach (transformed_load_data ld in this.transformed_Loads)
                 {
 
                     // Check whether the load has values
@@ -399,6 +430,129 @@ namespace String_vibration_openTK.src.fe_objects
 
 
             // Transform the Modal response to the global displacement, velocities and acceleration
+            // Global Displacement Response store
+            MathNet.Numerics.LinearAlgebra.Vector<double> global_displ_ampl_respMatrix
+                = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(matrix_size);
+
+            // Global Velocity Response store
+            MathNet.Numerics.LinearAlgebra.Vector<double> global_velo_ampl_respMatrix
+                = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(matrix_size);
+
+            // Global Acceleration Response store
+            MathNet.Numerics.LinearAlgebra.Vector<double> global_accl_ampl_respMatrix
+                = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(matrix_size);
+
+
+
+            global_displ_ampl_respMatrix = this.eigen_vectors * modal_displ_ampl_respMatrix;
+            global_velo_ampl_respMatrix = this.eigen_vectors * modal_velo_ampl_respMatrix;
+            global_accl_ampl_respMatrix = this.eigen_vectors * modal_accl_ampl_respMatrix;
+
+            // Get the maximum values at this time step
+            double displ_max_at_timestep = global_displ_ampl_respMatrix.Max();
+            double displ_min_at_timestep = global_displ_ampl_respMatrix.Min();
+            double velo_max_at_timestep = global_velo_ampl_respMatrix.Max();
+            double velo_min_at_timestep = global_velo_ampl_respMatrix.Min();
+            double accl_max_at_timestep = global_accl_ampl_respMatrix.Max();
+            double accl_min_at_timestep = global_accl_ampl_respMatrix.Min();
+
+
+            float invSegments = 1.0f / (float)(matrix_size + 1);
+
+            if (Math.Abs(displ_max_at_timestep - displ_min_at_timestep) > 0.00001)
+            {
+
+                // Update the modal results displacement of the string line nodes
+                stringline_resultsdata.update_mesh_point(0, start_loc.X, start_loc.Y, 0.0f, 0.0f);
+
+                for (int i = 0; i < matrix_size; i++)
+                {
+                    // Find the next point by interpolation
+                    float t = (i + 1) * invSegments;
+                    Vector2 p = Vector2.Lerp(start_loc, end_loc, t);
+
+                    // Remap the displacement value
+                    double displ_vec = gvariables_static.GetRemap(displ_max_at_timestep,
+                        displ_min_at_timestep,
+                        1.0, -1.0, global_displ_ampl_respMatrix[i]);
+
+
+                    // Update the P - y point
+                    double color_scale = Math.Abs(displ_vec);
+
+                    double animscale = displ_scale * displ_vec;
+
+                    // Update the point
+                    stringline_resultsdata.update_mesh_point(i + 1, p.X, p.Y + animscale, 0.0f, color_scale);
+
+                }
+
+                stringline_resultsdata.update_mesh_point(matrix_size, end_loc.X, end_loc.Y, 0.0f, 0.0f);
+                //
+            }
+
+            // Update the velocity
+            this.IsPaintVelocityVector = false;
+
+            if (Math.Abs(velo_max_at_timestep - velo_min_at_timestep) > 0.00001)
+            {
+                this.IsPaintVelocityVector = true;
+
+                for (int i = 0; i < matrix_size; i++)
+                {
+                    // Find the next point by interpolation
+                    float t = (i + 1) * invSegments;
+                    Vector2 p = Vector2.Lerp(start_loc, end_loc, t);
+
+                    // Remap the velocity value
+                    double velo_vec = gvariables_static.GetRemap(velo_max_at_timestep,
+                        velo_min_at_timestep,
+                        1.0, -1.0, global_velo_ampl_respMatrix[i]);
+
+
+                    // Update the P - y point
+                    double color_scale = Math.Abs(velo_vec);
+
+                    double animscale = velo_scale * velo_vec;
+
+                    // Update the velocity vector
+                    velocity_vectors.update_vector(i, p, new Vector2( p.X, (float)(p.Y + animscale)), color_scale);
+
+                }
+            }
+
+            // Update the acceleration
+            this.IsPaintAccelerationVector = false;
+
+            if (Math.Abs(accl_max_at_timestep - accl_min_at_timestep) > 0.00001)
+            {
+                this.IsPaintAccelerationVector = true;
+
+                for (int i = 0; i < matrix_size; i++)
+                {
+                    // Find the next point by interpolation
+                    float t = (i + 1) * invSegments;
+                    Vector2 p = Vector2.Lerp(start_loc, end_loc, t);
+
+                    // Remap the acceleration value
+                    double accl_vec = gvariables_static.GetRemap(accl_max_at_timestep,
+                        accl_min_at_timestep,
+                        1.0, -1.0, global_accl_ampl_respMatrix[i]);
+
+
+                    // Update the P - y point
+                    double color_scale = Math.Abs(accl_vec);
+
+                    double animscale = accl_scale * accl_vec;
+
+                    // Update the acceleration vector
+                    acceleration_vectors.update_vector(i, p, new Vector2(p.X, (float)(p.Y + animscale)), color_scale);
+
+                }
+
+
+
+            }
 
 
 
@@ -418,25 +572,48 @@ namespace String_vibration_openTK.src.fe_objects
             gvariables_static.LineWidth = 1.0f;
             gvariables_static.PointSize = 1.0f;
 
+
+            if (IsPaintVelocityVector == true)
+                velocity_vectors.paint_vectors();
+
+
+            if (IsPaintAccelerationVector == true)
+                acceleration_vectors.paint_vectors();
+
+
         }
 
 
 
         public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency,
             Matrix4 projectionMatrix, Matrix4 modelMatrix, Matrix4 viewMatrix,
-            float geom_transparency)
+            float rslt_transparency)
         {
             // Update the openTK uniforms of the drawing objects
             stringline_resultsdata.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 projectionMatrix,
                 modelMatrix,
                 viewMatrix,
-                geom_transparency);
+                rslt_transparency);
+
+
+            velocity_vectors.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                projectionMatrix,
+                modelMatrix,
+                viewMatrix,
+                rslt_transparency);
+
+
+            acceleration_vectors.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                projectionMatrix,
+                modelMatrix,
+                viewMatrix,
+                rslt_transparency);
 
 
         }
 
-        
+
 
 
 

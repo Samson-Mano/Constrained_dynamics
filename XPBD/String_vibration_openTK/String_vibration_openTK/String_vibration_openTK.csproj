@@ -141,6 +141,7 @@
     <Compile Include="src\fe_objects\stringlinemodalresults_store.cs" />
     <Compile Include="src\fe_objects\stringlinerespresults_store.cs" />
     <Compile Include="src\fe_objects\text_store.cs" />
+    <Compile Include="src\fe_objects\vector_list_store.cs" />
     <Compile Include="src\geom_objects\label_list_store.cs" />
     <Compile Include="src\geom_objects\line_list_store.cs" />
     <Compile Include="src\geom_objects\meshdata_store.cs" />

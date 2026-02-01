@@ -41,10 +41,9 @@ namespace String_vibration_openTK
         private load_frm load_Form;
         private modal_frm modal_Form;
         private resp_frm resp_Form;
+        private option_frm option_Form;
 
-        //private animation_frm animation_Form;
-        //private option_frm option_Form;
-
+        
         private int frameCount = 0;
 
 
@@ -376,6 +375,31 @@ namespace String_vibration_openTK
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Check if option_Form is null or disposed
+            if (option_Form == null || option_Form.IsDisposed)
+            {
+                option_Form = new option_frm();
+
+                // Make it behave like a tool window
+                option_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                option_Form.ShowInTaskbar = false;
+                option_Form.TopLevel = true;
+                option_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - option_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - option_Form.Height) / 2;
+                option_Form.StartPosition = FormStartPosition.Manual;
+                option_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+            option_Form.initialize_option_form();
+
+            // Show the form
+            option_Form.Show(this);
+            option_Form.BringToFront();
 
         }
 
@@ -532,5 +556,12 @@ namespace String_vibration_openTK
 
         #endregion
 
+        private void main_frm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Main form closing
+            // save the default input
+
+            fedata.stringintension_data.Save();
+        }
     }
 }

@@ -193,10 +193,10 @@ namespace String_vibration_openTK.src.fe_objects
         {
             return new stringdata_store
             {
-                no_of_nodes = 50,
-                string_tension = 100.0,
-                string_length = 10.0,
-                string_density = 0.01
+                no_of_nodes = 100,
+                string_tension = 6000.0,
+                string_length = 100.0,
+                string_density = 24
             };
         }
 

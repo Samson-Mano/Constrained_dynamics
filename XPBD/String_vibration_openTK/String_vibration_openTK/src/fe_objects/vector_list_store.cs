@@ -19,7 +19,7 @@ namespace String_vibration_openTK.src.fe_objects
         public int vector_id { get; set; }
         public Vector2 tail_pt { get; set; }
         public Vector2 arrow_pt { get; set; }
-        public double intensity { get; set; }
+        // public double intensity { get; set; }
 
     }
 
@@ -30,13 +30,14 @@ namespace String_vibration_openTK.src.fe_objects
         // Vector data list
         public Dictionary<int, vector_data> vectorMap = new Dictionary<int, vector_data>();
         public int vector_count = 0;
+        public int color_id = 0;
 
         // Vector drawing data
         meshdata_store vector_drawingdata;
 
         // Length and width of arrow head
-        const float L = 3.0f;   // arrow head length 10F
-        const float W = 1.5f;  // arrow head width 5F
+        const float L = 6.0f;   // arrow head length 10F
+        const float W = 3.0f;  // arrow head width 5F
 
         public vector_list_store()
         {
@@ -49,7 +50,7 @@ namespace String_vibration_openTK.src.fe_objects
         }
 
 
-        public void add_vector(int vector_id, Vector2 tail_pt, Vector2 arrow_pt, double intensity)
+        public void add_vector(int vector_id, Vector2 tail_pt, Vector2 arrow_pt, int color_id)
         {
 
             // Add a vector data
@@ -57,7 +58,9 @@ namespace String_vibration_openTK.src.fe_objects
             new_vector.vector_id = vector_id;
             new_vector.tail_pt = tail_pt;
             new_vector.arrow_pt = arrow_pt;
-            new_vector.intensity = intensity;
+            // new_vector.intensity = intensity;
+
+            this.color_id = color_id;   
 
             // Add to the map
             vectorMap.Add(new_vector.vector_id, new_vector);
@@ -65,7 +68,7 @@ namespace String_vibration_openTK.src.fe_objects
 
         }
 
-        public void update_vector(int vector_id, Vector2 tail_pt, Vector2 arrow_pt, double intensity)
+        public void update_vector(int vector_id, Vector2 tail_pt, Vector2 arrow_pt)
         {
             //// Check if the vector id exists
             //if (vectorMap.ContainsKey(vector_id) == false)
@@ -78,7 +81,7 @@ namespace String_vibration_openTK.src.fe_objects
             // Update the vector data
             vectorMap[vector_id].tail_pt = tail_pt;
             vectorMap[vector_id].arrow_pt = arrow_pt;
-            vectorMap[vector_id].intensity = intensity;
+            // vectorMap[vector_id].intensity = intensity;
 
             // Update the point and line data in the drawing data
             int tail_pt_id = vector_id * 4;
@@ -87,8 +90,8 @@ namespace String_vibration_openTK.src.fe_objects
             int arrow_right_pt_id = tail_pt_id + 3;
 
             // Update the vector points
-            vector_drawingdata.update_mesh_point(tail_pt_id, tail_pt.X, tail_pt.Y, 0.0, intensity);
-            vector_drawingdata.update_mesh_point(arrow_pt_id, arrow_pt.X, arrow_pt.Y, 0.0, intensity);
+            vector_drawingdata.update_mesh_point(tail_pt_id, tail_pt.X, tail_pt.Y, 0.0, color_id);
+            vector_drawingdata.update_mesh_point(arrow_pt_id, arrow_pt.X, arrow_pt.Y, 0.0, color_id);
             // Add the arrow head points
 
             Vector2 dir_vector = Vector2.Normalize(arrow_pt - tail_pt);
@@ -97,8 +100,8 @@ namespace String_vibration_openTK.src.fe_objects
             Vector2 arrow_left = arrow_pt - (L * dir_vector) + (W * perp_vector);
             Vector2 arrow_right = arrow_pt - (L * dir_vector) - (W * perp_vector);
 
-            vector_drawingdata.update_mesh_point(arrow_left_pt_id, arrow_left.X, arrow_left.Y, 0.0, intensity);
-            vector_drawingdata.update_mesh_point(arrow_right_pt_id, arrow_right.X, arrow_right.Y, 0.0, intensity);
+            vector_drawingdata.update_mesh_point(arrow_left_pt_id, arrow_left.X, arrow_left.Y, 0.0, color_id);
+            vector_drawingdata.update_mesh_point(arrow_right_pt_id, arrow_right.X, arrow_right.Y, 0.0, color_id);
 
 
         }
@@ -107,7 +110,7 @@ namespace String_vibration_openTK.src.fe_objects
         public void set_vector_visualization()
         {
             // Initialize the mesh data
-            vector_drawingdata = new meshdata_store(true);
+            vector_drawingdata = new meshdata_store(false);
 
             // Set the vector visualization for all vectors in the map
 
@@ -120,8 +123,8 @@ namespace String_vibration_openTK.src.fe_objects
                 int arrow_right_pt_id = tail_pt_id + 3;
 
                 // Add the vector points
-                vector_drawingdata.add_mesh_point(tail_pt_id, vector.tail_pt.X, vector.tail_pt.Y, 0.0, -9);
-                vector_drawingdata.add_mesh_point(arrow_pt_id, vector.arrow_pt.X, vector.arrow_pt.Y, 0.0, -9);
+                vector_drawingdata.add_mesh_point(tail_pt_id, vector.tail_pt.X, vector.tail_pt.Y, 0.0, color_id);
+                vector_drawingdata.add_mesh_point(arrow_pt_id, vector.arrow_pt.X, vector.arrow_pt.Y, 0.0, color_id);
                 // Add the arrow head points
 
                 Vector2 dir_vector = Vector2.Normalize(vector.arrow_pt - vector.tail_pt);
@@ -130,8 +133,8 @@ namespace String_vibration_openTK.src.fe_objects
                 Vector2 arrow_left = vector.arrow_pt - (L * dir_vector) + (W * perp_vector);
                 Vector2 arrow_right = vector.arrow_pt - (L * dir_vector) - (W * perp_vector);
 
-                vector_drawingdata.add_mesh_point(arrow_left_pt_id, arrow_left.X, arrow_left.Y, 0.0, -9);
-                vector_drawingdata.add_mesh_point(arrow_right_pt_id, arrow_right.X, arrow_right.Y, 0.0, -9);
+                vector_drawingdata.add_mesh_point(arrow_left_pt_id, arrow_left.X, arrow_left.Y, 0.0, color_id);
+                vector_drawingdata.add_mesh_point(arrow_right_pt_id, arrow_right.X, arrow_right.Y, 0.0, color_id);
 
 
                 // Set the line ids
@@ -140,11 +143,11 @@ namespace String_vibration_openTK.src.fe_objects
                 int arrow_head_line_id2 = vector_line_id + 2;
 
                 // Lines
-                vector_drawingdata.add_mesh_lines(vector_line_id, tail_pt_id, arrow_pt_id, -9);
+                vector_drawingdata.add_mesh_lines(vector_line_id, tail_pt_id, arrow_pt_id, color_id);
 
                 // Arrow head lines
-                vector_drawingdata.add_mesh_lines(arrow_head_line_id1, arrow_pt_id, arrow_left_pt_id, -9);
-                vector_drawingdata.add_mesh_lines(arrow_head_line_id2, arrow_pt_id, arrow_right_pt_id, -9);
+                vector_drawingdata.add_mesh_lines(arrow_head_line_id1, arrow_pt_id, arrow_left_pt_id, color_id);
+                vector_drawingdata.add_mesh_lines(arrow_head_line_id2, arrow_pt_id, arrow_right_pt_id, color_id);
 
             }
 

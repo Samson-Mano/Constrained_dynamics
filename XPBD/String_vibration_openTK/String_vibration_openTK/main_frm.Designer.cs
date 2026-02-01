@@ -205,6 +205,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "main_frm";
             this.Text = "String Vibration Analysis";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.main_frm_FormClosing);
             this.Load += new System.EventHandler(this.main_frm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

@@ -130,5 +130,65 @@ namespace String_vibration_openTK.Properties {
                 this["Sett_modal_selected_index"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double Sett_modal_animation_speed {
+            get {
+                return ((double)(this["Sett_modal_animation_speed"]));
+            }
+            set {
+                this["Sett_modal_animation_speed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double Sett_resp_animation_speed {
+            get {
+                return ((double)(this["Sett_resp_animation_speed"]));
+            }
+            set {
+                this["Sett_resp_animation_speed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double Sett_displ_scale {
+            get {
+                return ((double)(this["Sett_displ_scale"]));
+            }
+            set {
+                this["Sett_displ_scale"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double Sett_velo_scale {
+            get {
+                return ((double)(this["Sett_velo_scale"]));
+            }
+            set {
+                this["Sett_velo_scale"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double Sett_accl_scale {
+            get {
+                return ((double)(this["Sett_accl_scale"]));
+            }
+            set {
+                this["Sett_accl_scale"] = value;
+            }
+        }
     }
 }

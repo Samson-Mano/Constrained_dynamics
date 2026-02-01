@@ -43,6 +43,12 @@ namespace String_vibration_openTK.src.fe_objects
 
         List<transformed_load_data> transformed_Loads = new List<transformed_load_data>();
 
+        // Store the absolute max displacement
+        double abs_max_displ = 0.0;
+        double abs_max_velo = 0.0;
+        double abs_max_accl = 0.0;
+
+
         struct transformed_load_data
         {
             public int load_id;
@@ -94,8 +100,8 @@ namespace String_vibration_openTK.src.fe_objects
                 if(i != segmentCount - 1)
                 {
                     // Initialize the velocity and acceleration vectors
-                    velocity_vectors.add_vector(i, p, p, 0.0);
-                    acceleration_vectors.add_vector(i, p, p, 0.0);
+                    velocity_vectors.add_vector(i, p, p, -8);
+                    acceleration_vectors.add_vector(i, p, p, -9);
                 }
                 
             }
@@ -113,6 +119,11 @@ namespace String_vibration_openTK.src.fe_objects
 
             this.IsPaintVelocityVector = false;
             this.IsPaintAccelerationVector = false;
+
+            // Reset the scale
+            this.abs_max_displ = 0.0;
+            this.abs_max_velo = 0.0;
+            this.abs_max_accl = 0.0;
 
 
         }
@@ -193,7 +204,7 @@ namespace String_vibration_openTK.src.fe_objects
                 {
                     if (nd != 0 && nd != matrix_size + 1)
                     {
-                        global_LoadAmplitudeVector[nd - 1] += load.load_values[i];
+                        global_LoadAmplitudeVector[nd - 1] += -load.load_values[i];
                         i++;
                     }
                 }
@@ -448,22 +459,26 @@ namespace String_vibration_openTK.src.fe_objects
             global_velo_ampl_respMatrix = this.eigen_vectors * modal_velo_ampl_respMatrix;
             global_accl_ampl_respMatrix = this.eigen_vectors * modal_accl_ampl_respMatrix;
 
-            // Get the maximum values at this time step
-            double displ_max_at_timestep = global_displ_ampl_respMatrix.Max();
-            double displ_min_at_timestep = global_displ_ampl_respMatrix.Min();
-            double velo_max_at_timestep = global_velo_ampl_respMatrix.Max();
-            double velo_min_at_timestep = global_velo_ampl_respMatrix.Min();
-            double accl_max_at_timestep = global_accl_ampl_respMatrix.Max();
-            double accl_min_at_timestep = global_accl_ampl_respMatrix.Min();
+            // Get the absolute maximum values at this time step
+            this.abs_max_displ =Math.Max(this.abs_max_displ, Math.Max(Math.Abs(global_displ_ampl_respMatrix.Max()), 
+                Math.Abs(global_displ_ampl_respMatrix.Min())));
+
+            this.abs_max_velo = Math.Max(this.abs_max_velo, Math.Max(Math.Abs(global_velo_ampl_respMatrix.Max()),
+                Math.Abs(global_velo_ampl_respMatrix.Min())));
+
+            this.abs_max_accl = Math.Max(this.abs_max_accl, Math.Max(Math.Abs(global_accl_ampl_respMatrix.Max()),
+                Math.Abs(global_accl_ampl_respMatrix.Min())));
 
 
             float invSegments = 1.0f / (float)(matrix_size + 1);
 
-            if (Math.Abs(displ_max_at_timestep - displ_min_at_timestep) > 0.00001)
+            if (abs_max_displ > 0.000001)
             {
 
                 // Update the modal results displacement of the string line nodes
                 stringline_resultsdata.update_mesh_point(0, start_loc.X, start_loc.Y, 0.0f, 0.0f);
+
+                List<Vector2> displ_pts = new List<Vector2>();
 
                 for (int i = 0; i < matrix_size; i++)
                 {
@@ -472,15 +487,15 @@ namespace String_vibration_openTK.src.fe_objects
                     Vector2 p = Vector2.Lerp(start_loc, end_loc, t);
 
                     // Remap the displacement value
-                    double displ_vec = gvariables_static.GetRemap(displ_max_at_timestep,
-                        displ_min_at_timestep,
-                        1.0, -1.0, global_displ_ampl_respMatrix[i]);
+                    double displ_vec = global_displ_ampl_respMatrix[i] / abs_max_displ;
 
 
                     // Update the P - y point
                     double color_scale = Math.Abs(displ_vec);
 
                     double animscale = displ_scale * displ_vec;
+
+                    displ_pts.Add(new Vector2(p.X, (float)(p.Y + animscale)));
 
                     // Update the point
                     stringline_resultsdata.update_mesh_point(i + 1, p.X, p.Y + animscale, 0.0f, color_scale);
@@ -489,72 +504,69 @@ namespace String_vibration_openTK.src.fe_objects
 
                 stringline_resultsdata.update_mesh_point(matrix_size, end_loc.X, end_loc.Y, 0.0f, 0.0f);
                 //
-            }
 
-            // Update the velocity
-            this.IsPaintVelocityVector = false;
 
-            if (Math.Abs(velo_max_at_timestep - velo_min_at_timestep) > 0.00001)
-            {
-                this.IsPaintVelocityVector = true;
+                // Update the velocity
+                this.IsPaintVelocityVector = false;
 
-                for (int i = 0; i < matrix_size; i++)
+                if (abs_max_velo > 0.000001)
                 {
-                    // Find the next point by interpolation
-                    float t = (i + 1) * invSegments;
-                    Vector2 p = Vector2.Lerp(start_loc, end_loc, t);
+                    this.IsPaintVelocityVector = true;
 
-                    // Remap the velocity value
-                    double velo_vec = gvariables_static.GetRemap(velo_max_at_timestep,
-                        velo_min_at_timestep,
-                        1.0, -1.0, global_velo_ampl_respMatrix[i]);
+                    for (int i = 0; i < matrix_size; i++)
+                    {
+                        // Find the next point by interpolation
+                        float t = (i + 1) * invSegments;
+                        Vector2 p = Vector2.Lerp(start_loc, end_loc, t);
 
+                        // Remap the velocity value
+                        double velo_vec = global_velo_ampl_respMatrix[i] / abs_max_velo;
 
-                    // Update the P - y point
-                    double color_scale = Math.Abs(velo_vec);
+                        // Update the P - y point
+                        // double color_scale = Math.Abs(velo_vec);
 
-                    double animscale = velo_scale * velo_vec;
+                        double animscale = velo_scale * velo_vec;
 
-                    // Update the velocity vector
-                    velocity_vectors.update_vector(i, p, new Vector2( p.X, (float)(p.Y + animscale)), color_scale);
+                        // Update the velocity vector
+                        velocity_vectors.update_vector(i, displ_pts[i], 
+                            new Vector2(displ_pts[i].X, (float)(displ_pts[i].Y + animscale)));
 
-                }
-            }
-
-            // Update the acceleration
-            this.IsPaintAccelerationVector = false;
-
-            if (Math.Abs(accl_max_at_timestep - accl_min_at_timestep) > 0.00001)
-            {
-                this.IsPaintAccelerationVector = true;
-
-                for (int i = 0; i < matrix_size; i++)
-                {
-                    // Find the next point by interpolation
-                    float t = (i + 1) * invSegments;
-                    Vector2 p = Vector2.Lerp(start_loc, end_loc, t);
-
-                    // Remap the acceleration value
-                    double accl_vec = gvariables_static.GetRemap(accl_max_at_timestep,
-                        accl_min_at_timestep,
-                        1.0, -1.0, global_accl_ampl_respMatrix[i]);
-
-
-                    // Update the P - y point
-                    double color_scale = Math.Abs(accl_vec);
-
-                    double animscale = accl_scale * accl_vec;
-
-                    // Update the acceleration vector
-                    acceleration_vectors.update_vector(i, p, new Vector2(p.X, (float)(p.Y + animscale)), color_scale);
-
+                    }
                 }
 
+                // Update the acceleration
+                this.IsPaintAccelerationVector = false;
 
+                if (abs_max_accl > 0.000001)
+                {
+                    this.IsPaintAccelerationVector = true;
+
+                    for (int i = 0; i < matrix_size; i++)
+                    {
+                        // Find the next point by interpolation
+                        float t = (i + 1) * invSegments;
+                        Vector2 p = Vector2.Lerp(start_loc, end_loc, t);
+
+                        // Remap the acceleration value
+                        double accl_vec = global_accl_ampl_respMatrix[i] / abs_max_accl;
+
+                        // Update the P - y point
+                        // double color_scale = Math.Abs(accl_vec);
+
+                        double animscale = accl_scale * accl_vec;
+
+                        // Update the acceleration vector
+                        acceleration_vectors.update_vector(i, displ_pts[i], 
+                            new Vector2(displ_pts[i].X, (float)(displ_pts[i].Y + animscale)));
+
+                    }
+
+                }
+                //
 
             }
 
-
+           //
 
         }
 
@@ -569,17 +581,19 @@ namespace String_vibration_openTK.src.fe_objects
             stringline_resultsdata.paint_dynamic_mesh_lines();
             stringline_resultsdata.paint_dynamic_mesh_points();
 
-            gvariables_static.LineWidth = 1.0f;
-            gvariables_static.PointSize = 1.0f;
 
 
-            if (IsPaintVelocityVector == true)
+
+            if (IsPaintVelocityVector == true && gvariables_static.is_show_velocity_vector == true)
                 velocity_vectors.paint_vectors();
 
 
-            if (IsPaintAccelerationVector == true)
+            if (IsPaintAccelerationVector == true && gvariables_static.is_show_acceleration_vector == true)
                 acceleration_vectors.paint_vectors();
 
+
+            gvariables_static.LineWidth = 1.0f;
+            gvariables_static.PointSize = 1.0f;
 
         }
 

@@ -24,7 +24,7 @@ namespace String_vibration_openTK.src.fe_objects
 
         bool isInlConditionExists = false;
 
-        const float y_drawing_scale = 300.0f;
+        const float y_drawing_scale = 200.0f;
         int colorID = -1;
 
         const int DISPLACEMENT_COLOR = -6;

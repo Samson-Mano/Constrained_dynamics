@@ -60,9 +60,9 @@ namespace String_vibration_openTK.src.fe_objects
         private bool isModelSet = false;
 
 
-        const double displextent = 100.0; // Extent of displacement for scaling
-        const double veloextent = 100.0; // Extent of velocity for scaling
-        const double acclextent = 100.0; // Extent of acceleration for scaling
+        const float displextent = 200.0f; // Extent of displacement for scaling
+        const float veloextent = 200.0f; // Extent of velocity for scaling
+        const float acclextent = 200.0f; // Extent of acceleration for scaling
 
 
         // Set whether the modal analysis is set
@@ -310,7 +310,8 @@ namespace String_vibration_openTK.src.fe_objects
                 stringlinemodalresults_data.paint_modalanalysisresults();
 
                 // Paint the animation time
-                time_label.paint_dynamic_text();
+                if(gvariables_static.is_show_time_label == true)
+                    time_label.paint_dynamic_text();
 
             }
 
@@ -321,7 +322,8 @@ namespace String_vibration_openTK.src.fe_objects
                 stringlinerespresults_data.paint_responseanalysisresults();
 
                 // Paint the animation time
-                time_label.paint_dynamic_text();
+                if (gvariables_static.is_show_time_label == true)
+                    time_label.paint_dynamic_text();
 
             }
 

@@ -44,6 +44,7 @@
             this.trackBar_deformation_scale = new System.Windows.Forms.TrackBar();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button_close = new System.Windows.Forms.Button();
+            this.checkBox_rollform = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_acceleration_scale)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_velocity_scale)).BeginInit();
@@ -54,7 +55,7 @@
             // label_status
             // 
             this.label_status.AutoSize = true;
-            this.label_status.Location = new System.Drawing.Point(9, 319);
+            this.label_status.Location = new System.Drawing.Point(9, 343);
             this.label_status.Name = "label_status";
             this.label_status.Size = new System.Drawing.Size(53, 16);
             this.label_status.TabIndex = 22;
@@ -62,7 +63,7 @@
             // 
             // button_stop
             // 
-            this.button_stop.Location = new System.Drawing.Point(12, 272);
+            this.button_stop.Location = new System.Drawing.Point(12, 296);
             this.button_stop.Name = "button_stop";
             this.button_stop.Size = new System.Drawing.Size(133, 33);
             this.button_stop.TabIndex = 21;
@@ -72,7 +73,7 @@
             // 
             // button_play_pause
             // 
-            this.button_play_pause.Location = new System.Drawing.Point(12, 233);
+            this.button_play_pause.Location = new System.Drawing.Point(12, 257);
             this.button_play_pause.Name = "button_play_pause";
             this.button_play_pause.Size = new System.Drawing.Size(133, 33);
             this.button_play_pause.TabIndex = 20;
@@ -85,9 +86,9 @@
             this.groupBox1.Controls.Add(this.label_animation_speed);
             this.groupBox1.Controls.Add(this.label_realtimeanim_speed);
             this.groupBox1.Controls.Add(this.button_animation_speed);
-            this.groupBox1.Location = new System.Drawing.Point(12, 356);
+            this.groupBox1.Location = new System.Drawing.Point(12, 380);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(468, 144);
+            this.groupBox1.Size = new System.Drawing.Size(485, 144);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Animation Speed: ";
@@ -176,16 +177,16 @@
             this.groupBox2.Controls.Add(this.trackBar_velocity_scale);
             this.groupBox2.Controls.Add(this.label_deformation_scale);
             this.groupBox2.Controls.Add(this.trackBar_deformation_scale);
-            this.groupBox2.Location = new System.Drawing.Point(12, 12);
+            this.groupBox2.Location = new System.Drawing.Point(12, 44);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(468, 202);
+            this.groupBox2.Size = new System.Drawing.Size(485, 202);
             this.groupBox2.TabIndex = 23;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Animation Scale: ";
             // 
             // button_close
             // 
-            this.button_close.Location = new System.Drawing.Point(184, 518);
+            this.button_close.Location = new System.Drawing.Point(182, 553);
             this.button_close.Name = "button_close";
             this.button_close.Size = new System.Drawing.Size(125, 46);
             this.button_close.TabIndex = 24;
@@ -193,11 +194,24 @@
             this.button_close.UseVisualStyleBackColor = true;
             this.button_close.Click += new System.EventHandler(this.button_close_Click);
             // 
+            // checkBox_rollform
+            // 
+            this.checkBox_rollform.Appearance = System.Windows.Forms.Appearance.Button;
+            this.checkBox_rollform.AutoSize = true;
+            this.checkBox_rollform.Location = new System.Drawing.Point(471, 12);
+            this.checkBox_rollform.Name = "checkBox_rollform";
+            this.checkBox_rollform.Size = new System.Drawing.Size(25, 26);
+            this.checkBox_rollform.TabIndex = 25;
+            this.checkBox_rollform.Text = "▲";
+            this.checkBox_rollform.UseVisualStyleBackColor = true;
+            this.checkBox_rollform.CheckedChanged += new System.EventHandler(this.checkBox_rollform_CheckedChanged);
+            // 
             // resp_frm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(511, 576);
+            this.ClientSize = new System.Drawing.Size(509, 611);
+            this.Controls.Add(this.checkBox_rollform);
             this.Controls.Add(this.button_close);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.label_status);
@@ -207,8 +221,12 @@
             this.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximumSize = new System.Drawing.Size(525, 650);
+            this.MinimumSize = new System.Drawing.Size(525, 85);
             this.Name = "resp_frm";
+            this.Opacity = 0.85D;
             this.Text = "Response Form";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.resp_frm_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_acceleration_scale)).EndInit();
@@ -238,5 +256,6 @@
         private System.Windows.Forms.TrackBar trackBar_deformation_scale;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button button_close;
+        private System.Windows.Forms.CheckBox checkBox_rollform;
     }
 }

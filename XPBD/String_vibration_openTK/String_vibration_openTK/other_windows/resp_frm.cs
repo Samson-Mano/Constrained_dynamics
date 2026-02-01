@@ -24,6 +24,10 @@ namespace String_vibration_openTK.other_windows
         private Button buttonPopupCancel;
 
 
+        Timer rollTimer = new Timer();
+        int targetHeight;
+        int step = 20;
+
 
         public resp_frm(ref fedata_store fe_data)
         {
@@ -31,6 +35,25 @@ namespace String_vibration_openTK.other_windows
 
 
             this.fe_data = fe_data;
+
+            // Check box to control the form roll
+            checkBox_rollform.Checked = false;
+            rollTimer.Interval = 15;
+            rollTimer.Tick += RollTimer_Tick;
+
+            // === Track bar control ===
+            trackBar_deformation_scale.Minimum = 0;
+            trackBar_deformation_scale.Maximum = 19;
+            trackBar_deformation_scale.Value = 10; // Default starting value of 1.0
+
+            trackBar_velocity_scale.Minimum = 0;
+            trackBar_velocity_scale.Maximum = 19;
+            trackBar_velocity_scale.Value = 10; // Default starting value of 1.0
+
+            trackBar_acceleration_scale.Minimum = 0;
+            trackBar_acceleration_scale.Maximum = 19;
+            trackBar_acceleration_scale.Value = 10; // Default starting value of 1.0
+
 
             // === Popup Panel ===
             panelPopup = new Panel();
@@ -67,9 +90,15 @@ namespace String_vibration_openTK.other_windows
         }
 
 
+
+
         public void initialize_response_form()
         {
             // Initialie the Pulse Form data
+
+            gvariables_static.displacement_scale = Properties.Settings.Default.Sett_displ_scale;
+            gvariables_static.velocity_scale = Properties.Settings.Default.Sett_velo_scale;
+            gvariables_static.acceleration_scale = Properties.Settings.Default.Sett_accl_scale;
 
             // Update the scale labels based on current global variable values
             trackBar_deformation_scale.Value = ComputeTrackBarFromScale(gvariables_static.displacement_scale);
@@ -100,6 +129,10 @@ namespace String_vibration_openTK.other_windows
            );
 
 
+            trackBar_deformation_scale.Scroll += trackBar_deformation_scale_Scroll;
+            trackBar_velocity_scale.Scroll += trackBar_velocity_scale_Scroll;
+            trackBar_acceleration_scale.Scroll += trackBar_acceleration_scale_Scroll;
+
 
             //____________________________________________________________________________________________________
 
@@ -121,6 +154,8 @@ namespace String_vibration_openTK.other_windows
                 label_status.Text = "Stopped";
 
             }
+
+            gvariables_static.resp_animation_speed = Properties.Settings.Default.Sett_resp_animation_speed;
 
             // Set the global variable
             double value = gvariables_static.resp_animation_speed;
@@ -174,11 +209,76 @@ namespace String_vibration_openTK.other_windows
 
 
 
+        private void resp_frm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Update the settings
+            Properties.Settings.Default.Sett_resp_animation_speed = gvariables_static.resp_animation_speed;
+            Properties.Settings.Default.Sett_displ_scale = gvariables_static.displacement_scale;
+            Properties.Settings.Default.Sett_velo_scale = gvariables_static.velocity_scale;
+            Properties.Settings.Default.Sett_accl_scale = gvariables_static.acceleration_scale;
+
+            Properties.Settings.Default.Save();
+
+            // Stop painting modal analysis
+            this.fe_data.isResponseAnalysisPaint  = false;
+            this.fe_data.update_model_transparency();
+
+            //___________________________________________________________________________________________________
+            // Animation control
+            this.fe_data.stop_animation();
+
+            gvariables_static.animate_play = false;
+            gvariables_static.animate_pause = false;
+            gvariables_static.animate_stop = false;
+
+            // Call to main form
+            if (this.Owner is main_frm mainForm)
+            {
+                mainForm.CallFrom_inpt_frms();
+            }
+
+        }
+
 
 
 
         //__________________________________________________________________________________________________________
 
+
+        private void trackBar_deformation_scale_Scroll(object sender, EventArgs e)
+        {
+            UpdateScale(
+                          trackBar_deformation_scale,
+                          label_deformation_scale,
+                          "Deformation scale",
+                          v => gvariables_static.displacement_scale = v
+                      );
+
+        }
+
+
+        private void trackBar_velocity_scale_Scroll(object sender, EventArgs e)
+        {
+            UpdateScale(
+                         trackBar_velocity_scale,
+                         label_velocity_scale,
+                         "Velocity scale",
+                         v => gvariables_static.velocity_scale = v
+                     );
+
+        }
+
+
+        private void trackBar_acceleration_scale_Scroll(object sender, EventArgs e)
+        {
+            UpdateScale(
+                           trackBar_acceleration_scale,
+                           label_acceleration_scale,
+                           "Acceleration scale",
+                           v => gvariables_static.acceleration_scale = v
+                       );
+
+        }
 
         private void UpdateScale(TrackBar bar, Label label, string prefix, Action<double> setValue)
         {
@@ -354,6 +454,53 @@ namespace String_vibration_openTK.other_windows
         }
 
 
+        private void checkBox_rollform_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_rollform.Checked)
+            {
+                // Collapse
+                checkBox_rollform.Text = "▼";
+                targetHeight = 85;
+            }
+            else
+            {
+                // Expand
+                checkBox_rollform.Text = "▲";
+                targetHeight = 650;
+            }
+
+
+            rollTimer.Start();
+
+        }
+
+
+
+        private void RollTimer_Tick(object sender, EventArgs e)
+        {
+            if (this.Height < targetHeight) // Height is at 85 and will be extended to Target height of 650
+            {
+                this.Height += step;
+                if (this.Height >= targetHeight)
+                {
+                    this.Height = targetHeight;
+                    rollTimer.Stop();
+                }
+            }
+            else if (this.Height > targetHeight) // Height is at 650 and will be reduced to Target height of 85
+            {
+                this.Height -= step;
+                if (this.Height <= targetHeight)
+                {
+                    this.Height = targetHeight;
+                    rollTimer.Stop();
+                }
+            }
+            else
+            {
+                rollTimer.Stop();
+            }
+        }
 
 
         //__________________________________________________________________________________________________________

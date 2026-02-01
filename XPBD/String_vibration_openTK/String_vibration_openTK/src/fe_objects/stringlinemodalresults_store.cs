@@ -20,7 +20,6 @@ namespace String_vibration_openTK.src.fe_objects
         Vector2 end_loc = new Vector2(0.0f, 0.0f);
         int segmentCount = 0;
 
-
         public stringlinemodalresults_store(Vector2 start_loc, Vector2 end_loc, int segmentCount)
         {
             // Store the initialization data

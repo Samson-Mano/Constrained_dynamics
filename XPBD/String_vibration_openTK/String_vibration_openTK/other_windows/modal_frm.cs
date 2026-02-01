@@ -25,13 +25,25 @@ namespace String_vibration_openTK.other_windows
         private TextBox textPopup;
         private Button buttonPopupOK;
         private Button buttonPopupCancel;
- 
+
+
+
+        Timer rollTimer = new Timer();
+        int targetHeight;
+        int step = 20;
+
 
         public modal_frm(ref fedata_store fe_data)
         {
             InitializeComponent();
 
             this.fe_data = fe_data;
+
+            // Check box to control the form roll
+            checkBox_rollform.Checked = false;
+            rollTimer.Interval = 15;
+            rollTimer.Tick += RollTimer_Tick;
+
 
             // === Popup Panel ===
             panelPopup = new Panel();
@@ -145,6 +157,8 @@ namespace String_vibration_openTK.other_windows
 
             }
 
+            gvariables_static.modal_animation_speed = Properties.Settings.Default.Sett_modal_animation_speed;
+
             // Set the global variable
             double value = gvariables_static.modal_animation_speed;
 
@@ -190,6 +204,8 @@ namespace String_vibration_openTK.other_windows
         {
             // Update the settings
             Properties.Settings.Default.Sett_modal_selected_index = comboBox_modedata.SelectedIndex;
+            Properties.Settings.Default.Sett_modal_animation_speed = gvariables_static.modal_animation_speed;
+
             Properties.Settings.Default.Save();
 
             // Stop painting modal analysis
@@ -332,6 +348,57 @@ namespace String_vibration_openTK.other_windows
             label_status.Text = "Stopped";
 
         }
+
+        private void checkBox_rollform_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_rollform.Checked)
+            {
+                // Collapse
+                checkBox_rollform.Text = "▼";
+                targetHeight = 85;
+            }
+            else
+            {
+                // Expand
+                checkBox_rollform.Text = "▲";
+                targetHeight = 650;
+            }
+
+
+            rollTimer.Start();
+
+        }
+
+
+
+        private void RollTimer_Tick(object sender, EventArgs e)
+        {
+            if (this.Height < targetHeight) // Height is at 85 and will be extended to Target height of 650
+            {
+                this.Height += step;
+                if (this.Height >= targetHeight)
+                {
+                    this.Height = targetHeight;
+                    rollTimer.Stop();
+                }
+            }
+            else if (this.Height > targetHeight) // Height is at 650 and will be reduced to Target height of 85
+            {
+                this.Height -= step;
+                if (this.Height <= targetHeight)
+                {
+                    this.Height = targetHeight;
+                    rollTimer.Stop();
+                }
+            }
+            else
+            {
+                rollTimer.Stop();
+            }
+        }
+
+
+
 
         //__________________________________________________________________________________________________________
 

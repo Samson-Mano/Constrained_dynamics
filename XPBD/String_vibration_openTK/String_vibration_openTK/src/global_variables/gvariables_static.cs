@@ -153,25 +153,22 @@ namespace String_vibration_openTK.src.global_variables
         public static Color glcontrol_background_color = Color.White;
 
         // Garphics Control variables
-        public static bool is_show_velocity_vector = true;
-        public static bool is_show_acceleration_vector = true;
+        public static bool is_show_velocity_vector = false;
+        public static bool is_show_acceleration_vector = false;
 
         public static bool is_show_displacement_graph = true;
         public static bool is_show_velocity_graph = true;
         public static bool is_show_acceleration_graph = true;
 
         public static bool is_show_time_label = true;
+
+
         public static bool is_show_displacement_label = true;
         public static bool is_show_velocity_label = true;
         public static bool is_show_acceleration_label = true;
 
         public static bool is_show_phaseportrait = false;
 
-        public static bool is_show_larmour_field = false;
-        public static bool is_show_field_around_circle = false;
-
-
-        public static bool is_show_masstrail = true;
 
         public static bool is_paint_shrunk_triangle = false;
 

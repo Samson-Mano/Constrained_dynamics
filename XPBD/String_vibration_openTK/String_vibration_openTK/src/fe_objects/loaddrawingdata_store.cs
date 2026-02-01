@@ -23,7 +23,7 @@ namespace String_vibration_openTK.src.fe_objects
 
         bool isLoadExists = false;
 
-        const float y_drawing_scale = 300.0f;
+        const float y_drawing_scale = 200.0f;
         const float y_arrow_size = 30.0f;
 
         const int LOAD_COLOR = -8;

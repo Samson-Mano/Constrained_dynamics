@@ -223,6 +223,11 @@ namespace String_vibration_openTK.src.fe_objects
                 this.transformed_Loads.Add(t_load);
             }
 
+            // Reset the scale
+            this.abs_max_displ = 0.0;
+            this.abs_max_velo = 0.0;
+            this.abs_max_accl = 0.0;
+
         }
 
 
@@ -502,7 +507,7 @@ namespace String_vibration_openTK.src.fe_objects
 
                 }
 
-                stringline_resultsdata.update_mesh_point(matrix_size, end_loc.X, end_loc.Y, 0.0f, 0.0f);
+                stringline_resultsdata.update_mesh_point(matrix_size + 1, end_loc.X, end_loc.Y, 0.0f, 0.0f);
                 //
 
 

@@ -44,6 +44,15 @@ bld/
 !XPBD/PBD_pendulum_simulation/PBD_pendulum_simulation/bin/x64/Release/
 !XPBD/PBD_pendulum_simulation/PBD_pendulum_simulation/bin/x64/Release/**
 
+!XPBD/
+!XPBD/String_vibration_openTK/
+!XPBD/String_vibration_openTK/String_vibration_openTK/
+!XPBD/String_vibration_openTK/String_vibration_openTK/bin/
+!XPBD/String_vibration_openTK/String_vibration_openTK/bin/x64/
+!XPBD/String_vibration_openTK/String_vibration_openTK/bin/x64/Release/
+!XPBD/String_vibration_openTK/String_vibration_openTK/bin/x64/Release/**
+
+
 
 
 # Visual Studio 2015/2017 cache/options directory

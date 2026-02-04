@@ -1,0 +1,27 @@
+{
+  "inlcond_ids": [],
+  "load_ids": [
+    0
+  ],
+  "model_version": 1,
+  "no_of_nodes": 100,
+  "string_tension": 6000.0,
+  "string_length": 100.0,
+  "string_density": 24.0,
+  "inlcond_data": [],
+  "load_data": [
+    {
+      "load_id": 0,
+      "load_type": 0,
+      "load_start_time": 2.0,
+      "load_end_time": 5.0,
+      "load_nodes": [
+        36
+      ],
+      "load_values": [
+        10.0
+      ],
+      "abs_max_value": 10.0
+    }
+  ]
+}

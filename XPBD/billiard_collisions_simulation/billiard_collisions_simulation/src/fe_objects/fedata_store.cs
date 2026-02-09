@@ -18,7 +18,8 @@ namespace billiard_collisions_simulation.src.fe_objects
 
     public class fedata_store
     {
-        public pendulum_data_store pendulum_data;
+        // public pendulum_data_store pendulum_data;
+        public billiardball_data_store billiardballs;
 
         public elementfixedend_store fe_fixedend;
 
@@ -89,17 +90,20 @@ namespace billiard_collisions_simulation.src.fe_objects
             fe_fixedend = new elementfixedend_store(new Vector2(0.0f, 0.0f), 270.0f);
 
             // Settings.Default.Reset();
-            
+
             // Set the pendulum model
-            set_triple_pendulum_model(Settings.Default.sett_mass1,
-                Settings.Default.sett_mass2, 
-                Settings.Default.sett_mass3, 
-                Settings.Default.sett_length1, 
-                Settings.Default.sett_length2, 
-                Settings.Default.sett_length3, 
-                Settings.Default.sett_initialangle1, 
-                Settings.Default.sett_initialangle2, 
-                Settings.Default.sett_initialangle3);
+            billiardballs = new billiardball_data_store();
+
+
+            //set_triple_pendulum_model(Settings.Default.sett_mass1,
+            //    Settings.Default.sett_mass2, 
+            //    Settings.Default.sett_mass3, 
+            //    Settings.Default.sett_length1, 
+            //    Settings.Default.sett_length2, 
+            //    Settings.Default.sett_length3, 
+            //    Settings.Default.sett_initialangle1, 
+            //    Settings.Default.sett_initialangle2, 
+            //    Settings.Default.sett_initialangle3);
 
 
             // Initialize the labels 
@@ -114,17 +118,10 @@ namespace billiard_collisions_simulation.src.fe_objects
 
         }
 
-        public void set_triple_pendulum_model(double mass1, double mass2, double mass3,
-            double length1, double length2, double length3,
-            double initial_angle1, double initial_angle2, double initial_angle3)
+        public void set_billiardball_model(int number_of_balls, double min_radius, double max_radius)
         {
-            // Set the pendulum data
-            List<double> masses = new List<double>() { mass1, mass2, mass3 };
-            List<double> lengths = new List<double>() { length1, length2, length3 };
-            List<double> initial_angles_deg = new List<double>() { initial_angle1, initial_angle2, initial_angle3 };
-
-
-            pendulum_data = new pendulum_data_store(masses, lengths, initial_angles_deg);
+            // Update the Billiard ball data
+            billiardballs.update_billiardball_datas(number_of_balls, min_radius, max_radius);
 
             update_openTK_uniforms(true, true, true);
 
@@ -147,8 +144,8 @@ namespace billiard_collisions_simulation.src.fe_objects
             // Paint the three pendulum system
             fe_fixedend.paint_fixedend();
 
-            // Paint the pendulum
-            pendulum_data.paint_pendulum();
+            // Paint the Billiard balls
+            billiardballs.paint_billiardballs();
 
             // Paint the animation time
             time_label.paint_dynamic_text();
@@ -180,7 +177,7 @@ namespace billiard_collisions_simulation.src.fe_objects
             stopwatch.Reset();
             stopwatch.Stop();
 
-            pendulum_data.reset_simulation();
+            billiardballs.reset_simulation();
           
         }
 
@@ -198,7 +195,7 @@ namespace billiard_collisions_simulation.src.fe_objects
             {
                 time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(0.0f, 65.0f)); 
 
-                pendulum_data.simulate(elapsedRealTime);
+                billiardballs.simulate(elapsedRealTime);
 
             }
             
@@ -245,8 +242,8 @@ namespace billiard_collisions_simulation.src.fe_objects
                 gvariables_static.geom_transparency);
 
 
-            // Update pendulum openTK uniforms
-            pendulum_data.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            // Update billiard balls openTK uniforms
+            billiardballs.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control);
 
 

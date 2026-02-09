@@ -9,6 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using billiard_collisions_simulation.src.global_variables;
+
+
 namespace billiard_collisions_simulation.other_windows
 {
     public partial class setmodel_frm : Form
@@ -27,8 +30,45 @@ namespace billiard_collisions_simulation.other_windows
 
         public void initialize_model_form()
         {
+            textBox_no_of_balls.Text = Properties.Settings.Default.Sett_number_of_balls.ToString();
+
+            textBox_min_radius.Text = Properties.Settings.Default.Sett_minimum_radius.ToString();
+            textBox_max_radius.Text = Properties.Settings.Default.Sett_maximum_radius.ToString();
+
 
         }
+
+        private void button_update_model_Click(object sender, EventArgs e)
+        {
+
+            // -------------------------------
+            // Validate inputs
+            // -------------------------------
+            if (!gvariables_static.TryGetPositiveInteger(textBox_no_of_balls, "Number of balls", out int no_of_balls)) return;
+
+            if (!gvariables_static.TryGetPositiveDouble(textBox_min_radius, "Minimum Radius", out double min_radius)) return;
+            if (!gvariables_static.TryGetPositiveDouble(textBox_max_radius, "Maximum Radius", out double max_radius)) return;
+
+
+
+
+
+
+
+            // -------------------------------
+            // Update settings
+            // -------------------------------
+            Properties.Settings.Default.Sett_number_of_balls = no_of_balls;
+
+            Properties.Settings.Default.Sett_minimum_radius = min_radius;
+            Properties.Settings.Default.Sett_maximum_radius = max_radius;
+
+            Properties.Settings.Default.Save();
+
+
+
+        }
+
 
 
 

@@ -216,6 +216,64 @@ namespace billiard_collisions_simulation.src.global_variables
         }
 
 
+        public static bool TryGetPositiveInteger(TextBox tb, string name, out int value)
+        {
+            if (!int.TryParse(tb.Text, out value))
+            {
+                MessageBox.Show(
+                    $"{name} must be a numeric value.",
+                    "Invalid Input",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                tb.Focus();
+                return false;
+            }
+
+            if (value <= 0)
+            {
+                MessageBox.Show(
+                    $"{name} must be a positive integer.",
+                    "Invalid Input",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                tb.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+
+
+        public static bool TryGetPositiveDouble(TextBox tb, string name, out double value)
+        {
+            if (!double.TryParse(tb.Text, out value))
+            {
+                MessageBox.Show(
+                    $"{name} must be a numeric value.",
+                    "Invalid Input",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                tb.Focus();
+                return false;
+            }
+
+            if (value <= 0)
+            {
+                MessageBox.Show(
+                    $"{name} must be a positive number.",
+                    "Invalid Input",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                tb.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+
+
         public static float get_font_scale(float font_size)
         {
             return gvariables_static.geom_size * 0.0003f * (font_size / 12.0f);
@@ -231,79 +289,6 @@ namespace billiard_collisions_simulation.src.global_variables
             return ch_data.Size.Y * get_font_scale(font_size);
 
         }
-
-
-        public static Vector2 larmour_field(Vector2 gridNodePt, Vector2 acceleration_at_t,
-            double waveSpeedC, Vector2 wVector, Vector2 refZero)
-        {
-
-            // Larmour field calculation
-            // r = gridNodePt − refZero
-            Vector2 rVector = gridNodePt - refZero;
-
-            // r' = r − w
-            Vector2 rDashVector = rVector - wVector;
-
-            float magnitudeRDash = rDashVector.Length;
-
-            if (magnitudeRDash == 0f)
-                return Vector2.Zero;  // avoid division by zero
-
-            // normalize r'
-            Vector2 normRDash = rDashVector / magnitudeRDash;
-
-            // Convert to 3D (z = 0) for cross products
-            Vector3 r3 = new Vector3(normRDash.X, normRDash.Y, 0.0f);
-            Vector3 a3 = new Vector3(acceleration_at_t.X, acceleration_at_t.Y, 0.0f);
-
-            // Cross #1: r × a
-            Vector3 rCrossA = Vector3.Cross(r3, a3);
-
-            // Cross #2: r × (r × a)
-            Vector3 aPerpDash = Vector3.Cross(r3, rCrossA);
-
-            // Back to 2D
-            Vector2 aPerp = new Vector2(aPerpDash.X, aPerpDash.Y);
-
-            // Constants
-            float k1 = 1.0f;
-            float k2 = (float)(1.0 / (magnitudeRDash * Math.Pow(waveSpeedC, 2.0)));
-
-            return k1 * k2 * aPerp;
-
-        }
-
-
-        // Intertia ratio plotter
-        public static double GetInertiaRatio(double velocity, double acceleration, double k = 1.0)
-        {
-            // Protect against NaN or infinity input
-            if (double.IsNaN(velocity) || double.IsNaN(acceleration))
-                return 0;
-
-            if (double.IsInfinity(velocity) || double.IsInfinity(acceleration))
-                return 0;
-
-            // If both velocity and acceleration are effectively zero
-            if (Math.Abs(velocity) < 1e-9 && Math.Abs(acceleration) < 1e-9)
-                return 0;
-
-            double v2 = velocity * velocity;
-            double a2 = acceleration * acceleration;
-
-            // Avoid division by zero if acceleration and velocity are tiny, but not exactly zero
-            double denominator = v2 + k * a2;
-            if (denominator < 1e-12)
-                return 0;
-
-            // The ratio, preserving velocity sign
-            double ratio = (v2 / denominator) * Math.Sign(velocity);
-
-            return ratio;
-
-        }
-
-
 
 
         public static int error_tracker = 0;

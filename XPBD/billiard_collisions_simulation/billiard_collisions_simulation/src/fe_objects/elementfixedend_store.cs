@@ -12,61 +12,57 @@ namespace billiard_collisions_simulation.src.fe_objects
 {
     public class elementfixedend_store
     {
-        const float fixed_end_width = 30.0f;
-        const float fixed_end_height = 300.0f;
+        const float fixed_wall_width = 30.0f;
 
         // Fixed end drawing data
         meshdata_store fixed_drawingdata;
 
 
-        public elementfixedend_store(Vector2 fixedend_loc, float fixedend_angle)
+        public elementfixedend_store(float fixedend_width, float fixedend_height)
         {
-            // Convert angle to radians
-            float angleRad = MathHelper.DegreesToRadians(fixedend_angle);
-
-            // Precompute cosine and sine of the angle
-            float cosAngle = (float)Math.Cos(angleRad);
-            float sinAngle = (float)Math.Sin(angleRad);
-
-            // Local rectangle corners relative to the top-middle point
-            Vector2 topLeft = new Vector2(-fixed_end_width, fixed_end_height / 2.0f);
-            Vector2 topRight = new Vector2(0.0f, fixed_end_height / 2.0f);
-            Vector2 bottomLeft = new Vector2(-fixed_end_width, -fixed_end_height / 2.0f);
-            Vector2 bottomRight = new Vector2(0.0f, -fixed_end_height / 2.0f);
-
-            // Function to apply rotation to a point
-            Vector2 RotatePoint(Vector2 point)
-            {
-                float xNew = point.X * cosAngle - point.Y * sinAngle;
-                float yNew = point.X * sinAngle + point.Y * cosAngle;
-                return new Vector2(xNew, yNew);
-            }
-
-            // Rotate each corner
-            Vector2 rotatedTopLeft = RotatePoint(topLeft);
-            Vector2 rotatedTopRight = RotatePoint(topRight);
-            Vector2 rotatedBottomLeft = RotatePoint(bottomLeft);
-            Vector2 rotatedBottomRight = RotatePoint(bottomRight);
-
-            // Translate rotated points by the top-middle point (fixedend_loc)
-            Vector2 finalTopLeft = rotatedTopLeft + fixedend_loc;
-            Vector2 finalTopRight = rotatedTopRight + fixedend_loc;
-            Vector2 finalBottomLeft = rotatedBottomLeft + fixedend_loc;
-            Vector2 finalBottomRight = rotatedBottomRight + fixedend_loc;
-
 
             fixed_drawingdata = new meshdata_store(false);
 
-            // Create the geometry
-            // Fixed end point
-            fixed_drawingdata.add_mesh_point(0, finalTopLeft.X, finalTopLeft.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(1, finalTopRight.X, finalTopRight.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(2, finalBottomRight.X, finalBottomRight.Y, 0.0, -5);
-            fixed_drawingdata.add_mesh_point(3, finalBottomLeft.X, finalBottomLeft.Y, 0.0, -5);
 
-            // Fixed end 
+            // Wall Section Bottom 
+            fixed_drawingdata.add_mesh_point(0, -fixedend_width * 0.5f, -fixedend_height * 0.5f, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(1, -fixedend_width * 0.5f, (-fixedend_height * 0.5f) - fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(2, fixedend_width * 0.5f, (-fixedend_height * 0.5f) - fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(3, fixedend_width * 0.5f, -fixedend_height * 0.5f, 0.0, -5);
+
             fixed_drawingdata.add_mesh_tris(0, 0, 1, 2, -5);
             fixed_drawingdata.add_mesh_tris(1, 2, 3, 0, -5);
+
+
+            // Wall Section Top 
+            fixed_drawingdata.add_mesh_point(4, -fixedend_width * 0.5f, fixedend_height * 0.5f, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(5, -fixedend_width * 0.5f, (fixedend_height * 0.5f) + fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(6, fixedend_width * 0.5f, (fixedend_height * 0.5f) + fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(7, fixedend_width * 0.5f, fixedend_height * 0.5f, 0.0, -5);
+
+            fixed_drawingdata.add_mesh_tris(2, 4, 5, 6, -5);
+            fixed_drawingdata.add_mesh_tris(3, 6, 7, 4, -5);
+
+
+            // Wall Section Left
+            fixed_drawingdata.add_mesh_point(8, (-fixedend_width * 0.5f) , (-fixedend_height * 0.5f) - fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(9, (-fixedend_width * 0.5f) - fixed_wall_width, (-fixedend_height * 0.5f) - fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(10, (-fixedend_width * 0.5f) - fixed_wall_width, (fixedend_height * 0.5f) + fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(11, (-fixedend_width * 0.5f), (fixedend_height * 0.5f) + fixed_wall_width, 0.0, -5);
+
+            fixed_drawingdata.add_mesh_tris(4, 8, 9, 10, -5);
+            fixed_drawingdata.add_mesh_tris(5, 10, 11, 8, -5);
+
+
+            // Wall Section Right
+            fixed_drawingdata.add_mesh_point(12, (fixedend_width * 0.5f), (-fixedend_height * 0.5f) - fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(13, (fixedend_width * 0.5f) + fixed_wall_width, (-fixedend_height * 0.5f) - fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(14, (fixedend_width * 0.5f) + fixed_wall_width, (fixedend_height * 0.5f) + fixed_wall_width, 0.0, -5);
+            fixed_drawingdata.add_mesh_point(15, (fixedend_width * 0.5f), (fixedend_height * 0.5f) + fixed_wall_width, 0.0, -5);
+
+            fixed_drawingdata.add_mesh_tris(6, 12, 13, 14, -5);
+            fixed_drawingdata.add_mesh_tris(7, 14, 15, 12, -5);
+
 
             // Set the shader
             fixed_drawingdata.set_shader();

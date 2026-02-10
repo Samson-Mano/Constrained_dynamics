@@ -14,6 +14,19 @@ using System.Threading.Tasks;
 namespace billiard_collisions_simulation.src.fe_objects
 {
 
+    public class Vec2Data
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+
+        public Vec2Data() { }
+
+        public Vec2Data(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
+    }
 
     public class billiardball_data
     {
@@ -21,8 +34,9 @@ namespace billiard_collisions_simulation.src.fe_objects
         public double billiardball_mass { get; set; }
         public double billiardball_radius { get; set; }
 
-        public Vector2 billiardball_position { get; set; }
-        public Vector2 billiardball_velocity { get; set; }
+        
+        public Vec2Data billiardball_position { get; set; }
+        public Vec2Data billiardball_velocity { get; set; }
 
     }
 
@@ -32,7 +46,7 @@ namespace billiard_collisions_simulation.src.fe_objects
     {
         List<billiardball_data> billiardballs = new List<billiardball_data>();
 
-        const double SIMULATION_WIDTH = 1000.0;
+        const double SIMULATION_WIDTH = 1200.0;
         const double SIMULATION_HEIGHT = 800.0;
 
         const string FILE_NAME = "billiardballs.json";
@@ -97,8 +111,8 @@ namespace billiard_collisions_simulation.src.fe_objects
                 double pos_x = radius + (SIMULATION_WIDTH - 2.0 * radius) * rnd.NextDouble();
                 double pos_y = radius + (SIMULATION_HEIGHT - 2.0 * radius) * rnd.NextDouble();
 
-                Vector2 pos = new Vector2((float)pos_x, (float)pos_y);
-                Vector2 vel = new Vector2(
+                Vec2Data pos = new Vec2Data((float)pos_x, (float)pos_y);
+                Vec2Data vel = new Vec2Data(
                     -1.0f + 2.0f * (float)rnd.NextDouble(),
                     -1.0f + 2.0f * (float)rnd.NextDouble()
                 );

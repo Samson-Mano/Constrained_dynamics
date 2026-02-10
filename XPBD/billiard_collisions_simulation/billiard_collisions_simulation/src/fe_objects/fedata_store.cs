@@ -67,10 +67,10 @@ namespace billiard_collisions_simulation.src.fe_objects
             // Create the boundary
             List<Vector3> nodePtsList = new List<Vector3>();
 
-            nodePtsList.Add(new Vector3(-500.0f, -500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(-500.0f, 500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(500.0f, 500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(500.0f, -500.0f, 0.0f));
+            nodePtsList.Add(new Vector3(-600.0f, -500.0f, 0.0f));
+            nodePtsList.Add(new Vector3(-600.0f, 500.0f, 0.0f));
+            nodePtsList.Add(new Vector3(600.0f, 500.0f, 0.0f));
+            nodePtsList.Add(new Vector3(600.0f, -500.0f, 0.0f));
 
 
             // Set the mesh boundaries
@@ -87,7 +87,7 @@ namespace billiard_collisions_simulation.src.fe_objects
             gvariables_static.geom_size = this.geom_bounds.Length;
 
             // (Re)Initialize the data
-            fe_fixedend = new elementfixedend_store(new Vector2(0.0f, 0.0f), 270.0f);
+            fe_fixedend = new elementfixedend_store(1200.0f, 800.0f);
 
             // Settings.Default.Reset();
 
@@ -107,7 +107,7 @@ namespace billiard_collisions_simulation.src.fe_objects
 
 
             // Initialize the labels 
-            time_label = new text_store("Time = 0.0000000 s", new Vector2(0.0f, 0.0f), -3); // Number of character  = 18
+            time_label = new text_store("Time = 0.0000000 s", new Vector2(-465.0f, 475.0f), -3); // Number of character  = 18
             disp_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -8); // Number of character  = 12
             velo_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -9); // Number of character  = 12
             accl_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -10); // Number of character  = 12
@@ -193,7 +193,7 @@ namespace billiard_collisions_simulation.src.fe_objects
 
             if(gvariables_static.animate_play == true)
             {
-                time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(0.0f, 65.0f)); 
+                time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(-465.0f, 475.0f)); 
 
                 billiardballs.simulate(elapsedRealTime);
 

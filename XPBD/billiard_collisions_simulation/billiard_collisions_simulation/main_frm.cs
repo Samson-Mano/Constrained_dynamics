@@ -65,7 +65,6 @@ namespace billiard_collisions_simulation
             // Render timer
             Application.Idle += OnApplicationIdle;
 
-
             // Set the GL Control Main Panel Events
             glControl_main_panel.Load += glControl_main_panel_Load;
             glControl_main_panel.Paint += glControl_main_panel_Paint;
@@ -78,8 +77,6 @@ namespace billiard_collisions_simulation
             glControl_main_panel.KeyDown += glControl_main_panel_KeyDown;
             glControl_main_panel.KeyUp += glControl_main_panel_KeyUp;
 
-
-
         }
 
         private void main_frm_Load(object sender, EventArgs e)
@@ -87,6 +84,7 @@ namespace billiard_collisions_simulation
             // Initialize the GLControl in the Load event
             // Fill the gcontrol panel
             glControl_main_panel.Dock = DockStyle.Fill;
+
 
         }
 

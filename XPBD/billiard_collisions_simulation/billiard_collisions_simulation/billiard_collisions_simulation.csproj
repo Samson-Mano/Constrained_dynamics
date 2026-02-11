@@ -116,9 +116,11 @@
     <Compile Include="src\fe_objects\elementlink_store.cs" />
     <Compile Include="src\fe_objects\elementmass_store.cs" />
     <Compile Include="src\fe_objects\fedata_store.cs" />
+    <Compile Include="src\fe_objects\mass_list_store.cs" />
     <Compile Include="src\fe_objects\pendulum_data_store.cs" />
     <Compile Include="src\fe_objects\text_store.cs" />
     <Compile Include="src\fe_objects\traildata_store.cs" />
+    <Compile Include="src\fe_objects\vector_list_store.cs" />
     <Compile Include="src\geom_objects\label_list_store.cs" />
     <Compile Include="src\geom_objects\line_list_store.cs" />
     <Compile Include="src\geom_objects\meshdata_store.cs" />

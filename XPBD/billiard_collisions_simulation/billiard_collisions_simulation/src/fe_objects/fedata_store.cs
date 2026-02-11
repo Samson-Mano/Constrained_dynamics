@@ -95,17 +95,6 @@ namespace billiard_collisions_simulation.src.fe_objects
             billiardballs = new billiardball_data_store();
 
 
-            //set_triple_pendulum_model(Settings.Default.sett_mass1,
-            //    Settings.Default.sett_mass2, 
-            //    Settings.Default.sett_mass3, 
-            //    Settings.Default.sett_length1, 
-            //    Settings.Default.sett_length2, 
-            //    Settings.Default.sett_length3, 
-            //    Settings.Default.sett_initialangle1, 
-            //    Settings.Default.sett_initialangle2, 
-            //    Settings.Default.sett_initialangle3);
-
-
             // Initialize the labels 
             time_label = new text_store("Time = 0.0000000 s", new Vector2(-465.0f, 475.0f), -3); // Number of character  = 18
             disp_label = new text_store("0.0000000000", new Vector2(0.0f, 0.0f), -8); // Number of character  = 12

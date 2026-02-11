@@ -50,8 +50,8 @@ namespace billiard_collisions_simulation.other_windows
             if (!gvariables_static.TryGetPositiveDouble(textBox_max_radius, "Maximum Radius", out double max_radius)) return;
 
 
-
-
+            // Set the billiard ball model
+            this.fe_data.set_billiardball_model(no_of_balls, min_radius, max_radius);
 
 
 

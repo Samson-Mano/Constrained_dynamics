@@ -105,6 +105,14 @@ namespace billiard_collisions_simulation.src.fe_objects
 
             update_openTK_uniforms(true, true, true);
 
+            stop_animation();
+
+            gvariables_static.animate_play = true;
+            gvariables_static.animate_pause = false;
+            gvariables_static.animate_stop = false;
+
+            start_animation();
+
         }
 
         public void set_billiardball_model(int number_of_balls, double min_radius, double max_radius)

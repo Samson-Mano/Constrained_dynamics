@@ -33,8 +33,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.textBox_no_of_balls = new System.Windows.Forms.TextBox();
-            this.textBox_max_radius = new System.Windows.Forms.TextBox();
             this.textBox_min_radius = new System.Windows.Forms.TextBox();
+            this.textBox_max_radius = new System.Windows.Forms.TextBox();
             this.button_update_model = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -73,19 +73,19 @@
             this.textBox_no_of_balls.Size = new System.Drawing.Size(100, 27);
             this.textBox_no_of_balls.TabIndex = 3;
             // 
-            // textBox_max_radius
-            // 
-            this.textBox_max_radius.Location = new System.Drawing.Point(221, 72);
-            this.textBox_max_radius.Name = "textBox_max_radius";
-            this.textBox_max_radius.Size = new System.Drawing.Size(100, 27);
-            this.textBox_max_radius.TabIndex = 4;
-            // 
             // textBox_min_radius
             // 
-            this.textBox_min_radius.Location = new System.Drawing.Point(221, 115);
+            this.textBox_min_radius.Location = new System.Drawing.Point(221, 72);
             this.textBox_min_radius.Name = "textBox_min_radius";
             this.textBox_min_radius.Size = new System.Drawing.Size(100, 27);
-            this.textBox_min_radius.TabIndex = 5;
+            this.textBox_min_radius.TabIndex = 4;
+            // 
+            // textBox_max_radius
+            // 
+            this.textBox_max_radius.Location = new System.Drawing.Point(221, 115);
+            this.textBox_max_radius.Name = "textBox_max_radius";
+            this.textBox_max_radius.Size = new System.Drawing.Size(100, 27);
+            this.textBox_max_radius.TabIndex = 5;
             // 
             // button_update_model
             // 
@@ -113,8 +113,8 @@
             this.ClientSize = new System.Drawing.Size(384, 267);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.button_update_model);
-            this.Controls.Add(this.textBox_min_radius);
             this.Controls.Add(this.textBox_max_radius);
+            this.Controls.Add(this.textBox_min_radius);
             this.Controls.Add(this.textBox_no_of_balls);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -136,8 +136,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBox_no_of_balls;
-        private System.Windows.Forms.TextBox textBox_max_radius;
         private System.Windows.Forms.TextBox textBox_min_radius;
+        private System.Windows.Forms.TextBox textBox_max_radius;
         private System.Windows.Forms.Button button_update_model;
         private System.Windows.Forms.Label label4;
     }

@@ -203,8 +203,8 @@ namespace billiard_collisions_simulation.src.fe_objects
 
                 Vec2Data pos = new Vec2Data(pos_x, pos_y);
                 Vec2Data vel = new Vec2Data(
-                    -1.0 + 2.0 * rnd.NextDouble(),
-                    -1.0 + 2.0 * rnd.NextDouble()
+                    -10.0 + 200.0 * rnd.NextDouble(),
+                    -10.0 + 200.0 * rnd.NextDouble()
                 );
 
                 billiardballs.Add(new billiardball_data()
@@ -411,28 +411,55 @@ namespace billiard_collisions_simulation.src.fe_objects
         {
             Vec2Data dir = new Vec2Data();
             dir.subtractVectors(ball1.billiardball_position, ball2.billiardball_position);
+
             double d = dir.length();
-            if (d == 0.0 || d > (ball1.billiardball_radius + ball2.billiardball_radius))
+            double minDist = ball1.billiardball_radius + ball2.billiardball_radius;
+
+            if (d <= 0.0 || d >= minDist)
                 return;
 
+            // Normalize collision normal
             dir.scale(1.0 / d);
 
-            double corr = ((ball1.billiardball_radius + ball2.billiardball_radius - d) / 2.0);
-            ball1.billiardball_position.add(dir, -corr);
-            ball2.billiardball_position.add(dir, corr);
+            // --- Position correction with slop ---
+            double penetration = minDist - d;
+            double slop = 0.01;
+            double percent = 0.8;
 
-            double v1 = ball1.billiardball_velocity.dot(dir);
-            double v2 = ball2.billiardball_velocity.dot(dir);
+            if (penetration > slop)
+            {
+                double corr = (penetration - slop) * 0.5 * percent;
+                ball1.billiardball_position.add(dir, corr);
+                ball2.billiardball_position.add(dir, -corr);
+            }
+
+
+
+            // Relative velocity along normal
+            Vec2Data relVel = new Vec2Data();
+            relVel.subtractVectors(ball1.billiardball_velocity, ball2.billiardball_velocity);
+
+            double velAlongNormal = relVel.dot(dir);
+
+            // DO NOT resolve if separating
+            if (velAlongNormal > 0)
+                return;
+
 
             double m1 = ball1.billiardball_mass;
             double m2 = ball2.billiardball_mass;
 
-            double newV1 = (m1 * v1 + m2 * v2 - m2 * (v1 - v2) * RESTITUTION) / (m1 + m2);
-            double newV2 = (m1 * v1 + m2 * v2 - m1 * (v2 - v1) * RESTITUTION) / (m1 + m2);
 
-            ball1.billiardball_velocity.add(dir, newV1 - v1);
-            ball2.billiardball_velocity.add(dir, newV2 - v2);
+            double j = -(1 + RESTITUTION) * velAlongNormal;
+            j = j / (1.0 / m1 + 1.0 / m2);
 
+
+            Vec2Data impulse = new Vec2Data(dir.X, dir.Y);
+            impulse.scale(j);
+
+
+            ball1.billiardball_velocity.add(impulse, 1.0 / m1);
+            ball2.billiardball_velocity.add(impulse, -1.0 / m2);
 
         }
 

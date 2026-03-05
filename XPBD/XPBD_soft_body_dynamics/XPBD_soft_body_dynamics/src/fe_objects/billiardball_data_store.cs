@@ -16,69 +16,69 @@ using System.Windows.Forms;
 namespace XPBD_soft_body_dynamics.src.fe_objects
 {
 
-    public class Vec2Data
-    {
-        public double X { get; set; }
-        public double Y { get; set; }
+    //public class Vec2Data
+    //{
+    //    public double X { get; set; }
+    //    public double Y { get; set; }
 
-        public Vec2Data() { }
+    //    public Vec2Data() { }
 
-        public Vec2Data(double x, double y)
-        {
-            X = x;
-            Y = y;
-        }
+    //    public Vec2Data(double x, double y)
+    //    {
+    //        X = x;
+    //        Y = y;
+    //    }
 
-        public void add(Vec2Data v, double s = 1.0f)
-        {
-            this.X += v.X * s;
-            this.Y += v.Y * s;
+    //    public void add(Vec2Data v, double s = 1.0f)
+    //    {
+    //        this.X += v.X * s;
+    //        this.Y += v.Y * s;
  
-        }
+    //    }
 
-        public void addVectors(Vec2Data a, Vec2Data b)
-        {
-            this.X = a.X + b.X;
-            this.Y = a.Y + b.Y;
+    //    public void addVectors(Vec2Data a, Vec2Data b)
+    //    {
+    //        this.X = a.X + b.X;
+    //        this.Y = a.Y + b.Y;
 
-        }
+    //    }
 
-        public void subtract(Vec2Data v, double s = 1.0f)
-        {
-            this.X -= v.X * s;
-            this.Y -= v.Y * s;
+    //    public void subtract(Vec2Data v, double s = 1.0f)
+    //    {
+    //        this.X -= v.X * s;
+    //        this.Y -= v.Y * s;
 
-        }
+    //    }
 
-        public void subtractVectors(Vec2Data a, Vec2Data b)
-        {
-            this.X = a.X - b.X;
-            this.Y = a.Y - b.Y;
+    //    public void subtractVectors(Vec2Data a, Vec2Data b)
+    //    {
+    //        this.X = a.X - b.X;
+    //        this.Y = a.Y - b.Y;
 
-        }
+    //    }
 
-        public double length()
-        {
-            return Math.Sqrt((this.X * this.X) + (this.Y * this.Y));
-        }
+    //    public double length()
+    //    {
+    //        return Math.Sqrt((this.X * this.X) + (this.Y * this.Y));
+    //    }
 
-        public void scale(double s)
-        {
-            this.X *= s;
-            this.Y *= s;
-        }
+    //    public void scale(double s)
+    //    {
+    //        this.X *= s;
+    //        this.Y *= s;
+    //    }
 
-        public double dot(Vec2Data v)
-        {
-            return (this.X * v.X) + (this.Y * v.Y);
-        }
+    //    public double dot(Vec2Data v)
+    //    {
+    //        return (this.X * v.X) + (this.Y * v.Y);
+    //    }
 
-        public Vector2 GetVector()
-        {
-            return new Vector2((float)this.X, (float)this.Y);   
-        }
+    //    public Vector2 GetVector()
+    //    {
+    //        return new Vector2((float)this.X, (float)this.Y);   
+    //    }
 
-    }
+    //}
 
     public class billiardball_data
     {

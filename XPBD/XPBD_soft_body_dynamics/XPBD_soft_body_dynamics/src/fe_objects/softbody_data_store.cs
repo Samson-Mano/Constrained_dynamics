@@ -189,19 +189,23 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
     public class softbody_data_container
     {
 
-        List<coord_sys_data_store> coord_sys_data = new List<coord_sys_data_store>();
+        public Dictionary<int, Vec2Data> grid_vertexMap { get; set; } = new Dictionary<int, Vec2Data>();
 
-        List<grid_data_store> grid_data = new List<grid_data_store>();
+        public Dictionary<int, int> grid_coordMap { get; set; } = new Dictionary<int, int>();
 
-        List<crod_data_store> crod_data = new List<crod_data_store>();
+        public List<coord_sys_data_store> coord_sys_data { get; set; } = new List<coord_sys_data_store>();
 
-        List<spc_data_store> spc_data = new List<spc_data_store>();
+        public List<grid_data_store> grid_data { get; set; } = new List<grid_data_store>();
 
-        List<mass_data_store> mass_data = new List<mass_data_store>();
+        public List<crod_data_store> crod_data { get; set; } = new List<crod_data_store>();
 
-        List<property_data_store> prop_data = new List<property_data_store>();
+        public List<spc_data_store> spc_data { get; set; } = new List<spc_data_store>();
 
-        List<mat1_data_store> mat_data = new List<mat1_data_store>();
+        public List<mass_data_store> mass_data { get; set; } = new List<mass_data_store>();
+
+        public List<property_data_store> prop_data { get; set; } = new List<property_data_store>();
+
+        public List<mat1_data_store> mat_data { get; set; } = new List<mat1_data_store>();
 
 
         public void simulate(Vec2Data gravity, double delta_t)
@@ -216,11 +220,15 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
     public class softbody_data_store
     {
-
         // Stores the entire softbody data
-        softbody_data_container softbody_data = new softbody_data_container();
+        public softbody_data_container softbody_data = new softbody_data_container();
+
+        // Element link store
+        elementlink_list_store elementlink_list = new elementlink_list_store();
 
 
+        bool isModelSet = false;
+    
         const string FILE_NAME = "softbodydata.json";
 
 
@@ -233,6 +241,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         const int CONSTRAINT_ITERATIONS = 8;
         double prev_time = 0.0;
         double accumulator = 0.0;
+
 
 
         public softbody_data_store()
@@ -273,21 +282,193 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         public void update_softbody_data(string model_data)
         {
+            isModelSet = false;
 
+            // Initialize the soft body data
+            softbody_data = new softbody_data_container();
 
+            var lines = model_data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
+            foreach (var raw_line in lines)
+            {
+                string line = raw_line.Trim();
+
+                // Ignore comments
+                if (line.StartsWith("$"))
+                    continue;
+
+                var tokens = line.Split(',')
+                                 .Select(t => t.Trim())
+                                 .ToArray();
+
+                if (tokens.Length == 0)
+                    continue;
+
+                string card = tokens[0];
+
+                switch (card)
+                {
+                    case "CORD2R":
+                        parse_CORD2R(tokens);
+                        break;
+
+                    case "GRID":
+                        parse_GRID(tokens);
+                        break;
+
+                    case "CROD":
+                        parse_CROD(tokens);
+                        break;
+
+                    case "SPC1":
+                        parse_SPC1(tokens);
+                        break;
+
+                    case "CONM2":
+                        parse_CONM2(tokens);
+                        break;
+
+                    case "PROD":
+                        parse_PROD(tokens);
+                        break;
+
+                    case "MAT1":
+                    case "MAT2":
+                        parse_MAT(tokens);
+                        break;
+                }
+            }
+
+            // Set the drawing data
+            set_drawing_data();
+
+            isModelSet = true;
+
+            //
         }
 
-
-        public void set_drawing_data()
+        #region "Parse model string data"
+        void parse_CORD2R(string[] t)
         {
+            // Parse the CORD2R data
+            coord_sys_data_store coord = new coord_sys_data_store();
 
+            coord.coord_id = int.Parse(t[1]); // Coord ID
 
+            coord.origin_pt = new Vec2Data(
+                float.Parse(t[3]), // Origin pt x
+                float.Parse(t[4]) // Origin pt y
+            );
+
+            coord.haxis_pt = new Vec2Data(
+                float.Parse(t[6]), // Horizontal pt x
+                float.Parse(t[7]) // Horizontal pt y
+            );
+
+            coord.vaxis_pt = new Vec2Data(
+                float.Parse(t[9]), // Vertical pt x
+                float.Parse(t[10]) // Vertical pt y
+            );
+
+            softbody_data.coord_sys_data.Add(coord);
         }
+
+        void parse_GRID(string[] t)
+        {
+            // Parse GRID data
+            grid_data_store grid = new grid_data_store();
+
+            grid.grid_id = int.Parse(t[1]); // GRID Id
+            grid.coord_id = int.Parse(t[2]); // Coord Id
+
+            grid.coord_pt = new Vec2Data(
+                float.Parse(t[3]), // x pt
+                float.Parse(t[4]) // y pt
+            );
+
+            // Add to the map
+            softbody_data.grid_vertexMap.Add(grid.grid_id, grid.coord_pt);
+            softbody_data.grid_coordMap.Add(grid.grid_id, grid.coord_id);
+
+
+            softbody_data.grid_data.Add(grid);
+        }
+
+
+        void parse_CROD(string[] t)
+        {
+            // Parse CROD data
+            crod_data_store rod = new crod_data_store();
+
+            rod.element_id = int.Parse(t[1]); // Element ID
+            rod.property_id = int.Parse(t[2]); // Property ID
+            rod.start_grid_id = int.Parse(t[3]); // Start GRID Id
+            rod.end_grid_id = int.Parse(t[4]); // End GRID Id
+
+            softbody_data.crod_data.Add(rod);
+        }
+
+
+        void parse_SPC1(string[] t)
+        {
+            // Parse SPC1 data
+            spc_data_store spc = new spc_data_store();
+
+            spc.spc_id = int.Parse(t[1]); // SPC Id
+            spc.spc_type = int.Parse(t[2]); // SPC type
+            spc.grid_id = int.Parse(t[3]); // GRID Id
+
+            softbody_data.spc_data.Add(spc);
+        }
+
+
+        void parse_CONM2(string[] t)
+        {
+            // Parse MASS data
+            mass_data_store mass = new mass_data_store();
+
+            mass.mass_id = int.Parse(t[1]); // Mass Id
+            mass.grid_id = int.Parse(t[2]); // Grid Id
+            mass.coord_id = int.Parse(t[3]); // Coord Id
+            mass.mass_value = double.Parse(t[4]); // Mass value
+
+            softbody_data.mass_data.Add(mass);
+        }
+
+
+        void parse_PROD(string[] t)
+        {
+            // Parse PRDO data
+            property_data_store prop = new property_data_store();
+
+            prop.prop_id = int.Parse(t[1]); // PROD Id
+            prop.mat_id = int.Parse(t[2]); // MAT Id
+            prop.cs_area = double.Parse(t[3]); // CS Area
+
+            if (t.Length > 6 && !string.IsNullOrWhiteSpace(t[6]))
+                prop.non_structural_mass = double.Parse(t[6]); // Non Structural Mass
+
+            softbody_data.prop_data.Add(prop);
+        }
+
+
+        void parse_MAT(string[] t)
+        {
+            // Parse MAT data
+            mat1_data_store mat = new mat1_data_store();
+
+            mat.mat_id = int.Parse(t[1]); // MAT Id
+            mat.youngs_mod = double.Parse(t[2]); // Youngs Modulus
+            mat.shear_mod = double.Parse(t[3]); // Shear Modulus
+            mat.poissons_ratio = double.Parse(t[4]); // Poissons Ratio
+            mat.mat_density_rho = double.Parse(t[5]); // Material density
+
+            softbody_data.mat_data.Add(mat);
+        }
+
 
 
         // Default model data
-
         private string default_model_data()
         {
             return @"
@@ -333,6 +514,95 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
         }
 
 
+        #endregion
+
+
+        public void set_drawing_data()
+        {
+            // Create the drawing data
+            elementlink_list = new elementlink_list_store();
+
+            foreach( crod_data_store crod in softbody_data.crod_data)
+            {
+                // Get the start pt and end pt
+                Vec2Data startpt = softbody_data.grid_vertexMap[crod.start_grid_id];
+                Vec2Data endpt = softbody_data.grid_vertexMap[crod.end_grid_id];
+
+                elementlink_list.add_elementlink(crod.element_id, startpt.GetVector(), endpt.GetVector(), crod.property_id);
+            }
+
+
+
+            //_______________________________________________________________________________________
+            // Find the boundary
+            List<Vector3> nodePtsList = new List<Vector3>();
+
+            // Get the model boundary
+            foreach (Vec2Data vec2d in softbody_data.grid_vertexMap.Values)
+            {
+                Vector2 vec = vec2d.GetVector();
+
+                nodePtsList.Add(new Vector3(vec.X, vec.Y, 0.0f));
+
+            }
+
+
+            // Set the mesh boundaries
+            Vector3 geometry_center = gvariables_static.FindGeometricCenter(nodePtsList);
+            Tuple<Vector3, Vector3> geom_extremes = gvariables_static.FindMinMaxXY(nodePtsList);
+
+
+            // Set the geometry bounds
+            Vector3  min_bounds = geom_extremes.Item1; // Minimum bound
+            Vector3  max_bounds = geom_extremes.Item2; // Maximum bound
+
+            Vector3  geom_bounds = max_bounds - min_bounds;
+
+            float geom_size = geom_bounds.Length;
+            //_______________________________________________________________________________________
+
+
+
+
+            // Finalize the visualization
+            elementlink_list.set_elementlink_visualization(geom_size);
+
+
+        }
+
+
+        public void paint_drawing_data()
+        {
+            if (!isModelSet) return;
+
+            elementlink_list.paint_elementlink();
+
+        }
+
+
+
+
+        public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency,
+                          drawing_events graphic_events_control)
+        {
+
+            if (!isModelSet) return;
+
+            //// Update mass openTK uniforms
+            //mass_List.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            //    graphic_events_control.projectionMatrix,
+            //    graphic_events_control.modelMatrix,
+            //    graphic_events_control.viewMatrix,
+            //    gvariables_static.geom_transparency);
+
+            elementlink_list.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
+
+        }
 
 
 

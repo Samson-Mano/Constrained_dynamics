@@ -19,9 +19,9 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
     public class fedata_store
     {
         // public pendulum_data_store pendulum_data;
-        public billiardball_data_store billiardballs;
+        public softbody_data_store softbodies;
 
-        public elementfixedend_store fe_fixedend;
+        // public elementfixedend_store fe_fixedend;
 
 
         // Drawing labels
@@ -64,13 +64,27 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         public void set_model()
         {
+            
+            //// (Re)Initialize the data
+            //fe_fixedend = new elementfixedend_store(1200.0f, 800.0f);
+
+            // Settings.Default.Reset();
+
+            // Set the soft body model
+            softbodies = new softbody_data_store();
+
+
             // Create the boundary
             List<Vector3> nodePtsList = new List<Vector3>();
 
-            nodePtsList.Add(new Vector3(-600.0f, -500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(-600.0f, 500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(600.0f, 500.0f, 0.0f));
-            nodePtsList.Add(new Vector3(600.0f, -500.0f, 0.0f));
+            // Get the model boundary
+            foreach (Vec2Data vec2d in softbodies.softbody_data.grid_vertexMap.Values)
+            {
+                Vector2 vec = vec2d.GetVector();
+
+                nodePtsList.Add(new Vector3(vec.X, vec.Y, 0.0f));
+
+            }
 
 
             // Set the mesh boundaries
@@ -86,13 +100,6 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
             gvariables_static.geom_size = this.geom_bounds.Length;
 
-            // (Re)Initialize the data
-            fe_fixedend = new elementfixedend_store(1200.0f, 800.0f);
-
-            // Settings.Default.Reset();
-
-            // Set the pendulum model
-            billiardballs = new billiardball_data_store();
 
 
             // Initialize the labels 
@@ -115,10 +122,40 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         }
 
-        public void set_billiardball_model(int number_of_balls, double min_radius, double max_radius)
+        public void set_softbodydata_model(string model_data)
         {
-            // Update the Billiard ball data
-            billiardballs.update_billiardball_datas(number_of_balls, min_radius, max_radius);
+            // Update the SoftBody data
+            softbodies.update_softbody_data(model_data);
+
+            //_______________________________________________________________________________________
+            // Create the boundary
+            List<Vector3> nodePtsList = new List<Vector3>();
+
+            // Get the model boundary
+            foreach (Vec2Data vec2d in softbodies.softbody_data.grid_vertexMap.Values)
+            {
+                Vector2 vec = vec2d.GetVector();
+
+                nodePtsList.Add(new Vector3(vec.X, vec.Y, 0.0f));
+
+            }
+
+
+            // Set the mesh boundaries
+            Vector3 geometry_center = gvariables_static.FindGeometricCenter(nodePtsList);
+            Tuple<Vector3, Vector3> geom_extremes = gvariables_static.FindMinMaxXY(nodePtsList);
+
+
+            // Set the geometry bounds
+            this.min_bounds = geom_extremes.Item1; // Minimum bound
+            this.max_bounds = geom_extremes.Item2; // Maximum bound
+
+            this.geom_bounds = max_bounds - min_bounds;
+
+            gvariables_static.geom_size = this.geom_bounds.Length;
+
+            //_______________________________________________________________________________________
+
 
             update_openTK_uniforms(true, true, true);
 
@@ -138,14 +175,14 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
                 return;
 
 
-            // Paint the three pendulum system
-            fe_fixedend.paint_fixedend();
+            //// Paint the three pendulum system
+            //fe_fixedend.paint_fixedend();
 
-            // Paint the Billiard balls
-            billiardballs.paint_billiardballs();
+            // Paint the Soft body
+            softbodies.paint_drawing_data();
 
             // Paint the animation time
-            time_label.paint_dynamic_text();
+            // time_label.paint_dynamic_text();
 
         }
 
@@ -174,7 +211,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             stopwatch.Reset();
             stopwatch.Stop();
 
-            billiardballs.reset_simulation();
+            // billiardballs.reset_simulation();
           
         }
 
@@ -192,7 +229,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             {
                 time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(-465.0f, 475.0f)); 
 
-                billiardballs.simulate(elapsedRealTime);
+                // billiardballs.simulate(elapsedRealTime);
 
             }
             
@@ -231,16 +268,16 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
 
 
-            // Update fixed end openTK uniforms
-            fe_fixedend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-                graphic_events_control.projectionMatrix,
-                graphic_events_control.modelMatrix,
-                graphic_events_control.viewMatrix,
-                gvariables_static.geom_transparency);
+            //// Update fixed end openTK uniforms
+            //fe_fixedend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            //    graphic_events_control.projectionMatrix,
+            //    graphic_events_control.modelMatrix,
+            //    graphic_events_control.viewMatrix,
+            //    gvariables_static.geom_transparency);
 
 
-            // Update billiard balls openTK uniforms
-            billiardballs.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            // Update soft bodies openTK uniforms
+            softbodies.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control);
 
 

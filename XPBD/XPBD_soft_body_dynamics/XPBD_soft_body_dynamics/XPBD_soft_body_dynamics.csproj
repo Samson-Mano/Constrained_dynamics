@@ -99,9 +99,8 @@
     </Compile>
     <Compile Include="src\events_handler\drawing_events.cs" />
     <Compile Include="src\events_handler\file_events.cs" />
-    <Compile Include="src\fe_objects\billiardball_data_store.cs" />
     <Compile Include="src\fe_objects\elementfixedend_store.cs" />
-    <Compile Include="src\fe_objects\elementlink_store.cs" />
+    <Compile Include="src\fe_objects\elementlink_list_store.cs" />
     <Compile Include="src\fe_objects\elementmass_store.cs" />
     <Compile Include="src\fe_objects\fedata_store.cs" />
     <Compile Include="src\fe_objects\mass_list_store.cs" />

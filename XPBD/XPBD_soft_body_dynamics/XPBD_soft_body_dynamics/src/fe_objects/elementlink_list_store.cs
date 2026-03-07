@@ -125,7 +125,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         public void set_elementlink_visualization(float geom_size)
         {
             // Initialize the element link drawing data
-            springlink_drawingdata = new meshdata_store(false);
+            springlink_drawingdata = new meshdata_store(true);
 
             // Set the element link visualization for all links in the map
 
@@ -215,7 +215,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
                 projectionMatrix,
                 modelMatrix,
                 viewMatrix,
-                0.5f * geom_transparency);
+                geom_transparency);
 
             //
         }

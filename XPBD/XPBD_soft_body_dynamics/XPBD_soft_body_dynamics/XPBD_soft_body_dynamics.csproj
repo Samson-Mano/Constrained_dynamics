@@ -71,6 +71,9 @@
     <Reference Include="SpaceWizards.SharpFont, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SpaceWizards.SharpFont.1.0.1\lib\net472\SpaceWizards.SharpFont.dll</HintPath>
     </Reference>
+    <Reference Include="StbImageSharp, Version=2.30.15.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StbImageSharp.2.30.15\lib\net471\StbImageSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -99,11 +102,11 @@
     </Compile>
     <Compile Include="src\events_handler\drawing_events.cs" />
     <Compile Include="src\events_handler\file_events.cs" />
-    <Compile Include="src\fe_objects\elementfixedend_store.cs" />
     <Compile Include="src\fe_objects\elementlink_list_store.cs" />
-    <Compile Include="src\fe_objects\elementmass_store.cs" />
     <Compile Include="src\fe_objects\fedata_store.cs" />
     <Compile Include="src\fe_objects\mass_list_store.cs" />
+    <Compile Include="src\fe_objects\nodeconstraint_list_store.cs" />
+    <Compile Include="src\fe_objects\node_list_store.cs" />
     <Compile Include="src\fe_objects\softbody_data_store.cs" />
     <Compile Include="src\fe_objects\text_store.cs" />
     <Compile Include="src\fe_objects\traildata_store.cs" />
@@ -113,11 +116,13 @@
     <Compile Include="src\geom_objects\meshdata_store.cs" />
     <Compile Include="src\geom_objects\point_list_store.cs" />
     <Compile Include="src\geom_objects\quad_list_store.cs" />
+    <Compile Include="src\geom_objects\texture_list_store.cs" />
     <Compile Include="src\geom_objects\tri_list_store.cs" />
     <Compile Include="src\global_variables\gvariables_static.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\fontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\graphicBuffers.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />
+    <Compile Include="src\opentk_control\opentk_buffer\TextureBuffer.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\VertexArray.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\VertexBuffer.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\VertexBufferLayout.cs" />
@@ -162,6 +167,12 @@
   <ItemGroup>
     <Content Include="freetype6.dll" />
     <Content Include="innx_icon.ico" />
+    <Content Include="Resources\pic_3d_circle.png" />
+    <Content Include="Resources\pic_3D_circle_paint.png" />
+    <Content Include="Resources\pic_node_texture.png" />
+    <Content Include="Resources\pic_node_texture2.png" />
+    <Content Include="Resources\pic_pin_support.png" />
+    <Content Include="Resources\pic_roller_support.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

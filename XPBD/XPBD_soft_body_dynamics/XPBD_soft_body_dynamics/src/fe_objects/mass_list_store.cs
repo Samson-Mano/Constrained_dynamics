@@ -2,15 +2,16 @@
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
-using XPBD_soft_body_dynamics.src.geom_objects;
-using XPBD_soft_body_dynamics.src.global_variables;
-using XPBD_soft_body_dynamics.src.opentk_control.opentk_bgdraw;
 //
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XPBD_soft_body_dynamics.Resources;
+using XPBD_soft_body_dynamics.src.geom_objects;
+using XPBD_soft_body_dynamics.src.global_variables;
+using XPBD_soft_body_dynamics.src.opentk_control.opentk_bgdraw;
 
 namespace XPBD_soft_body_dynamics.src.fe_objects
 {
@@ -18,7 +19,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
     {
         public int mass_id { get; set; }
         public Vector2 mass_loc { get; set; }
-        public float mass_size { get; set; }
+        public float mass_size { get; set; } // Varies between 0.0 to 1.0
 
     }
 
@@ -27,7 +28,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
     public class mass_list_store
     {
 
-        const int circle_pt_count = 30; // Circle segment count
+        const float geom_mass_size = 30.0f;
 
         // Mass data list
         public Dictionary<int, mass_data> massMap = new Dictionary<int, mass_data>();
@@ -35,7 +36,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         public int color_id = 0;
 
         // Mass drawing data
-        meshdata_store mass_drawingdata;
+        texture_list_store mass_drawingdata;
+
 
 
         public mass_list_store()
@@ -64,83 +66,46 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         }
 
-        public void update_mass(int mass_id, Vector2 mass_loc)
+        public void update_mass(int mass_id, Vector2 mass_loc, double norm_defl_scale)
         {
+            // Update the point data
 
-            // Update the mass data
-            massMap[mass_id].mass_loc = mass_loc;
+            mass_drawingdata.update_texturecenter(mass_id, mass_loc, norm_defl_scale);
 
-            // Set the point id
-            int origin_pt_id = mass_id * (circle_pt_count + 1);
-
-            // Add the origin point
-            mass_drawingdata.update_mesh_point(origin_pt_id + 0, mass_loc.X, mass_loc.Y, 0.0, -4);
-
-            for (int i = 0; i < circle_pt_count; i++)
-            {
-                // Create the points for circle
-                double angle = (2.0 * Math.PI * i) / (double)circle_pt_count;
-                double x = mass_loc.X + (massMap[mass_id].mass_size * Math.Cos(angle));
-                double y = mass_loc.Y + (massMap[mass_id].mass_size * Math.Sin(angle));
-
-                mass_drawingdata.update_mesh_point(origin_pt_id + (i + 1), x, y, 0.0, -4);
-
-            }
-
+            //
         }
 
 
-        public void set_mass_visualization()
+        public void set_mass_visualization(float geom_size)
         {
+
+            // Load the Texture for mass
+            byte[] res_3dcirclepic = Resource_font.pic_3D_circle_paint;
+
+
             // Initialize the mass drawing data
-            mass_drawingdata = new meshdata_store(false);
+            mass_drawingdata = new texture_list_store(false, res_3dcirclepic);
 
             // Set the mass visualization for all masses in the map
 
             foreach (mass_data mass in massMap.Values)
             {
+
                 // Set the point id
-                int origin_pt_id =  mass.mass_id * (circle_pt_count + 1);
+                int pt_id = mass.mass_id; // 1 point to form a texture
+                Vector2 mass_pt = mass.mass_loc;
 
- 
-                // Add the origin point
-                mass_drawingdata.add_mesh_point(origin_pt_id + 0, mass.mass_loc.X, mass.mass_loc.Y, 0.0, -4);
+                float mass_dia = geom_mass_size * mass.mass_size * (geom_size * 0.002f);
 
-                for (int i = 0; i < circle_pt_count; i++)
-                {
-                    // Create the points for circle
-                    double angle = (2.0 * Math.PI * i) / (double)circle_pt_count;
-                    double x = mass.mass_loc.X + (mass.mass_size * Math.Cos(angle));
-                    double y = mass.mass_loc.Y + (mass.mass_size * Math.Sin(angle));
+                int color_id = -3;
 
-                    mass_drawingdata.add_mesh_point(origin_pt_id + (i + 1), x, y, 0.0, -4);
+                //_______________________________________________________________________
+                //_____________________________________________________________________________________________
+                // Mesh objects
 
-                }
+                mass_drawingdata.add_texture(pt_id, mass_pt, mass_dia, mass_dia, color_id);
 
-                // Add Triangle and lines
-                for (int i = 0; i < circle_pt_count - 1; i++)
-                {
-                    mass_drawingdata.add_mesh_lines(origin_pt_id + i, 
-                        origin_pt_id + (i + 1), 
-                        origin_pt_id + (i + 2), -4);
-
-                    mass_drawingdata.add_mesh_tris(origin_pt_id + i, 
-                        origin_pt_id + 0,
-                        origin_pt_id + (i + 1),
-                        origin_pt_id + (i + 2), -4);
-
-                }
-
-                // Final segment
-                mass_drawingdata.add_mesh_lines(origin_pt_id + (circle_pt_count - 1), 
-                    origin_pt_id + circle_pt_count, 
-                    origin_pt_id + 1, -4);
-
-                mass_drawingdata.add_mesh_tris(origin_pt_id + (circle_pt_count - 1), 
-                    origin_pt_id + 0, 
-                    origin_pt_id + circle_pt_count, 
-                    origin_pt_id + 1, -4);
-
+                //
 
             }
 
@@ -156,7 +121,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         public void paint_pointmass()
         {
             // Paint the mass
-            mass_drawingdata.paint_dynamic_mesh();
+            mass_drawingdata.paint_dynamic_texture();
 
         }
 
@@ -174,10 +139,10 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
                 projectionMatrix,
                 modelMatrix,
                 viewMatrix,
-                0.5f * geom_transparency);
+                geom_transparency);
 
         }
-
+        
         //
     }
     //

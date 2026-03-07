@@ -21,8 +21,6 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         // public pendulum_data_store pendulum_data;
         public softbody_data_store softbodies;
 
-        // public elementfixedend_store fe_fixedend;
-
 
         // Drawing labels
         public text_store time_label;
@@ -65,10 +63,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         public void set_model()
         {
             
-            //// (Re)Initialize the data
-            //fe_fixedend = new elementfixedend_store(1200.0f, 800.0f);
+            // (Re)Initialize the data
 
-            // Settings.Default.Reset();
 
             // Set the soft body model
             softbodies = new softbody_data_store();
@@ -174,10 +170,6 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             if (!isModelSet)
                 return;
 
-
-            //// Paint the three pendulum system
-            //fe_fixedend.paint_fixedend();
-
             // Paint the Soft body
             softbodies.paint_drawing_data();
 
@@ -265,15 +257,6 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         {
             if (!isModelSet)
                 return;
-
-
-
-            //// Update fixed end openTK uniforms
-            //fe_fixedend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
 
 
             // Update soft bodies openTK uniforms

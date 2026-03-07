@@ -79,5 +79,65 @@ namespace XPBD_soft_body_dynamics.Resources {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] pic_3d_circle {
+            get {
+                object obj = ResourceManager.GetObject("pic_3d_circle", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] pic_3D_circle_paint {
+            get {
+                object obj = ResourceManager.GetObject("pic_3D_circle_paint", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] pic_node_texture {
+            get {
+                object obj = ResourceManager.GetObject("pic_node_texture", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] pic_node_texture2 {
+            get {
+                object obj = ResourceManager.GetObject("pic_node_texture2", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] pic_pin_support {
+            get {
+                object obj = ResourceManager.GetObject("pic_pin_support", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] pic_roller_support {
+            get {
+                object obj = ResourceManager.GetObject("pic_roller_support", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

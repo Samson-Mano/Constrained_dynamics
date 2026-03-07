@@ -124,4 +124,22 @@
   <data name="HyperFont" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>HyperFont.ttf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="pic_3d_circle" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>pic_3d_circle.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pic_3D_circle_paint" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>pic_3D_circle_paint.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pic_node_texture" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>pic_node_texture.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pic_node_texture2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>pic_node_texture2.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pic_pin_support" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>pic_pin_support.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pic_roller_support" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>pic_roller_support.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

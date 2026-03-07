@@ -207,6 +207,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         public List<mat1_data_store> mat_data { get; set; } = new List<mat1_data_store>();
 
+        public double max_mass { get; set; } = 0.0;
+
 
         public void simulate(Vec2Data gravity, double delta_t)
         {
@@ -223,8 +225,11 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         // Stores the entire softbody data
         public softbody_data_container softbody_data = new softbody_data_container();
 
-        // Element link store
-        elementlink_list_store elementlink_list = new elementlink_list_store();
+        // Drawing Elements
+        node_list_store node_list = new node_list_store(); // Node store
+        elementlink_list_store elementlink_list = new elementlink_list_store(); // Element link store
+
+        mass_list_store mass_list = new mass_list_store(); // Mass store
 
 
         bool isModelSet = false;
@@ -432,6 +437,9 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             mass.coord_id = int.Parse(t[3]); // Coord Id
             mass.mass_value = double.Parse(t[4]); // Mass value
 
+            // Set the max mass value
+            softbody_data.max_mass = Math.Max(softbody_data.max_mass, Math.Abs(mass.mass_value));
+
             softbody_data.mass_data.Add(mass);
         }
 
@@ -520,6 +528,20 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
         public void set_drawing_data()
         {
             // Create the drawing data
+
+            // Create the node drawing data
+            node_list = new node_list_store();
+
+            foreach (grid_data_store grid in softbody_data.grid_data)
+            {
+                // Get the grid node point
+                Vec2Data gridpt = grid.coord_pt;
+
+                node_list.add_node(grid.grid_id, gridpt.GetVector());  
+            }
+
+
+            // Create the element link drawing data
             elementlink_list = new elementlink_list_store();
 
             foreach( crod_data_store crod in softbody_data.crod_data)
@@ -531,6 +553,19 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
                 elementlink_list.add_elementlink(crod.element_id, startpt.GetVector(), endpt.GetVector(), crod.property_id);
             }
 
+            // Create the mass drawing data
+            mass_list = new mass_list_store();
+
+            foreach (mass_data_store mass in softbody_data.mass_data)
+            {
+
+                // Get the mass location
+                Vec2Data mass_loc = softbody_data.grid_vertexMap[mass.grid_id];
+
+                float mass_size = (float)(Math.Abs(mass.mass_value) / softbody_data.max_mass);
+
+                mass_list.add_mass(mass.mass_id, mass_loc.GetVector(), mass_size, -3);
+            }
 
 
             //_______________________________________________________________________________________
@@ -565,8 +600,9 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
 
 
             // Finalize the visualization
+            node_list.set_node_visualization(geom_size);
             elementlink_list.set_elementlink_visualization(geom_size);
-
+            mass_list.set_mass_visualization(geom_size);    
 
         }
 
@@ -575,8 +611,12 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
         {
             if (!isModelSet) return;
 
+
             elementlink_list.paint_elementlink();
 
+            node_list.paint_node();
+
+            mass_list.paint_pointmass();    
         }
 
 
@@ -601,6 +641,18 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
                 graphic_events_control.viewMatrix,
                 gvariables_static.geom_transparency);
 
+            node_list.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
+
+
+            mass_list.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
 
         }
 

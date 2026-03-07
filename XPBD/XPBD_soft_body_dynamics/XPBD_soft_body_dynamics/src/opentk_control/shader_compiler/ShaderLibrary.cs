@@ -13,6 +13,7 @@ namespace XPBD_soft_body_dynamics.src.opentk_control.shader_compiler
         {
             MeshShader,
             TextShader,
+            TextureShader,
             SelectionShader
         }
 
@@ -132,6 +133,70 @@ void main()
 
 
 
+
+        public static string texture_vert_shader()
+        {
+            return @"
+
+#version 330 core
+
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+uniform float vertexTransparency; // Transparency of the mesh
+
+layout(location = 0) in vec2 quad_position;
+layout(location = 1) in vec2 center_position;
+layout(location = 2) in vec2 textureCoord;
+layout(location = 3) in vec3 textureColor;
+layout(location = 4) in float is_dynamic;
+layout(location = 5) in float deflscale; // Deflection scale value = normalized_deflscale (varies 0 to 1) * max deformation
+
+out float v_is_dynamic;
+out float v_deflscale;
+out float v_Transparency;
+
+out vec3 v_textureColor;
+out vec2 v_textureCoord;
+
+
+
+void main()
+{
+
+	// apply Translation to the final position 
+	vec4 finalPosition =  projectionMatrix * viewMatrix * modelMatrix * vec4(quad_position,0.0f,1.0f);
+
+	// apply Translation to the text origin
+	vec4 finalTextureorigin =  projectionMatrix * viewMatrix * modelMatrix * vec4(center_position,0.0f,1.0f);
+    
+    float zoomscale = 1.0f; //viewMatrix[0][0];
+	// Remove the zoom scale
+	vec2 scaled_pt = vec2(finalPosition.x - finalTextureorigin.x,finalPosition.y - finalTextureorigin.y) / zoomscale;
+		
+	// Set the final position of the vertex
+	gl_Position = vec4(scaled_pt.x + finalTextureorigin.x, scaled_pt.y + finalTextureorigin.y, 0.0f, 1.0f);
+
+	// Calculate texture coordinates for the glyph
+	v_textureCoord = textureCoord;
+	
+	// Pass the texture color to the fragment shader
+	v_textureColor = textureColor;
+    v_Transparency = vertexTransparency;
+
+    // To handle dynamic drawing
+    v_is_dynamic = is_dynamic;
+    v_deflscale = deflscale;
+
+}
+
+                    ";
+
+        }
+
+
+
         #endregion
 
         #region "Fragment shaders"
@@ -167,8 +232,13 @@ void main()
     {
         vertexColor = jetHeatmap(v_deflscale);
     }
+    
+    vec4 FragColor =  vec4(vertexColor, v_Transparency); // Set the final color
 
-    f_Color = vec4(vertexColor, v_Transparency); // Set the final color
+    //if(FragColor.a < 0.5)
+    //    discard;
+
+    f_Color = FragColor;
 }
 
                     ";
@@ -220,6 +290,55 @@ void main()
 
 
 
+
+        public static string texture_frag_shader()
+        {
+            return @"
+
+#version 330 core
+uniform sampler2D u_Texture;
+
+in float v_is_dynamic;
+in float v_deflscale;
+in float v_Transparency;
+
+in vec3 v_textureColor;
+in vec2 v_textureCoord;
+
+out vec4 f_Color; // fragment's final color (out to the fragment shader)
+
+
+
+
+vec3 jetHeatmap(float value) 
+{
+
+    return clamp(vec3(1.5) - abs(4.0 * vec3(value) + vec3(-3, -2, -1)), vec3(0), vec3(1));
+}
+
+
+
+void main()
+{
+    vec3 vertexColor = v_textureColor;
+    
+    if (v_is_dynamic == 1.0f)
+    {
+        vertexColor = jetHeatmap(v_deflscale);
+    }
+
+    vec4 v_textureColor4 = vec4(vertexColor, v_Transparency); // Set the final color
+
+
+	vec4 texColor = vec4(1.0, 1.0, 1.0, texture(u_Texture, v_textureCoord).r);
+	f_Color = v_textureColor4 * texColor;
+}
+
+                    ";
+
+        }
+
+
         #endregion
 
         public static string get_vertex_shader(ShaderType type)
@@ -233,6 +352,8 @@ void main()
                     return selrect_vert_shader();
                 case ShaderType.TextShader:
                     return text_vert_shader();
+                case ShaderType.TextureShader:
+                    return texture_vert_shader();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), "Unknown shader type");
 
@@ -250,6 +371,8 @@ void main()
                     return selrect_frag_shader();
                 case ShaderType.TextShader:
                     return text_frag_shader();
+                case ShaderType.TextureShader:
+                    return texture_frag_shader();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), "Unknown shader type");
 

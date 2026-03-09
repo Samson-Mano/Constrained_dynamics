@@ -47,10 +47,10 @@
             // 
             this.glControl_main_panel.BackColor = System.Drawing.Color.Black;
             this.glControl_main_panel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.glControl_main_panel.Location = new System.Drawing.Point(231, 110);
-            this.glControl_main_panel.Margin = new System.Windows.Forms.Padding(5);
+            this.glControl_main_panel.Location = new System.Drawing.Point(173, 89);
+            this.glControl_main_panel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.glControl_main_panel.Name = "glControl_main_panel";
-            this.glControl_main_panel.Size = new System.Drawing.Size(297, 198);
+            this.glControl_main_panel.Size = new System.Drawing.Size(224, 162);
             this.glControl_main_panel.TabIndex = 0;
             this.glControl_main_panel.VSync = false;
             // 
@@ -61,29 +61,29 @@
             this.toolStripStatusLabel_zoom_value,
             this.toolStripStatusLabel_IsRefresh,
             this.toolStripStatusFPSLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 424);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 344);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 25, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(800, 26);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(600, 22);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // toolStripStatusLabel_zoom_value
             // 
             this.toolStripStatusLabel_zoom_value.Name = "toolStripStatusLabel_zoom_value";
-            this.toolStripStatusLabel_zoom_value.Size = new System.Drawing.Size(92, 20);
+            this.toolStripStatusLabel_zoom_value.Size = new System.Drawing.Size(73, 17);
             this.toolStripStatusLabel_zoom_value.Text = "Zoom: 100%";
             // 
             // toolStripStatusLabel_IsRefresh
             // 
             this.toolStripStatusLabel_IsRefresh.Name = "toolStripStatusLabel_IsRefresh";
-            this.toolStripStatusLabel_IsRefresh.Size = new System.Drawing.Size(13, 20);
+            this.toolStripStatusLabel_IsRefresh.Size = new System.Drawing.Size(10, 17);
             this.toolStripStatusLabel_IsRefresh.Text = " ";
             // 
             // toolStripStatusFPSLabel
             // 
             this.toolStripStatusFPSLabel.Name = "toolStripStatusFPSLabel";
-            this.toolStripStatusFPSLabel.Size = new System.Drawing.Size(47, 20);
+            this.toolStripStatusFPSLabel.Size = new System.Drawing.Size(38, 17);
             this.toolStripStatusFPSLabel.Text = "FPS: 0";
             // 
             // menuStrip1
@@ -93,7 +93,8 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1000, 38);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
+            this.menuStrip1.Size = new System.Drawing.Size(600, 24);
             this.menuStrip1.TabIndex = 4;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -104,40 +105,40 @@
             this.optionsToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 34);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // importTXTToolStripMenuItem
             // 
             this.importTXTToolStripMenuItem.Name = "importTXTToolStripMenuItem";
-            this.importTXTToolStripMenuItem.Size = new System.Drawing.Size(166, 26);
-            this.importTXTToolStripMenuItem.Text = "Import TXT";
+            this.importTXTToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.importTXTToolStripMenuItem.Text = "Import model";
             this.importTXTToolStripMenuItem.Click += new System.EventHandler(this.importTXTToolStripMenuItem_Click);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(166, 26);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.optionsToolStripMenuItem.Text = "Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(166, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // main_frm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(600, 366);
             this.Controls.Add(this.glControl_main_panel);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "main_frm";
             this.Text = "XPBD Soft Body Dynamics";
             this.Load += new System.EventHandler(this.main_frm_Load);

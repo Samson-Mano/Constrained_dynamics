@@ -103,7 +103,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
                 //_____________________________________________________________________________________________
                 // Mesh objects
 
-                mass_drawingdata.add_texture(pt_id, mass_pt, mass_dia, mass_dia, color_id);
+                mass_drawingdata.add_texture(pt_id, mass_pt, mass_dia, mass_dia, 0.0, color_id);
 
                 //
 

@@ -33,8 +33,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         public int color_id = 0;
 
         // Constraint drawing data
-        texture_list_store constraint_drawingdata;
-
+        texture_list_store constraint_pin_drawingdata;
+        texture_list_store constraint_roller_drawingdata;
 
 
         public nodeconstraint_list_store()
@@ -67,48 +67,64 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         {
 
             // Load the Texture for the costraint
-            byte[] res_3dcirclepic = Resource_font.pic_3D_circle_paint;
+            byte[] res_pinsupport = Resource_font.pic_pin_support;
+            byte[] res_rollersupport = Resource_font.pic_roller_support;
 
 
             // Initialize the constraint drawing data
-            constraint_drawingdata = new texture_list_store(false, res_3dcirclepic);
+            constraint_pin_drawingdata = new texture_list_store(false, res_pinsupport);
+            constraint_roller_drawingdata = new texture_list_store(false, res_rollersupport);
 
             // Set the constraint visualization for all constraints in the map
 
             foreach (nodeconstraint_store constraint in constraintMap.Values)
             {
 
-                //// Set the point id
-                //int pt_id = mass.mass_id; // 1 point to form a texture
-                //Vector2 constraint_loc = mass.mass_loc;
+                // Set the point id
+                int pt_id = constraint.constraint_id; // 1 point to form a texture
+                Vector2 constraint_pt = constraint.constraint_loc;
 
-                //float mass_dia = geom_mass_size * mass.mass_size * (geom_size * 0.002f);
+                float constraint_size = geom_constraint_size * (geom_size * 0.002f);
 
-                //int color_id = -3;
+                int color_id = -9;
 
-                ////_______________________________________________________________________
-                ////_____________________________________________________________________________________________
-                //// Mesh objects
+                //_____________________________________________________________________________________________
+                // Mesh objects
+                
+                if(constraint.constraint_type == 1)
+                {
+                    // Pin support
+                    constraint_pin_drawingdata.add_texture(pt_id, constraint_pt, 
+                        constraint_size, constraint_size, constraint.constraint_angle, color_id);
 
-                //constraint_drawingdata.add_texture(pt_id, mass_pt, mass_dia, mass_dia, color_id);
+                }
+                else if (constraint.constraint_type == 2)
+                {
+                    // Roller support
+                    constraint_roller_drawingdata.add_texture(pt_id, constraint_pt,
+                        constraint_size, constraint_size, constraint.constraint_angle, color_id);
 
-                ////
+                }
 
             }
 
             // Set the shader
-            constraint_drawingdata.set_shader();
+            constraint_pin_drawingdata.set_shader();
+            constraint_roller_drawingdata.set_shader();
 
             // Set the buffer
-            constraint_drawingdata.set_buffer();
+            constraint_pin_drawingdata.set_buffer();
+            constraint_roller_drawingdata.set_buffer();
 
+            //
         }
 
 
         public void paint_constraint()
         {
             // Paint the constraint
-            constraint_drawingdata.paint_dynamic_texture();
+            constraint_pin_drawingdata.paint_static_texture();
+            constraint_roller_drawingdata.paint_static_texture();
 
         }
 
@@ -122,7 +138,13 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
                 return;
 
             // Update the openTK uniforms of the drawing objects
-            constraint_drawingdata.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+            constraint_pin_drawingdata.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                projectionMatrix,
+                modelMatrix,
+                viewMatrix,
+                geom_transparency);
+
+            constraint_roller_drawingdata.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 projectionMatrix,
                 modelMatrix,
                 viewMatrix,

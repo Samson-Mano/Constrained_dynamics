@@ -1,7 +1,7 @@
 $ CORD2R, CID, RID, ORG_X, ORG_Y, , SPT_X, SPT_Y, , TPT_X, TPT_Y, 
 $ Origin pt, second pt, third pt
-CORD2R, 0, , 0.0, 0.0, , 1.0, 0.0, , 0.0, 1.0, 
-CORD2R, 1, , 0.0, 0.0, , 1.0, 0.0, , 0.0, 1.0, 
+CORD2R, 0, , 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0 
+CORD2R, 1, , 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0
 $ GRID, ID, CID, X1, X2
 GRID, 0, 0, -5400, -1559
 GRID, 1, 0, -1800, -1559

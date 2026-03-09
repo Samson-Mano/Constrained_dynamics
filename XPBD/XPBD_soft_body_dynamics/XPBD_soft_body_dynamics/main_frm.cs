@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -352,13 +353,46 @@ namespace XPBD_soft_body_dynamics
 
         private void importTXTToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Import the new model
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "Import Model File",
+                Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
+                // InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = openFileDialog.FileName;
+
+                try
+                {
+                    string fileContent = File.ReadAllText(filePath);
+
+                    fedata.set_softbodydata_model(fileContent);
+
+                    // Do something with the file content, e.g., parse the model
+                    // MessageBox.Show("Model file loaded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error reading text file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            glControl_main_panel_SizeChanged(sender, e);
+
+            glControl_main_panel.Refresh();
+            glControl_main_panel.Invalidate();
 
         }
+
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
+
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {

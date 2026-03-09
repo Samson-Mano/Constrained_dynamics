@@ -25,6 +25,7 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
 
         public double texture_height { get; set; }
 
+        public double rotation_angle { get; set; }
 
         public double normalized_defl_scale { get; set; }
         public int color_id { get; set; }
@@ -61,7 +62,8 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
 
 
 
-        public void add_texture(int texture_id, Vector2 textrure_center, double texture_width, double texture_height, int color_id)
+        public void add_texture(int texture_id, Vector2 textrure_center, 
+            double texture_width, double texture_height, double rotation_angle, int color_id)
         {
             // Add the Texture to the list
             texture_store temp_texture = new texture_store
@@ -70,6 +72,7 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
                 textrure_center = textrure_center,
                 texture_width = texture_width,
                 texture_height = texture_height,
+                rotation_angle = rotation_angle,
 
                 color_id = color_id,
                 point_color = gvariables_static.ColorUtils.MeshGetRandomColor(color_id)
@@ -107,13 +110,7 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
             texture_shader = new Shader(ShaderLibrary.get_vertex_shader(ShaderLibrary.ShaderType.TextureShader),
                 ShaderLibrary.get_fragment_shader(ShaderLibrary.ShaderType.TextureShader));
 
-            // Set the texture uniform
-            // texture_shader.setUniform
-
-            // Load the Texture
-            // texture_data = new TextureBuffer(filePath);
-
-
+   
         }
 
 
@@ -274,17 +271,29 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
             // Get the center of texture
             Vector2 center_pt = tx.textrure_center;
 
-            float h_width = (float)tx.texture_width * 0.5f;
-            float h_height = (float)tx.texture_height * 0.5f;
-
             float norm_defl_scale = (float)tx.normalized_defl_scale;
+
+            float hw = (float)tx.texture_width * 0.5f;
+            float hh = (float)tx.texture_height * 0.5f;
+
+            float angleRad = (float)((tx.rotation_angle + 180.0) * Math.PI / 180.0);
+
+            float cos = (float)Math.Cos(angleRad);
+            float sin = (float)Math.Sin(angleRad);
+
+            // Create the four corner point of the quad
+            // rotate offsets
+            Vector2 topleft = new Vector2((-hw * cos) + (hh * sin), (hw * sin) + (hh * cos)) + center_pt;
+            Vector2 topright = new Vector2((hw * cos) + (hh * sin), -(hw * sin) + (hh * cos)) + center_pt;
+            Vector2 botright = new Vector2((hw * cos) - (hh * sin), -(hw * sin) - (hh * cos)) + center_pt;
+            Vector2 botleft = new Vector2((-hw * cos) - (hh * sin), (hw * sin) - (hh * cos)) + center_pt;
 
 
             // Get the node buffer for the shader
             // Set the Point mass vertices Corner 1 Top Left
             // Top left location
-            texture_vertices[texture_v_index + 0] = center_pt.X - h_width;
-            texture_vertices[texture_v_index + 1] = center_pt.Y + h_height;
+            texture_vertices[texture_v_index + 0] = topleft.X;
+            texture_vertices[texture_v_index + 1] = topleft.Y;
 
             // Center location
             texture_vertices[texture_v_index + 2] = center_pt.X;
@@ -311,8 +320,8 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
 
             // Set the Point mass vertices Corner 2 Top Right
             // Top Right location
-            texture_vertices[texture_v_index + 0] = center_pt.X + h_width;
-            texture_vertices[texture_v_index + 1] = center_pt.Y + h_height;
+            texture_vertices[texture_v_index + 0] = topright.X;
+            texture_vertices[texture_v_index + 1] = topright.Y;
 
             // Center location
             texture_vertices[texture_v_index + 2] = center_pt.X;
@@ -340,8 +349,8 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
 
             // Set the Point Mass vertices Corner 3 Bot Right
             // Bot Right location
-            texture_vertices[texture_v_index + 0] = center_pt.X + h_width;
-            texture_vertices[texture_v_index + 1] = center_pt.Y - h_height;
+            texture_vertices[texture_v_index + 0] = botright.X;
+            texture_vertices[texture_v_index + 1] = botright.Y;
 
             // Center location
             texture_vertices[texture_v_index + 2] = center_pt.X;
@@ -367,9 +376,9 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
 
 
             // Set the Constraint vertices Corner 4 Bot Left
-            // Bot Right location
-            texture_vertices[texture_v_index + 0] = center_pt.X - h_width;
-            texture_vertices[texture_v_index + 1] = center_pt.Y - h_height;
+            // Bot Left location
+            texture_vertices[texture_v_index + 0] = botleft.X;
+            texture_vertices[texture_v_index + 1] = botleft.Y;
 
             // Center location
             texture_vertices[texture_v_index + 2] = center_pt.X;
@@ -423,8 +432,7 @@ namespace XPBD_soft_body_dynamics.src.geom_objects
             texture_i_index = texture_i_index + 6;
 
         }
-
-
-
+        //
     }
+    //
 }

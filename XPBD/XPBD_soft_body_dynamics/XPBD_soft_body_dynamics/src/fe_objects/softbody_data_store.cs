@@ -1,16 +1,17 @@
-﻿using XPBD_soft_body_dynamics.src.global_variables;
-using XPBD_soft_body_dynamics.src.opentk_control.opentk_bgdraw;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System.IO;
-
+using SharpFont.MultipleMasters;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XPBD_soft_body_dynamics.src.global_variables;
+using XPBD_soft_body_dynamics.src.opentk_control.opentk_bgdraw;
 
 namespace XPBD_soft_body_dynamics.src.fe_objects
 {
@@ -83,14 +84,13 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
     public class coord_sys_data_store
     {
         // CORD2R data store
-        // CORD2R, CID, RID, ORG_X, ORG_Y, , SPT_X, SPT_Y, , TPT_X, TPT_Y, 
+        // CORD2R, CID, RID, X0, Y0, Z0, XZ, YZ, ZZ, XX, YX, ZX
+        // CORD2R, 0, , 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0
         public int coord_id { get; set; }
 
         public Vec2Data origin_pt { get; set; }
 
         public Vec2Data haxis_pt { get; set; }
-
-        public Vec2Data vaxis_pt { get; set; }
 
     }
 
@@ -100,9 +100,9 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         // GRID data store
         // GRID, ID, CID, X1, X2
 
-        public int grid_id { get; set; }   
+        public int grid_id { get; set; }
 
-        public int coord_id { get; set; }   
+        public int coord_id { get; set; }
 
         public Vec2Data coord_pt { get; set; }
 
@@ -115,7 +115,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         // CROD, EID, PID, GRID1, GRID2
         public int element_id { get; set; }
 
-        public int property_id { get; set; }    
+        public int property_id { get; set; }
 
         public int start_grid_id { get; set; }
 
@@ -134,6 +134,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         public int grid_id { get; set; }
 
+        public float spc_angle { get; set; }
+
     }
 
 
@@ -147,7 +149,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         public int coord_id { get; set; }
 
-        public double mass_value { get; set; }  
+        public double mass_value { get; set; }
 
     }
 
@@ -181,7 +183,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         public double poissons_ratio { get; set; }
 
-        public double mat_density_rho { get; set; } 
+        public double mat_density_rho { get; set; }
 
     }
 
@@ -192,6 +194,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         public Dictionary<int, Vec2Data> grid_vertexMap { get; set; } = new Dictionary<int, Vec2Data>();
 
         public Dictionary<int, int> grid_coordMap { get; set; } = new Dictionary<int, int>();
+
+        public Dictionary<int, coord_sys_data_store> coordsysMap { get; set; } = new Dictionary<int, coord_sys_data_store>();
 
         public List<coord_sys_data_store> coord_sys_data { get; set; } = new List<coord_sys_data_store>();
 
@@ -228,12 +232,11 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         // Drawing Elements
         node_list_store node_list = new node_list_store(); // Node store
         elementlink_list_store elementlink_list = new elementlink_list_store(); // Element link store
-
         mass_list_store mass_list = new mass_list_store(); // Mass store
-
+        nodeconstraint_list_store constraint_list = new nodeconstraint_list_store(); // Constraint store
 
         bool isModelSet = false;
-    
+
         const string FILE_NAME = "softbodydata.json";
 
 
@@ -269,11 +272,13 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
                 //____________________________________________________________________________________________________________
                 // Set the drawing data
                 set_drawing_data();
+
+                isModelSet = true;
             }
             else
             {
                 update_softbody_data(default_model_data());
-                // SaveToJson();
+
             }
         }
 
@@ -289,66 +294,86 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         {
             isModelSet = false;
 
-            // Initialize the soft body data
-            softbody_data = new softbody_data_container();
-
-            var lines = model_data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var raw_line in lines)
+            try
             {
-                string line = raw_line.Trim();
+                // Initialize the soft body data
+                softbody_data = new softbody_data_container();
 
-                // Ignore comments
-                if (line.StartsWith("$"))
-                    continue;
+                var lines = model_data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                var tokens = line.Split(',')
-                                 .Select(t => t.Trim())
-                                 .ToArray();
-
-                if (tokens.Length == 0)
-                    continue;
-
-                string card = tokens[0];
-
-                switch (card)
+                foreach (var raw_line in lines)
                 {
-                    case "CORD2R":
-                        parse_CORD2R(tokens);
-                        break;
+                    string line = raw_line.Trim();
 
-                    case "GRID":
-                        parse_GRID(tokens);
-                        break;
+                    // Ignore comments
+                    if (line.StartsWith("$"))
+                        continue;
 
-                    case "CROD":
-                        parse_CROD(tokens);
-                        break;
+                    var tokens = line.Split(',')
+                                     .Select(t => t.Trim())
+                                     .ToArray();
 
-                    case "SPC1":
-                        parse_SPC1(tokens);
-                        break;
+                    if (tokens.Length == 0)
+                        continue;
 
-                    case "CONM2":
-                        parse_CONM2(tokens);
-                        break;
+                    string card = tokens[0];
 
-                    case "PROD":
-                        parse_PROD(tokens);
-                        break;
+                    switch (card)
+                    {
+                        case "CORD2R":
+                            parse_CORD2R(tokens);
+                            break;
 
-                    case "MAT1":
-                    case "MAT2":
-                        parse_MAT(tokens);
-                        break;
+                        case "GRID":
+                            parse_GRID(tokens);
+                            break;
+
+                        case "CROD":
+                            parse_CROD(tokens);
+                            break;
+
+                        case "SPC1":
+                            parse_SPC1(tokens);
+                            break;
+
+                        case "CONM2":
+                            parse_CONM2(tokens);
+                            break;
+
+                        case "PROD":
+                            parse_PROD(tokens);
+                            break;
+
+                        case "MAT1":
+                        case "MAT2":
+                            parse_MAT(tokens);
+                            break;
+                    }
                 }
+
+                // Apply constraint angle
+                apply_constraint_angle();
+
+                // Set the drawing data
+                set_drawing_data();
+
+                isModelSet = true;
+
+
+                // Save the loaded model to JSON
+                SaveToJson();
+
             }
+            catch (Exception ex)
+            {
+                // log error
+                System.Windows.Forms.MessageBox.Show("Model load failed:\n" + ex.Message,
+                                "Model Load Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
 
-            // Set the drawing data
-            set_drawing_data();
-
-            isModelSet = true;
-
+                isModelSet = false;
+            }
             //
         }
 
@@ -366,14 +391,12 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             );
 
             coord.haxis_pt = new Vec2Data(
-                float.Parse(t[6]), // Horizontal pt x
-                float.Parse(t[7]) // Horizontal pt y
+                float.Parse(t[9]), // Horizontal pt x
+                float.Parse(t[10]) // Horizontal pt y
             );
 
-            coord.vaxis_pt = new Vec2Data(
-                float.Parse(t[9]), // Vertical pt x
-                float.Parse(t[10]) // Vertical pt y
-            );
+            // Add to map
+            softbody_data.coordsysMap.Add(coord.coord_id, coord);
 
             softbody_data.coord_sys_data.Add(coord);
         }
@@ -466,29 +489,64 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             mat1_data_store mat = new mat1_data_store();
 
             mat.mat_id = int.Parse(t[1]); // MAT Id
-            mat.youngs_mod = double.Parse(t[2]); // Youngs Modulus
-            mat.shear_mod = double.Parse(t[3]); // Shear Modulus
+
+            double youngs_mod, shear_mod = 0.0;
+
+            // Handle infinite stiffness
+            if (t[2] == "inf" || t[3] == "inf")
+            {
+                youngs_mod = double.PositiveInfinity;
+                shear_mod = double.PositiveInfinity;
+            }
+            else
+            {
+                youngs_mod = double.Parse(t[2]);
+                shear_mod = double.Parse(t[3]);
+            }
+
+
+            mat.youngs_mod = youngs_mod; // Youngs Modulus
+            mat.shear_mod = shear_mod; // Shear Modulus
             mat.poissons_ratio = double.Parse(t[4]); // Poissons Ratio
             mat.mat_density_rho = double.Parse(t[5]); // Material density
 
             softbody_data.mat_data.Add(mat);
         }
 
+        void apply_constraint_angle()
+        {
 
+            foreach (spc_data_store spc1 in softbody_data.spc_data)
+            {
+                // Get the coord ID
+                int spc_coord_id = softbody_data.grid_coordMap[spc1.grid_id];
+
+                // Get the coord
+                coord_sys_data_store coord_sys = softbody_data.coordsysMap[spc_coord_id];
+
+                // Find the rotation angle of the coordinate system w.r.t global system
+                Vector2 x_axis_vector = coord_sys.haxis_pt.GetVector() - coord_sys.origin_pt.GetVector();
+
+                float angle_rad = (float)Math.Atan2(x_axis_vector.Y, x_axis_vector.X);
+                float angle_deg = (float)(angle_rad * (180.0f / Math.PI)) + 90.0f;
+
+                spc1.spc_angle = angle_deg;
+
+            }
+        }
 
         // Default model data
         private string default_model_data()
         {
             return @"
-$ CORD2R, CID, RID, ORG_X, ORG_Y, , SPT_X, SPT_Y, , TPT_X, TPT_Y, 
-$ Origin pt, second pt, third pt
-CORD2R, 0, , 0.0, 0.0, , 1.0, 0.0, , 0.0, 1.0, 
-CORD2R, 1, , 0.0, 0.0, , 1.0, 0.0, , 0.0, 1.0, 
+$ CORD2R, CID, RID, X0,Y0,Z0, XZ,YZ,ZZ, XX,YX,ZX
+CORD2R, 0, , 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0 
+CORD2R, 1, , 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 
 $ GRID, ID, CID, X1, X2
-GRID, 0, 0, -5400, -1559
+GRID, 0, 1, -5400, -1559
 GRID, 1, 0, -1800, -1559
 GRID, 2, 0, 1800, -1559
-GRID, 3, 0, 5400, -1559
+GRID, 3, 1, 5400, -1559
 GRID, 5, 0, -3600, 1559
 GRID, 6, 0, -0.000207583, 1559
 GRID, 7, 0, 3600, 1559
@@ -537,14 +595,14 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
                 // Get the grid node point
                 Vec2Data gridpt = grid.coord_pt;
 
-                node_list.add_node(grid.grid_id, gridpt.GetVector());  
+                node_list.add_node(grid.grid_id, gridpt.GetVector());
             }
 
 
             // Create the element link drawing data
             elementlink_list = new elementlink_list_store();
 
-            foreach( crod_data_store crod in softbody_data.crod_data)
+            foreach (crod_data_store crod in softbody_data.crod_data)
             {
                 // Get the start pt and end pt
                 Vec2Data startpt = softbody_data.grid_vertexMap[crod.start_grid_id];
@@ -568,6 +626,33 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
             }
 
 
+            // Create the constraint drawing data
+            constraint_list = new nodeconstraint_list_store();
+            int spc_id = 0;
+            foreach (spc_data_store spc1 in softbody_data.spc_data)
+            {
+                // Get the coord
+                int spc_grid_id = spc1.grid_id;
+
+                Vec2Data spc_grid_loc = softbody_data.grid_vertexMap[spc_grid_id];
+
+                if (spc1.spc_type == 12)
+                {
+                    // Pin support
+                    constraint_list.add_constraint(spc_id, spc_grid_loc.GetVector(), 1, spc1.spc_angle);
+                    spc_id++;
+
+                }
+                else if (spc1.spc_type == 1)
+                {
+                    // Roller support
+                    constraint_list.add_constraint(spc_id, spc_grid_loc.GetVector(), 2, spc1.spc_angle);
+                    spc_id++;
+                }
+                //
+            }
+
+
             //_______________________________________________________________________________________
             // Find the boundary
             List<Vector3> nodePtsList = new List<Vector3>();
@@ -588,21 +673,20 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
 
 
             // Set the geometry bounds
-            Vector3  min_bounds = geom_extremes.Item1; // Minimum bound
-            Vector3  max_bounds = geom_extremes.Item2; // Maximum bound
+            Vector3 min_bounds = geom_extremes.Item1; // Minimum bound
+            Vector3 max_bounds = geom_extremes.Item2; // Maximum bound
 
-            Vector3  geom_bounds = max_bounds - min_bounds;
+            Vector3 geom_bounds = max_bounds - min_bounds;
 
             float geom_size = geom_bounds.Length;
             //_______________________________________________________________________________________
 
 
-
-
             // Finalize the visualization
             node_list.set_node_visualization(geom_size);
             elementlink_list.set_elementlink_visualization(geom_size);
-            mass_list.set_mass_visualization(geom_size);    
+            mass_list.set_mass_visualization(geom_size);
+            constraint_list.set_constraint_visualization(geom_size);
 
         }
 
@@ -616,7 +700,61 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
 
             node_list.paint_node();
 
-            mass_list.paint_pointmass();    
+            constraint_list.paint_constraint();
+
+            mass_list.paint_pointmass();
+        }
+
+
+
+        public void reset_simulation()
+        {
+
+
+            // Reset settings
+            prev_time = 0.0;
+            accumulator = 0.0;
+
+
+        }
+
+        public void simulate(double time_t)
+        {
+
+            double frameTime = time_t - prev_time;
+            frameTime = Math.Min(frameTime, 0.05); // avoid spiral of death
+
+            accumulator += frameTime;
+
+            while (accumulator >= FIXED_DT)
+            {
+                StepPhysics(FIXED_DT);
+                accumulator -= FIXED_DT;
+            }
+
+            prev_time = time_t;
+            //
+        }
+
+
+
+
+        private void StepPhysics(double dt)
+        {
+
+          
+            // Update the drawing
+            updateDrawing();
+            //
+
+        }
+
+
+        private void updateDrawing()
+        {
+
+           
+            //
         }
 
 
@@ -628,12 +766,6 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
 
             if (!isModelSet) return;
 
-            //// Update mass openTK uniforms
-            //mass_List.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
-            //    graphic_events_control.projectionMatrix,
-            //    graphic_events_control.modelMatrix,
-            //    graphic_events_control.viewMatrix,
-            //    gvariables_static.geom_transparency);
 
             elementlink_list.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control.projectionMatrix,
@@ -647,12 +779,19 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
                 graphic_events_control.viewMatrix,
                 gvariables_static.geom_transparency);
 
+            constraint_list.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
 
             mass_list.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control.projectionMatrix,
                 graphic_events_control.modelMatrix,
                 graphic_events_control.viewMatrix,
                 gvariables_static.geom_transparency);
+
+
 
         }
 

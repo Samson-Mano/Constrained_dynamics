@@ -229,6 +229,10 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         // Stores the entire softbody data
         public softbody_data_container softbody_data = new softbody_data_container();
 
+        // XPBD Solver data
+        public xpbd_solver xpbd_wrapper = new xpbd_solver();
+
+
         // Drawing Elements
         node_list_store node_list = new node_list_store(); // Node store
         elementlink_list_store elementlink_list = new elementlink_list_store(); // Element link store
@@ -357,8 +361,10 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
                 // Set the drawing data
                 set_drawing_data();
 
-                isModelSet = true;
+                // Create the XPBD Data
 
+
+                isModelSet = true;
 
                 // Save the loaded model to JSON
                 SaveToJson();

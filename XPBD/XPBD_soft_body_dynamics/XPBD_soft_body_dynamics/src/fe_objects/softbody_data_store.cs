@@ -226,6 +226,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
     public class softbody_data_store
     {
+        public fixedfloorend_store fixedfloorend;
+
         // Stores the entire softbody data
         public softbody_data_container softbody_data = new softbody_data_container();
 
@@ -245,7 +247,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
 
         // Gravity
-        Vec2Data GRAVITY = new Vec2Data(0.0f, 0.0f);
+        Vec2Data GRAVITY = new Vec2Data(0.0f, -9.8065f);
 
 
         // Simulation constants
@@ -682,10 +684,38 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
             Vector3 min_bounds = geom_extremes.Item1; // Minimum bound
             Vector3 max_bounds = geom_extremes.Item2; // Maximum bound
 
+            // Find the y bound of the model
+            double y_bound = max_bounds.Y - min_bounds.Y;
+
+            Vector3 floor = new Vector3(geometry_center.X, geometry_center.Y - (float)(y_bound * 1.5f), 0.0f);
+
+            // Set the fixed end floor
+            fixedfloorend = new fixedfloorend_store(new Vector2(floor.X, floor.Y));
+
+
+            //_______________________________________________________________________________________
+            // Add the floor point to the node list
+            nodePtsList.Add(floor);
+
+            // Recalculate the boundary
+            geometry_center = gvariables_static.FindGeometricCenter(nodePtsList);
+            geom_extremes = gvariables_static.FindMinMaxXY(nodePtsList);
+
+            min_bounds = geom_extremes.Item1; // Minimum bound
+            max_bounds = geom_extremes.Item2; // Maximum bound
+
             Vector3 geom_bounds = max_bounds - min_bounds;
 
             float geom_size = geom_bounds.Length;
+
+
+
             //_______________________________________________________________________________________
+            // Create the XPBD solver
+
+            xpbd_wrapper = new xpbd_solver(softbody_data);
+
+
 
 
             // Finalize the visualization
@@ -709,12 +739,17 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
             constraint_list.paint_constraint();
 
             mass_list.paint_pointmass();
+
+            fixedfloorend.paint_fixedend();
         }
 
 
 
         public void reset_simulation()
         {
+            if (!isModelSet) return;
+
+            xpbd_wrapper = new xpbd_solver(softbody_data);
 
 
             // Reset settings
@@ -748,7 +783,8 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
         private void StepPhysics(double dt)
         {
 
-          
+            xpbd_wrapper.simulate(GRAVITY.GetVector(), dt);
+            
             // Update the drawing
             updateDrawing();
             //
@@ -758,8 +794,37 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
 
         private void updateDrawing()
         {
+            foreach (xpbd_particle particle in xpbd_wrapper.particles.Values)
+            {
+                node_list.update_node(particle.particle_id, particle.position, 1.0f);
 
-           
+
+
+            }
+            
+
+            foreach (xpbd_distance_constraint spring in xpbd_wrapper.springs.Values)
+            {
+                Vector2 start_pt = xpbd_wrapper.particles[spring.i].position;
+                Vector2 end_pt = xpbd_wrapper.particles[spring.j].position;
+
+                elementlink_list.update_elementlink(spring.element_id, start_pt, end_pt);
+
+            }
+
+            foreach (mass_data_store mass in softbody_data.mass_data)
+            {
+
+                // Get the mass location
+                Vector2 mass_loc = xpbd_wrapper.particles[mass.grid_id].position;
+
+                float mass_size = (float)(Math.Abs(mass.mass_value) / softbody_data.max_mass);
+
+                mass_list.update_mass(mass.mass_id, mass_loc, 1.0f);
+            }
+
+
+
             //
         }
 
@@ -797,7 +862,11 @@ MAT2, 1, 69000, 25000, 0.33, 2.73e-09
                 graphic_events_control.viewMatrix,
                 gvariables_static.geom_transparency);
 
-
+            fixedfloorend.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control.projectionMatrix,
+                graphic_events_control.modelMatrix,
+                graphic_events_control.viewMatrix,
+                gvariables_static.geom_transparency);
 
         }
 

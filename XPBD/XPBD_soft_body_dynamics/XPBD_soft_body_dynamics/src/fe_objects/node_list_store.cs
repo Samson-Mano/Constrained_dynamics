@@ -37,6 +37,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         public Dictionary<int, node_store> nodeMap = new Dictionary<int, node_store>();
         public int node_count = 0;
 
+        float geom_size = 0.0f;
 
         // Node drawing data
         texture_list_store node_drawingdata;
@@ -84,6 +85,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             // Load the texture for node
             byte[] res_3dcirclepic = Resource_font.pic_node_texture2;
 
+            this.geom_size = geom_size;
 
             // Initialize the node texture drawing data
             node_drawingdata = new texture_list_store(true, res_3dcirclepic);

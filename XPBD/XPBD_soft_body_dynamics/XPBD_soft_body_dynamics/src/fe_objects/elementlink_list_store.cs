@@ -49,6 +49,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
         const float geom_line_width = 6.0f;
 
+        float geom_size = 0.0f;
+
         public Dictionary<int, elementlink_store> elementlinkMap = new Dictionary<int, elementlink_store>();
         public int elementlink_count = 0;
 
@@ -90,10 +92,10 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         {
             int element_pt_id = element_id * 4; // 4 points to form a rigid link
 
-            int color_id = elementlinkMap[element_pt_id].prop_id;
+            int color_id = elementlinkMap[element_id].prop_id;
 
             // Update the mesh point
-            float halfWidth = geom_line_width * 0.5f;
+            float halfWidth = geom_line_width * (geom_size * 0.001f) * 0.5f;
 
             Vector2 dir = end_pt - start_pt;
             float length = dir.Length;
@@ -106,6 +108,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
 
             // Perpendicular normal
             Vector2 normal = new Vector2(-dir.Y, dir.X);
+
 
             // Rectangle vertices
             Vector2 p1 = start_pt + (normal * halfWidth);
@@ -126,6 +129,8 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
         {
             // Initialize the element link drawing data
             springlink_drawingdata = new meshdata_store(true);
+
+            this.geom_size = geom_size;
 
             // Set the element link visualization for all links in the map
 

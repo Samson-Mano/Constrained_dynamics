@@ -87,12 +87,27 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             Vector3 geometry_center = gvariables_static.FindGeometricCenter(nodePtsList);
             Tuple<Vector3, Vector3> geom_extremes = gvariables_static.FindMinMaxXY(nodePtsList);
 
+            // Set the geometry bounds
+            this.min_bounds = geom_extremes.Item1; // Minimum bound
+            this.max_bounds = geom_extremes.Item2; // Maximum bound
+
+            // Find the y bound of the model
+            double y_bound = this.max_bounds.Y - this.min_bounds.Y;
+
+            Vector3 floor = new Vector3(geometry_center.X, geometry_center.Y - (float)(y_bound * 1.5f), 0.0f);
+
+            // Add floor to the node_pt list
+            nodePtsList.Add(floor);
+
+            // recalculate the bounds
+            geometry_center = gvariables_static.FindGeometricCenter(nodePtsList);
+            geom_extremes = gvariables_static.FindMinMaxXY(nodePtsList);
 
             // Set the geometry bounds
             this.min_bounds = geom_extremes.Item1; // Minimum bound
             this.max_bounds = geom_extremes.Item2; // Maximum bound
 
-            this.geom_bounds = max_bounds - min_bounds;
+            this.geom_bounds = (max_bounds - min_bounds);
 
             gvariables_static.geom_size = this.geom_bounds.Length;
 
@@ -146,9 +161,27 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             this.min_bounds = geom_extremes.Item1; // Minimum bound
             this.max_bounds = geom_extremes.Item2; // Maximum bound
 
-            this.geom_bounds = max_bounds - min_bounds;
+
+            // Find the y bound of the model
+            double y_bound = this.max_bounds.Y - this.min_bounds.Y;
+
+            Vector3 floor = new Vector3(geometry_center.X, geometry_center.Y - (float)(y_bound * 1.5f), 0.0f);
+
+            // Add floor to the node_pt list
+            nodePtsList.Add(floor);
+
+            // recalculate the bounds
+            geometry_center = gvariables_static.FindGeometricCenter(nodePtsList);
+            geom_extremes = gvariables_static.FindMinMaxXY(nodePtsList);
+
+            // Set the geometry bounds
+            this.min_bounds = geom_extremes.Item1; // Minimum bound
+            this.max_bounds = geom_extremes.Item2; // Maximum bound
+
+            this.geom_bounds = (max_bounds - min_bounds);
 
             gvariables_static.geom_size = this.geom_bounds.Length;
+
 
             //_______________________________________________________________________________________
 
@@ -203,7 +236,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             stopwatch.Reset();
             stopwatch.Stop();
 
-            // billiardballs.reset_simulation();
+            softbodies.reset_simulation();
           
         }
 
@@ -221,7 +254,7 @@ namespace XPBD_soft_body_dynamics.src.fe_objects
             {
                 time_label.update_text($"Time = {convert_value_to_label(elapsedRealTime, 9)} s", new Vector2(-465.0f, 475.0f)); 
 
-                // billiardballs.simulate(elapsedRealTime);
+               softbodies.simulate(elapsedRealTime);
 
             }
             

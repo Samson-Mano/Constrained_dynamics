@@ -2,6 +2,9 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <unordered_map>
+
+#include "../../fe_solver/lagrange_dynamics_solver.h"
+
 #include "../geom_parameters.h"
 #include "springelement_store.h"
 #include "rigidelement_store.h"
@@ -23,6 +26,9 @@ public:
 	void add_gyrosprings(int& sprg_id, int& startnd_id, int& endnd_id);
 	void add_gyrorigids(int& rigd_id, int& startnd_id,int& endnd_id);
 	void add_gyroptmass(int& mass_id,int& mass_nd_id, double& ptmass_value);
+
+	void set_matrices();
+
 
 	void rotate_gyro_model(const double& rotation_angle);
 	void rotate_gyro_model_ends(const double& rotation_angle);
@@ -47,5 +53,7 @@ private:
 	springelement_store spring_elements; // Spring elements
 	rigidelement_store rigid_elements; // Rigid elements
 	masselement_store mass_elements; // Mass elements
+
+	lagrange_dynamics_solver ld_solver;
 
 };

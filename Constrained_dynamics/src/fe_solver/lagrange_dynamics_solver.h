@@ -5,6 +5,8 @@
 // Stop watch
 #include "../events_handler/Stopwatch_events.h"
 
+#include "../geometry_store/geom_parameters.h"
+
 #pragma warning(push)
 #pragma warning (disable : 26451)
 #pragma warning (disable : 26495)
@@ -32,7 +34,10 @@ class lagrange_dynamics_solver
 {
 public:
 	lagrange_dynamics_solver();
-	~lagrange_dynamics_solver();
+	~lagrange_dynamics_solver() = default;
+
+	void set_matrices(std::unordered_map<int, gyronode_store*> g_nodes,
+	std::vector<gyrospring_store*> g_springs);
 
 	// Mass matrix
 
@@ -43,5 +48,22 @@ public:
 	// External force matrix (Column matrix)
 
 private:
+	std::unordered_map<int, int> nodeid_map;
+
+	// Global stiffness matrix
+	Eigen::MatrixXd globalStiffnessMatrix;
+
+	// Global mass matrix
+	Eigen::MatrixXd globalMassMatrix;
+
+
+	void get_global_stiffness_matrix(Eigen::MatrixXd& globalStiffnessMatrix, std::vector<gyrospring_store*> g_springs);
+
+
+	void get_element_stiffness_matrix(Eigen::Matrix4d& elementStiffnessMatrix, gyrospring_store* spring_element);
+
+
+
+
 
 };

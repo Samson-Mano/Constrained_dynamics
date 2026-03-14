@@ -30,20 +30,26 @@ typedef Eigen::SparseMatrix<double> SparseMatrix;
 #pragma warning(pop)
 
 
-class lagrange_dynamics_solver
+
+
+class penalty_dynamics_solver
 {
 public:
-	lagrange_dynamics_solver();
-	~lagrange_dynamics_solver() = default;
+	penalty_dynamics_solver();
+	~penalty_dynamics_solver() = default;
 
-	void set_lagrangesolver_matrices(std::unordered_map<int, gyronode_store*> g_nodes,
-	std::vector<gyrospring_store*> g_springs);
-
+	void set_penaltysolver_matrices(std::unordered_map<int, gyronode_store*> g_nodes,
+		std::vector<gyrospring_store*> g_springs);
 
 private:
 	const double M_PI = 3.14159265358979323;
 
-		std::unordered_map<int, int> nodeid_map;
+	// Penalty stiffness
+	double max_stiffness = 0.0;
+	const double penalty_factor = 1E+6;
+
+
+	std::unordered_map<int, int> nodeid_map;
 
 	// Global stiffness matrix
 	Eigen::MatrixXd globalStiffnessMatrix;
@@ -55,23 +61,20 @@ private:
 	Eigen::MatrixXd inverse_globalMassMatrix;
 
 
-	// Global constraint matrix
-	Eigen::MatrixXd globalConstraint_SPC_AMatrix; 
-	Eigen::MatrixXd globalConstraint_MPC_AMatrix; 
+	// Global Penalty SPC & MPC matrices
+	Eigen::MatrixXd globalPenalty_SPC_StiffnessMatrix;
+	Eigen::MatrixXd globalPenalty_MPC_StiffnessMatrix;
 
-	Eigen::MatrixXd globalConstraint_AMatrix;
-	
+
+	// Penalty Augmentation for Stiffness Matrix 
+	Eigen::MatrixXd globalPenaltyAugmentedStiffnessMatrix;
+
 	// Initial displacement vector
 	Eigen::VectorXd initial_displVector;
 
 	// Force Vector
 	Eigen::VectorXd forceVector;
 
-	// Lagrange Augmentation of Matrix
-	Eigen::MatrixXd globalLagrangeAugmentedStiffnessMatrix;
-	Eigen::MatrixXd globalLagrangeAugmentedMassMatrix;
-	Eigen::VectorXd globalAugmentedInitialDisplacement;
-	Eigen::VectorXd globalAugmentedForceVector;
 
 
 
@@ -81,12 +84,12 @@ private:
 	void get_element_stiffness_matrix(Eigen::Matrix4d& elementStiffnessMatrix, gyrospring_store* spring_element);
 
 
-	void get_global_mass_matrix(Eigen::MatrixXd& globalMassMatrix, Eigen::MatrixXd& inverse_globalMassMatrix, 
+	void get_global_mass_matrix(Eigen::MatrixXd& globalMassMatrix, Eigen::MatrixXd& inverse_globalMassMatrix,
 		std::unordered_map<int, gyronode_store*> g_nodes);
 
 
-	void set_global_constraint_A_matrix(Eigen::MatrixXd& globalConstraint_SPC_AMatrix,
-		Eigen::MatrixXd& globalConstraint_MPC_AMatrix, int numDOF,
+	void get_boundary_condition_penalty_matrix(Eigen::MatrixXd& globalPenalty_SPC_StiffnessMatrix,
+		Eigen::MatrixXd& globalPenalty_MPC_StiffnessMatrix, int numDOF,
 		std::unordered_map<int, gyronode_store*> g_nodes, std::vector<gyrospring_store*> g_springs);
 
 
@@ -94,3 +97,8 @@ private:
 
 
 };
+
+
+
+
+

@@ -149,6 +149,7 @@
     <ClCompile Include="src\events_handler\mouse_event_handler.cpp" />
     <ClCompile Include="src\events_handler\Stopwatch_events.cpp" />
     <ClCompile Include="src\fe_solver\lagrange_dynamics_solver.cpp" />
+    <ClCompile Include="src\fe_solver\penalty_dynamics_solver.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\constrained_ring_store.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\gyro_model_store.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\masselement_store.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="src\events_handler\mouse_event_handler.h" />
     <ClInclude Include="src\events_handler\Stopwatch_events.h" />
     <ClInclude Include="src\fe_solver\lagrange_dynamics_solver.h" />
+    <ClInclude Include="src\fe_solver\penalty_dynamics_solver.h" />
     <ClInclude Include="src\geometry_store\fe_objects\constrained_ring_store.h" />
     <ClInclude Include="src\geometry_store\fe_objects\gyro_model_store.h" />
     <ClInclude Include="src\geometry_store\fe_objects\masselement_store.h" />

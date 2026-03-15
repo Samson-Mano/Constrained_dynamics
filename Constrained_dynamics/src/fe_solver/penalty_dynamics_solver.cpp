@@ -53,10 +53,10 @@ void penalty_dynamics_solver::set_penaltysolver_matrices(std::unordered_map<int,
 	// Global Penalty for Stiffness 
 	// SPC Matrix contains (Single point constraints - Pin support) and MPC matrix containt (Multi point constraints - Rigid elements)
 
-	globalPenalty_SPC_StiffnessMatrix(numDOF, numDOF);
+	globalPenalty_SPC_StiffnessMatrix.resize(numDOF, numDOF);
 	globalPenalty_SPC_StiffnessMatrix.setZero();
 
-	globalPenalty_MPC_StiffnessMatrix(numDOF, numDOF);
+	globalPenalty_MPC_StiffnessMatrix.resize(numDOF, numDOF);
 	globalPenalty_MPC_StiffnessMatrix.setZero();
 
 
@@ -66,13 +66,16 @@ void penalty_dynamics_solver::set_penaltysolver_matrices(std::unordered_map<int,
 
 	//____________________________________________________________________________________________________________________
 	// Penalty Augmentation of global stiffness matrix
-	globalPenaltyAugmentedStiffnessMatrix(numDOF, numDOF);
+	globalPenaltyAugmentedStiffnessMatrix.resize(numDOF, numDOF);
 	globalPenaltyAugmentedStiffnessMatrix.setZero();
 
 	globalPenaltyAugmentedStiffnessMatrix = globalStiffnessMatrix + 
 		(globalPenalty_SPC_StiffnessMatrix + globalPenalty_MPC_StiffnessMatrix);
 
-
+	//____________________________________________________________________________________________________________________
+	// Damping matrix
+	dampingCMatrix.resize(numDOF, numDOF);
+	dampingCMatrix.setZero();
 
 	//____________________________________________________________________________________________________________________
 	// Intial displacement vector 
@@ -82,6 +85,10 @@ void penalty_dynamics_solver::set_penaltysolver_matrices(std::unordered_map<int,
 	get_initial_displ_vector(initial_displVector, g_nodes);
 
 
+	initial_veloVector.resize(numDOF);
+	initial_veloVector.setZero();
+
+
 	//____________________________________________________________________________________________________________________
 	// Intialize the Force vector (Zero at time = 0.0) 
 	forceVector.resize(numDOF);
@@ -89,10 +96,30 @@ void penalty_dynamics_solver::set_penaltysolver_matrices(std::unordered_map<int,
 
 
 
+	//____________________________________________________________________________________________________________________
+	// Set the solver
+	n_solver.initialize_hhtsolver(globalMassMatrix, 
+		inverse_globalMassMatrix,
+		globalPenaltyAugmentedStiffnessMatrix, 
+		dampingCMatrix,
+		initial_displVector,
+		initial_veloVector, 
+		forceVector);
+
+
 }
 
 
+void penalty_dynamics_solver::perform_penalty_solve(double dt)
+{
 
+
+
+
+	// Accumulate the time
+	accumulated_time = accumulated_time + dt;
+
+}
 
 
 
@@ -331,3 +358,64 @@ void penalty_dynamics_solver::get_boundary_condition_penalty_matrix(Eigen::Matri
 
 	//
 }
+
+
+
+
+
+void penalty_dynamics_solver::get_initial_displ_vector(Eigen::VectorXd& initial_displVector,
+	std::unordered_map<int, gyronode_store*> g_nodes)
+{
+	// Create initial dispalcement vector based on mode shapes number
+	const int mode_number = 1;
+
+	// Find the angle of free ring nodes
+
+	for (auto& node_m : g_nodes)
+	{
+		gyronode_store* node = node_m.second;
+
+		// Get the Node ID 
+		int nd_map = nodeid_map[node->gnode_id]; // get the ordered map of the start node ID
+
+
+		// Get the node point
+		if (node->isFixed == false)
+		{
+			// Get the node point
+			glm::vec2 node_pt = node->gnode_pt;
+
+			// Free circular nodes
+			// 1. Find the angle of the node
+			double nd_angle = std::atan2(node_pt.y, node_pt.x);
+
+			// convert [0 to pi, -pi to 0] --> [0, 2pi]
+			if (nd_angle < 0.0)
+			{
+				nd_angle = 2.0 * M_PI + nd_angle;
+			}
+
+
+			// 2. Find the amplitude magnitude based on mode shape
+			double ampl_mag = std::sin(mode_number * nd_angle);
+
+			// 3. Find the vector of node
+			glm::vec2 norm_node_pt = static_cast<float>(ampl_mag) * glm::normalize(node_pt);
+
+
+			// Add to the displacement vector
+			initial_displVector(nd_map * 2) = norm_node_pt.x;
+			initial_displVector((nd_map * 2) + 1) = norm_node_pt.y;
+
+		}
+		else
+		{
+			// Fixed nodes 
+			initial_displVector(nd_map * 2) = 0.0;
+			initial_displVector((nd_map * 2) + 1) = 0.0;
+		}
+		//
+	}
+	//
+}
+

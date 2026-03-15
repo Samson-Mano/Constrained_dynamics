@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "../../fe_solver/lagrange_dynamics_solver.h"
+#include "../../fe_solver/penalty_dynamics_solver.h"
 
 #include "../geom_parameters.h"
 #include "springelement_store.h"
@@ -34,7 +35,7 @@ public:
 	void rotate_gyro_model_ends(const double& rotation_angle);
 
 	// Simulate the run
-	void run_simulation(double time_t);
+	void run_simulation(double delta_t);
 	double get_acceleration_at_t(const double& time_t);
 
 	void set_buffer();
@@ -55,5 +56,6 @@ private:
 	masselement_store mass_elements; // Mass elements
 
 	lagrange_dynamics_solver ld_solver;
+	penalty_dynamics_solver pd_solver;
 
 };

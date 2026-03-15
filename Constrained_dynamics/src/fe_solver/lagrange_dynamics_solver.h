@@ -6,6 +6,8 @@
 #include "../events_handler/Stopwatch_events.h"
 
 #include "../geometry_store/geom_parameters.h"
+#include "hht_alpha_newmark_method.h"
+
 
 #pragma warning(push)
 #pragma warning (disable : 26451)
@@ -40,10 +42,16 @@ public:
 	std::vector<gyrospring_store*> g_springs);
 
 
+	void perform_lagrange_solve(double dt);
+
+
 private:
 	const double M_PI = 3.14159265358979323;
 
-		std::unordered_map<int, int> nodeid_map;
+	double accumulated_time = 0.0;
+
+	bool isMatricesSet = false;
+	std::unordered_map<int, int> nodeid_map;
 
 	// Global stiffness matrix
 	Eigen::MatrixXd globalStiffnessMatrix;
@@ -61,8 +69,16 @@ private:
 
 	Eigen::MatrixXd globalConstraint_AMatrix;
 	
+	// Damping C matrix
+	Eigen::MatrixXd dampingCMatrix;
+
+
 	// Initial displacement vector
 	Eigen::VectorXd initial_displVector;
+
+	// Initial velocity vector
+	Eigen::VectorXd initial_veloVector;
+
 
 	// Force Vector
 	Eigen::VectorXd forceVector;
@@ -70,8 +86,14 @@ private:
 	// Lagrange Augmentation of Matrix
 	Eigen::MatrixXd globalLagrangeAugmentedStiffnessMatrix;
 	Eigen::MatrixXd globalLagrangeAugmentedMassMatrix;
+	Eigen::MatrixXd globalLagrangeAugmentedinverseMassMatrix;
+	Eigen::MatrixXd globalLagrangeAugmentedDampingMatrix;
 	Eigen::VectorXd globalAugmentedInitialDisplacement;
+	Eigen::VectorXd globalAugmentedInitialVelocity;
 	Eigen::VectorXd globalAugmentedForceVector;
+
+	// HHT solver
+	hht_alpha_newmark_method n_solver;
 
 
 

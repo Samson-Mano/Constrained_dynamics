@@ -69,6 +69,8 @@ public:
 	void paint_geometry();
 private:
 	std::chrono::steady_clock::time_point start_time; // Variable to store the start time
+	std::chrono::steady_clock::time_point last_time; // Variable to store the last time
+
 
 	dynamic_selrectangle_store selection_rectangle;
 

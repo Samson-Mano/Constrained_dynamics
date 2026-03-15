@@ -148,6 +148,7 @@
     <ClCompile Include="src\events_handler\mouse_events.cpp" />
     <ClCompile Include="src\events_handler\mouse_event_handler.cpp" />
     <ClCompile Include="src\events_handler\Stopwatch_events.cpp" />
+    <ClCompile Include="src\fe_solver\hht_alpha_newmark_method.cpp" />
     <ClCompile Include="src\fe_solver\lagrange_dynamics_solver.cpp" />
     <ClCompile Include="src\fe_solver\penalty_dynamics_solver.cpp" />
     <ClCompile Include="src\geometry_store\fe_objects\constrained_ring_store.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="src\events_handler\mouse_events.h" />
     <ClInclude Include="src\events_handler\mouse_event_handler.h" />
     <ClInclude Include="src\events_handler\Stopwatch_events.h" />
+    <ClInclude Include="src\fe_solver\hht_alpha_newmark_method.h" />
     <ClInclude Include="src\fe_solver\lagrange_dynamics_solver.h" />
     <ClInclude Include="src\fe_solver\penalty_dynamics_solver.h" />
     <ClInclude Include="src\geometry_store\fe_objects\constrained_ring_store.h" />
@@ -249,6 +251,7 @@
   <ItemGroup>
     <Text Include="resources\gyro_constraint.txt" />
     <Text Include="resources\gyro_model.txt" />
+    <Text Include="src\fe_solver\junk.txt" />
     <Text Include="src\junk\junk_code.txt" />
     <Text Include="src\junk\lagrange_MPC_solver.txt" />
   </ItemGroup>

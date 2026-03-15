@@ -231,6 +231,11 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 	}
 
 
+	// Set the solver matrices
+	this->gyro_model.set_matrices();
+
+
+
 	//________________________________________________________________________
 	//________________________________________________________________________
 
@@ -253,6 +258,10 @@ void geom_store::load_constrained_ring(std::ifstream& cring_input_data, std::ifs
 	// Set the buffer
 	this->constrained_ring.set_buffer();
 	this->gyro_model.set_buffer();
+
+	// Set the time start
+	last_time = std::chrono::steady_clock::now();
+
 
 	//________________________________________________________________________________________________________________________
 	//________________________________________________________________________________________________________________________
@@ -497,11 +506,19 @@ void geom_store::run_simulation()
 	  // Get the current time
 	auto current_time = std::chrono::steady_clock::now();
 
-	// Calculate the elapsed time in seconds since the start time
-	double elapsed_time = std::chrono::duration<double>(current_time - start_time).count();
+	// Compute delta time
+	double dt = std::chrono::duration<double>(current_time - last_time).count();
 
+	// Update last time
+	last_time = current_time;
 
-	gyro_model.run_simulation(elapsed_time);
+	if (dt < 1e-8 || dt > 0.02)
+	{
+		// Pause the simulation if the FPS drops below 50 (1/ 50 = 0.02)
+		return;
+	}
+
+	gyro_model.run_simulation(dt);
 
 
 }

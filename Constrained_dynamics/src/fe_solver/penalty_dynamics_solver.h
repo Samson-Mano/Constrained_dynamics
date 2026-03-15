@@ -7,6 +7,8 @@
 
 #include "../geometry_store/geom_parameters.h"
 
+#include "hht_alpha_newmark_method.h"
+
 #pragma warning(push)
 #pragma warning (disable : 26451)
 #pragma warning (disable : 26495)
@@ -41,6 +43,9 @@ public:
 	void set_penaltysolver_matrices(std::unordered_map<int, gyronode_store*> g_nodes,
 		std::vector<gyrospring_store*> g_springs);
 
+	void perform_penalty_solve(double dt);
+
+
 private:
 	const double M_PI = 3.14159265358979323;
 
@@ -48,7 +53,10 @@ private:
 	double max_stiffness = 0.0;
 	const double penalty_factor = 1E+6;
 
+	double accumulated_time = 0.0;
 
+
+	bool isMatricesSet = false;
 	std::unordered_map<int, int> nodeid_map;
 
 	// Global stiffness matrix
@@ -69,13 +77,21 @@ private:
 	// Penalty Augmentation for Stiffness Matrix 
 	Eigen::MatrixXd globalPenaltyAugmentedStiffnessMatrix;
 
+	// Damping C matrix
+	Eigen::MatrixXd dampingCMatrix;
+
 	// Initial displacement vector
 	Eigen::VectorXd initial_displVector;
+
+	// Initial velocity vector
+	Eigen::VectorXd initial_veloVector;
+
 
 	// Force Vector
 	Eigen::VectorXd forceVector;
 
-
+	// HHT solver
+	hht_alpha_newmark_method n_solver;
 
 
 	void get_global_stiffness_matrix(Eigen::MatrixXd& globalStiffnessMatrix, std::vector<gyrospring_store*> g_springs);

@@ -83,6 +83,13 @@ void lagrange_dynamics_solver::set_lagrangesolver_matrices(std::unordered_map<in
 
 
 	//____________________________________________________________________________________________________________________
+	// Intial velocity vector 
+	initial_veloVector.resize(numDOF);
+	initial_veloVector.setZero();
+
+	
+
+	//____________________________________________________________________________________________________________________
 	// Intialize the Force vector (Zero at time = 0.0) 
 	forceVector.resize(numDOF);
 	forceVector.setZero();
@@ -116,6 +123,7 @@ void lagrange_dynamics_solver::set_lagrangesolver_matrices(std::unordered_map<in
 	// Bottom-right block: zero matrix (already zero-initialized)
 
 
+
 	//____________________________________________________________________________________________________________________
 	// Lagrange Augmentation of global Mass matrix with global constratint A matrix
 	
@@ -126,6 +134,31 @@ void lagrange_dynamics_solver::set_lagrangesolver_matrices(std::unordered_map<in
 	globalLagrangeAugmentedMassMatrix.topLeftCorner(numDOF, numDOF) = globalMassMatrix;
 
 	// Remaining blocks stay zero
+
+
+	globalLagrangeAugmentedinverseMassMatrix.resize(LagrageAugmentedMatrixSize, LagrageAugmentedMatrixSize);
+	globalLagrangeAugmentedinverseMassMatrix.setZero();
+
+	// Top-left block: M
+	globalLagrangeAugmentedinverseMassMatrix.topLeftCorner(numDOF, numDOF) = inverse_globalMassMatrix;
+
+	// Remaining blocks stay zero
+
+
+
+
+
+	//____________________________________________________________________________________________________________________
+	// Lagrange Augmentation of global Damping matrix with global constratint A matrix
+
+	globalLagrangeAugmentedDampingMatrix.resize(LagrageAugmentedMatrixSize, LagrageAugmentedMatrixSize);
+	globalLagrangeAugmentedDampingMatrix.setZero();
+
+	// Top-left block: M
+	// globalLagrangeAugmentedDampingMatrix.topLeftCorner(numDOF, numDOF) = dampingCMatrix;
+
+	// Remaining blocks stay zero
+
 
 
 
@@ -140,6 +173,20 @@ void lagrange_dynamics_solver::set_lagrangesolver_matrices(std::unordered_map<in
 
 	// bottom part = lagrange multipliers
 	// already zero
+
+
+		//____________________________________________________________________________________________________________________
+	// Lagrange Augmentation of initial velocity vector with global constratint A matrix
+
+	globalAugmentedInitialVelocity.resize(LagrageAugmentedMatrixSize);
+	globalAugmentedInitialVelocity.setZero();
+
+	// top part = physical velocity
+	globalAugmentedInitialVelocity.head(numDOF) = initial_veloVector;
+
+	// bottom part = lagrange multipliers
+	// already zero
+
 
 
 
@@ -158,14 +205,28 @@ void lagrange_dynamics_solver::set_lagrangesolver_matrices(std::unordered_map<in
 
 
 
-
-
-
-
+	//____________________________________________________________________________________________________________________
+	// Set the solver
+	n_solver.initialize_hhtsolver(globalLagrangeAugmentedMassMatrix, 
+		globalLagrangeAugmentedinverseMassMatrix,
+		globalLagrangeAugmentedStiffnessMatrix, 
+		globalLagrangeAugmentedDampingMatrix,
+		globalAugmentedInitialDisplacement,
+		globalAugmentedInitialVelocity, 
+		globalAugmentedForceVector);
 
 
 
 }
+
+
+void lagrange_dynamics_solver::perform_lagrange_solve(double dt)
+{
+
+
+
+}
+
 
 
 

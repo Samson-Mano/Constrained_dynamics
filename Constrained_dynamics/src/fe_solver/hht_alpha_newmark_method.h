@@ -43,11 +43,10 @@ public:
 		const Eigen::MatrixXd& dampingMatrix,
 		const Eigen::VectorXd& initialDispl,
 		const Eigen::VectorXd& initialVelo,
-		const Eigen::VectorXd& initialForce);
+		const Eigen::VectorXd& initialForce,
+		int solvertype);
 
-	void hht_solve(double dt);
-
-	void newmark_solve(double dt);
+	void hht_alpha_newmark_solve(double dt);
 
 	void update_force_vector(Eigen::VectorXd force_vector_at_timet);
 
@@ -58,8 +57,19 @@ public:
 	const Eigen::VectorXd& get_acceleration_at_t() const;
 
 private:
+	// Alpha values
+	//   0	    Standard Newmark(no numerical damping)
+	// -0.05	Very light high - frequency damping
+	//	-0.1	Moderate damping
+	//	-0.2	Strong damping
+	//	-1 / 3 = -0.333	Maximum stable dissipation
+
+	//             Abaqus	-0.05
+	//	ANSYS	around -0.05 to -0.1
+	//	many research codes	-0.1
+
 	// Hilber - Hughes - Taylor alpha method
-	const double alpha = -1.0 / 3.0; // Varies between -1/3 to 0
+	const double alpha = -0.05; // Varies between -1/3 to 0
 	double gamma = 0.0; // 0.5 (1.0 - 2.0 * alpha)
 	double beta = 0.0; // 0.25 (1.0 - alpha)^2
 
@@ -69,10 +79,12 @@ private:
 	// Linear Acceleration metho
 	// gamma = 0.5, beta = 1/6
 
+	int solvertype = 0; // 0 = HHT, 1 = Newmark
+
 	// Set the mass, stiffness and damping matrix
-	Eigen::MatrixXd massMatrix; 
-	Eigen::MatrixXd stiffnessMatrix;
-	Eigen::MatrixXd dampingMatrix;
+	Eigen::SparseMatrix<double> massMatrix;
+	Eigen::SparseMatrix<double> stiffnessMatrix;
+	Eigen::SparseMatrix<double> dampingMatrix;
 
 
 	Eigen::VectorXd displ_at_t;
@@ -83,11 +95,16 @@ private:
 	Eigen::VectorXd force_vector_prev;
 
 	// Solver Matrices
-	Eigen::MatrixXd a1_matrix;
-	Eigen::MatrixXd a2_matrix;
-	Eigen::MatrixXd a3_matrix;
-	Eigen::MatrixXd stiffness_hat_matrix;
+	Eigen::SparseMatrix<double> a1_matrix;
+	Eigen::SparseMatrix<double> a2_matrix;
+	Eigen::SparseMatrix<double> a3_matrix;
+	Eigen::SparseMatrix<double> stiffness_hat_matrix;
+
+	Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>, Eigen::Lower, Eigen::NaturalOrdering<int>> solver;
 
 
+	void hht_solve(double dt);
+
+	void newmark_solve(double dt);
 
 };

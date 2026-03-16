@@ -95,25 +95,60 @@ void penalty_dynamics_solver::set_penaltysolver_matrices(std::unordered_map<int,
 	forceVector.setZero();
 
 
+	//___________________ Print the matrices for Debugging_______________________
+	// print_matrices();
+
+
 
 	//____________________________________________________________________________________________________________________
 	// Set the solver
-	n_solver.initialize_hhtsolver(globalMassMatrix, 
+	int solvertype = 0; // 0 = HHT, 1 = Newmark
+
+	n_solver.initialize_hhtsolver(globalMassMatrix,
 		inverse_globalMassMatrix,
-		globalPenaltyAugmentedStiffnessMatrix, 
+		globalPenaltyAugmentedStiffnessMatrix,
 		dampingCMatrix,
 		initial_displVector,
-		initial_veloVector, 
-		forceVector);
+		initial_veloVector,
+		forceVector,
+		solvertype);
 
 
+	isMatricesSet = true;
+	accumulated_time = 0.0;
+	//
 }
 
 
-void penalty_dynamics_solver::perform_penalty_solve(double dt)
+void penalty_dynamics_solver::perform_penalty_solve(double dt,
+	std::unordered_map<int, gyronode_store*> g_nodes)
 {
 
+	// Main solver call
+	n_solver.hht_alpha_newmark_solve(dt);
 
+	// get the results
+	Eigen::VectorXd globalAugmentedDisplacement_at_t = n_solver.get_displacement_at_t();
+	Eigen::VectorXd globalAugmentedVelocity_at_t = n_solver.get_velocity_at_t();
+
+	// Map the results to the node
+	// Create the global mass matrix
+	for (auto& node_m : g_nodes)
+	{
+		int nd_id = node_m.first;
+		gyronode_store* node = node_m.second;
+
+		// Get the Node ID map
+		int nd_map = nodeid_map[node->gnode_id]; // get the ordered map of the start node ID
+
+		g_nodes[nd_id]->gnode_displ = glm::vec2(globalAugmentedDisplacement_at_t(nd_map * 2),
+			globalAugmentedDisplacement_at_t((nd_map * 2) + 1));
+
+
+		g_nodes[nd_id]->gnode_velo = glm::vec2(globalAugmentedVelocity_at_t(nd_map * 2),
+			globalAugmentedVelocity_at_t((nd_map * 2) + 1));
+
+	}
 
 
 	// Accumulate the time
@@ -367,7 +402,7 @@ void penalty_dynamics_solver::get_initial_displ_vector(Eigen::VectorXd& initial_
 	std::unordered_map<int, gyronode_store*> g_nodes)
 {
 	// Create initial dispalcement vector based on mode shapes number
-	const int mode_number = 1;
+	const int mode_number = 3;
 
 	// Find the angle of free ring nodes
 
@@ -400,7 +435,9 @@ void penalty_dynamics_solver::get_initial_displ_vector(Eigen::VectorXd& initial_
 			double ampl_mag = std::sin(mode_number * nd_angle);
 
 			// 3. Find the vector of node
-			glm::vec2 norm_node_pt = static_cast<float>(ampl_mag) * glm::normalize(node_pt);
+			// glm::vec2 norm_node_pt = static_cast<float>(ampl_mag) * glm::normalize(node_pt);
+			glm::vec2 norm_node_pt = glm::vec2(0.0, 1.0);
+
 
 
 			// Add to the displacement vector
@@ -419,3 +456,47 @@ void penalty_dynamics_solver::get_initial_displ_vector(Eigen::VectorXd& initial_
 	//
 }
 
+
+
+
+void penalty_dynamics_solver::print_matrices()
+{
+	std::ofstream output_file;
+	output_file.open("fe_matrices_penalty.txt");
+
+	// Print the Global Mass matrix
+	output_file << "Global Mass Matrix" << std::endl;
+	output_file << globalMassMatrix << std::endl;
+	output_file << std::endl;
+
+	// Print the Global Inverse Mass matrix
+	output_file << "Global Inverse Mass Matrix" << std::endl;
+	output_file << inverse_globalMassMatrix << std::endl;
+	output_file << std::endl;
+
+	// Print the Global Penalty Augmented Stiffness matrix
+	output_file << "Global Penalty Augmented Stiffness Matrix" << std::endl;
+	output_file << globalPenaltyAugmentedStiffnessMatrix << std::endl;
+	output_file << std::endl;
+
+	//// Print the Damping C matrix
+	//output_file << "Global Damping C Matrix" << std::endl;
+	//output_file << dampingCMatrix << std::endl;
+	//output_file << std::endl;
+
+
+	// Print the Initial Displacement matrix
+	output_file << "Global Inital Displacement Vector" << std::endl;
+	output_file << initial_displVector << std::endl;
+	output_file << std::endl;
+
+
+
+	//dampingCMatrix,
+	//	initial_displVector,
+	//	initial_veloVector,
+	//	forceVector
+
+	output_file.close();
+
+}

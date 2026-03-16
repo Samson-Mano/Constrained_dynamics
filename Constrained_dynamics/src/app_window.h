@@ -61,6 +61,8 @@ public:
 	void fini();
 	void app_render();
 	void menu_events();
+	void draw_status_bar();
+
 	static void framebufferSizeCallback(GLFWwindow* window, int window_width, int window_height);
 	void GLFWwindow_set_icon(GLFWwindow* window);
 private:

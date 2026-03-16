@@ -43,7 +43,7 @@ public:
 	void set_penaltysolver_matrices(std::unordered_map<int, gyronode_store*> g_nodes,
 		std::vector<gyrospring_store*> g_springs);
 
-	void perform_penalty_solve(double dt);
+	void perform_penalty_solve(double dt, std::unordered_map<int, gyronode_store*> g_nodes);
 
 
 private:
@@ -111,6 +111,8 @@ private:
 
 	void get_initial_displ_vector(Eigen::VectorXd& initial_displVector, std::unordered_map<int, gyronode_store*> g_nodes);
 
+
+	void print_matrices();
 
 };
 

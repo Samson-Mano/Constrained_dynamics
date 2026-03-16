@@ -159,6 +159,10 @@ void gyro_model_store::rotate_gyro_model_ends(const double& rotation_angle)
 void gyro_model_store::run_simulation(double delta_t)
 {
 
+	// Main solve call
+	// ld_solver.perform_lagrange_solve(delta_t, g_nodes);
+
+	pd_solver.perform_penalty_solve(delta_t, g_nodes);
 
 
 	// Update the buffer
@@ -166,15 +170,6 @@ void gyro_model_store::run_simulation(double delta_t)
 	spring_elements.update_buffer();
 	rigid_elements.update_buffer();
 
-}
-
-
-double gyro_model_store::get_acceleration_at_t(const double& time_t)
-{
-	// get the acceleration at time t
-	// accl_freq = 2.0; // Acceleration frequency
-
-	return 100.0 * std::sin(time_t * 2.0 * (geom_param_ptr->mPI) * accl_freq);
 }
 
 

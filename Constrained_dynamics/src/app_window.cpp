@@ -172,6 +172,9 @@ void app_window::app_render()
 		// menu events
 		menu_events();
 
+		// Status bar
+		draw_status_bar();
+
 		// Render OpenGL graphics here
 		glClearColor(geom.geom_param.geom_colors.background_color.x,
 			geom.geom_param.geom_colors.background_color.y,
@@ -214,16 +217,16 @@ void app_window::menu_events()
 		// File menu item
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New model"))
-			{
-				// Model data menu
-				md_window.is_show_window = true;
-			}
-			if (ImGui::MenuItem("Options"))
-			{
-				// Options menu
-				op_window.is_show_window = true;
-			}
+			//if (ImGui::MenuItem("New model"))
+			//{
+			//	// Model data menu
+			//	md_window.is_show_window = true;
+			//}
+			//if (ImGui::MenuItem("Options"))
+			//{
+			//	// Options menu
+			//	op_window.is_show_window = true;
+			//}
 			if (ImGui::MenuItem("Exit"))
 			{
 				// Handle menu Exit
@@ -231,41 +234,41 @@ void app_window::menu_events()
 			}
 			ImGui::EndMenu();
 		}
-		// Pre-Processing menu item
-		if (ImGui::BeginMenu("Pre-Processing"))
-		{
-			if (ImGui::MenuItem("Intial Condition"))
-			{
-				// Initial condition
-				inl_window.is_show_window = true;
-			}
-			if (ImGui::MenuItem("Nodal Loads"))
-			{
-				// Nodal Loads
-				nd_load_window.is_show_window = true;
-			}
+		//// Pre-Processing menu item
+		//if (ImGui::BeginMenu("Pre-Processing"))
+		//{
+		//	if (ImGui::MenuItem("Intial Condition"))
+		//	{
+		//		// Initial condition
+		//		inl_window.is_show_window = true;
+		//	}
+		//	if (ImGui::MenuItem("Nodal Loads"))
+		//	{
+		//		// Nodal Loads
+		//		nd_load_window.is_show_window = true;
+		//	}
 
-			ImGui::EndMenu();
-		}
-		// Solve
-		if (ImGui::BeginMenu("Solve"))
-		{
-			//if (ImGui::MenuItem("Modal Analysis Solve"))
-			//{
-			//	// Modal Analysis Solve
-			//	sol_modal_window.execute_modal_open = true;
-			//	sol_modal_window.is_show_window = true;
-			//}
-			//if (ImGui::MenuItem("Pulse Analysis Solve"))
-			//{
-			//	// Pulse Analysis Solve
-			//	sol_pulse_window.execute_pulse_open = true;
-			//	sol_pulse_window.is_show_window = true;
-			//}
+		//	ImGui::EndMenu();
+		//}
+		//// Solve
+		//if (ImGui::BeginMenu("Solve"))
+		//{
+		//	//if (ImGui::MenuItem("Modal Analysis Solve"))
+		//	//{
+		//	//	// Modal Analysis Solve
+		//	//	sol_modal_window.execute_modal_open = true;
+		//	//	sol_modal_window.is_show_window = true;
+		//	//}
+		//	//if (ImGui::MenuItem("Pulse Analysis Solve"))
+		//	//{
+		//	//	// Pulse Analysis Solve
+		//	//	sol_pulse_window.execute_pulse_open = true;
+		//	//	sol_pulse_window.is_show_window = true;
+		//	//}
 
 
-			ImGui::EndMenu();
-		}
+		//	ImGui::EndMenu();
+		//}
 		// Add more menu items here as needed
 		ImGui::EndMainMenuBar();
 	}
@@ -280,6 +283,38 @@ void app_window::menu_events()
 
 	// Pop the custom font after using it
 	ImGui::PopFont();
+}
+
+
+void app_window::draw_status_bar()
+{
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+
+	float height = ImGui::GetFrameHeight();
+
+	ImGui::SetNextWindowPos(
+		ImVec2(viewport->Pos.x, viewport->Pos.y + viewport->Size.y - height));
+
+	ImGui::SetNextWindowSize(
+		ImVec2(viewport->Size.x, height));
+
+	ImGuiWindowFlags flags =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoSavedSettings;
+
+
+	ImGui::Begin("StatusBar", nullptr, flags);
+
+	float fps = ImGui::GetIO().Framerate;
+	float ms = 1000.0f / fps;
+
+	ImGui::Text("FPS: %.1f | Frame: %.2f ms", fps, ms);
+
+	ImGui::End();
 }
 
 // Static callback function for framebuffer size changes

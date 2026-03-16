@@ -36,7 +36,7 @@ public:
 
 	// Simulate the run
 	void run_simulation(double delta_t);
-	double get_acceleration_at_t(const double& time_t);
+
 
 	void set_buffer();
 	void paint_gyro_model();

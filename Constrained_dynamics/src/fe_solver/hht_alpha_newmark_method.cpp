@@ -29,12 +29,13 @@ void hht_alpha_newmark_method::initialize_hhtsolver(const Eigen::MatrixXd& massM
 	const Eigen::MatrixXd& dampingMatrix,
 	const Eigen::VectorXd& initialDispl,
 	const Eigen::VectorXd& initialVelo,
-	const Eigen::VectorXd& initialForce)
+	const Eigen::VectorXd& initialForce,
+	int solvertype)
 {
 	// Set the matrix
-	this->massMatrix = massMatrix;
-	this->stiffnessMatrix = stiffnessMatrix;
-	this->dampingMatrix = dampingMatrix;
+	this->massMatrix = massMatrix.sparseView();
+	this->stiffnessMatrix = stiffnessMatrix.sparseView();
+	this->dampingMatrix = dampingMatrix.sparseView();
 
 	this->displ_at_t = initialDispl;
 	this->velo_at_t = initialVelo;
@@ -49,6 +50,34 @@ void hht_alpha_newmark_method::initialize_hhtsolver(const Eigen::MatrixXd& massM
 
 	this->accl_at_t = inversemassMatrix * (initialForce - dampCVelo - stiffKDispl);
 
+	this->solvertype = solvertype;
+
+	if (solvertype == 0)
+	{
+		// HHT Solver
+		gamma = 0.5 * (1.0 - 2.0 * alpha);
+		beta = 0.25 * (1.0 - alpha) * (1.0 - alpha);
+	}
+	else if (solvertype == 1)
+	{
+		// Newmark solver (linear acceleration)
+		gamma = 0.5;
+		beta = 1.0 / 6.0;
+	}
+
+}
+
+void hht_alpha_newmark_method::hht_alpha_newmark_solve(double dt)
+{
+	if (solvertype == 0)
+	{
+		hht_solve(dt);
+	}
+	else if (solvertype == 1)
+	{
+		newmark_solve(dt);
+	}
+	//
 }
 
 
@@ -99,9 +128,7 @@ void hht_alpha_newmark_method::hht_solve(double dt)
 
 
 	// Perform main solve
-	Eigen::LDLT<Eigen::MatrixXd> solver;
 	solver.compute(stiffness_hat_matrix);
-
 
 	// Solve for displacement at time t
 	Eigen::VectorXd displ_i_plus1 = solver.solve(force_hat_vector);
@@ -163,9 +190,7 @@ void hht_alpha_newmark_method::newmark_solve(double dt)
 
 
 	// Perform main solve
-	Eigen::LDLT<Eigen::MatrixXd> solver;
 	solver.compute(stiffness_hat_matrix);
-
 
 	// Solve for displacement at time t
 	Eigen::VectorXd displ_i_plus1 = solver.solve(force_hat_vector);

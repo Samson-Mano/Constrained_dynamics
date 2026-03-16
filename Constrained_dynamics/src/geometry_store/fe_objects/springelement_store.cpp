@@ -90,13 +90,18 @@ void springelement_store::update_buffer()
 
 	unsigned int sprg_v_index = 0;
 
+	float spring_width_amplitude = geom_param_ptr->spring_element_width *
+		(geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
+
+	float amplitude_scale = 10.0 * (geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
+
 	// Update the spring vertex buffer
 	for (auto& sprg_e : *g_springs)
 	{
 		if (sprg_e->is_rigid == false)
 		{
-			glm::vec2 start_pt = sprg_e->gstart_node->gnode_pt; // get the start pt
-			glm::vec2 end_pt = sprg_e->gend_node->gnode_pt; // get the end pt
+			glm::vec2 start_pt = sprg_e->gstart_node->gnode_pt + (amplitude_scale * sprg_e->gstart_node->gnode_displ); // get the start pt
+			glm::vec2 end_pt = sprg_e->gend_node->gnode_pt + (amplitude_scale * sprg_e->gend_node->gnode_displ); // get the end pt
 
 			// Line length
 			double element_length = geom_parameters::get_line_length(start_pt, end_pt);
@@ -126,8 +131,6 @@ void springelement_store::update_buffer()
 			glm::vec2 prev_pt = origin_pt;
 			curr_pt = glm::vec2(0);
 
-			double spring_width_amplitude = geom_param_ptr->spring_element_width *
-				(geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
 
 			// Points of springs
 			for (int i = 1; i < spring_turn_count; i++)

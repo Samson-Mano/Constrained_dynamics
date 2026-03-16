@@ -204,26 +204,64 @@ void lagrange_dynamics_solver::set_lagrangesolver_matrices(std::unordered_map<in
 
 
 
+	//___________________ Print the matrices for Debugging_______________________
+	// print_matrices();
+
 
 	//____________________________________________________________________________________________________________________
 	// Set the solver
+	int solvertype = 0; // 0 = HHT, 1 = Newmark
+
 	n_solver.initialize_hhtsolver(globalLagrangeAugmentedMassMatrix, 
 		globalLagrangeAugmentedinverseMassMatrix,
 		globalLagrangeAugmentedStiffnessMatrix, 
 		globalLagrangeAugmentedDampingMatrix,
 		globalAugmentedInitialDisplacement,
 		globalAugmentedInitialVelocity, 
-		globalAugmentedForceVector);
+		globalAugmentedForceVector,
+		solvertype);
 
 
-
+	isMatricesSet = true;
+	accumulated_time = 0.0;
+	//
 }
 
 
-void lagrange_dynamics_solver::perform_lagrange_solve(double dt)
+void lagrange_dynamics_solver::perform_lagrange_solve(double dt,
+	std::unordered_map<int, gyronode_store*> g_nodes)
 {
 
+	// Main solver call
+	n_solver.hht_alpha_newmark_solve(dt);
 
+	// get the results
+	Eigen::VectorXd globalAugmentedDisplacement_at_t = n_solver.get_displacement_at_t();
+	Eigen::VectorXd globalAugmentedVelocity_at_t = n_solver.get_velocity_at_t();
+
+	// Map the results to the node
+	// Create the global mass matrix
+	for (auto& node_m : g_nodes)
+	{
+		int nd_id = node_m.first;
+		gyronode_store* node = node_m.second;
+
+		// Get the Node ID map
+		int nd_map = nodeid_map[node->gnode_id]; // get the ordered map of the start node ID
+
+		g_nodes[nd_id]->gnode_displ = glm::vec2(globalAugmentedDisplacement_at_t(nd_map * 2),
+			globalAugmentedDisplacement_at_t((nd_map * 2) + 1));
+
+
+		g_nodes[nd_id]->gnode_velo = glm::vec2(globalAugmentedVelocity_at_t(nd_map * 2),
+			globalAugmentedVelocity_at_t((nd_map * 2) + 1));
+
+	}
+
+
+
+	// Accumulate the time
+	accumulated_time = accumulated_time + dt;
 
 }
 
@@ -494,3 +532,47 @@ void lagrange_dynamics_solver::get_initial_displ_vector(Eigen::VectorXd& initial
 	//
 }
 
+
+
+
+void lagrange_dynamics_solver::print_matrices()
+{
+	std::ofstream output_file;
+	output_file.open("fe_matrices_lagrange.txt");
+
+	// Print the Global Mass matrix
+	output_file << "Global Lagrange Augmented Mass Matrix" << std::endl;
+	output_file << globalLagrangeAugmentedMassMatrix << std::endl;
+	output_file << std::endl;
+
+	// Print the Global Inverse Mass matrix
+	output_file << "Global Lagrange Augmented Inverse Mass Matrix" << std::endl;
+	output_file << globalLagrangeAugmentedinverseMassMatrix << std::endl;
+	output_file << std::endl;
+
+	// Print the Global Lagrange Augmented Stiffness matrix
+	output_file << "Global Lagrange Augmented Stiffness Matrix" << std::endl;
+	output_file << globalLagrangeAugmentedStiffnessMatrix << std::endl;
+	output_file << std::endl;
+
+	//// Print the Damping C matrix
+	//output_file << "Global Damping C Matrix" << std::endl;
+	//output_file << dampingCMatrix << std::endl;
+	//output_file << std::endl;
+
+
+	// Print the Initial Displacement matrix
+	output_file << "Global Inital Displacement Vector" << std::endl;
+	output_file << globalAugmentedInitialDisplacement << std::endl;
+	output_file << std::endl;
+
+
+
+	//dampingCMatrix,
+	//	initial_displVector,
+	//	initial_veloVector,
+	//	forceVector
+
+	output_file.close();
+
+}

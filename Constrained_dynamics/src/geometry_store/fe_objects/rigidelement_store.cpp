@@ -80,13 +80,16 @@ void rigidelement_store::update_buffer()
 
 	unsigned int rigd_v_index = 0;
 
+	float amplitude_scale = 10.0 * (geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
+
+
 	// Update the rigid element vertex buffer
 	for (auto& rigd_e : *g_rigids)
 	{
 		if (rigd_e->is_rigid == true)
 		{
-			glm::vec2 start_pt = rigd_e->gstart_node->gnode_pt; // get the start pt
-			glm::vec2 end_pt = rigd_e->gend_node->gnode_pt; // get the end pt
+			glm::vec2 start_pt = rigd_e->gstart_node->gnode_pt + (amplitude_scale * rigd_e->gstart_node->gnode_displ); // get the start pt
+			glm::vec2 end_pt = rigd_e->gend_node->gnode_pt + (amplitude_scale * rigd_e->gend_node->gnode_displ); // get the end pt
 
 			// Add the vertex buffer of rigid quad
 			get_rigd_vertex_buffer(start_pt, end_pt, rigd_vertices, rigd_v_index);
@@ -168,11 +171,12 @@ void rigidelement_store::get_rigd_vertex_buffer(glm::vec2 rigd_startpt, glm::vec
 	double l_cos = (rigd_endpt.x - rigd_startpt.x) / element_length; // l cosine
 	double m_sin = (rigd_startpt.y - rigd_endpt.y) / element_length; // m sine
 
-	double rigid_width_amplitude = geom_param_ptr->rigid_element_width *
+	float rigid_width_amplitude = geom_param_ptr->rigid_element_width *
 		(geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
 
+
 	// Half-width vector
-	glm::vec2 half_width_vector = glm::vec2(m_sin, l_cos) * static_cast<float>(rigid_width_amplitude / 2.0f);
+	glm::vec2 half_width_vector = glm::vec2(m_sin, l_cos) * (rigid_width_amplitude / 2.0f);
 
 	// Four points to form the rigid element rectangle
 	glm::vec2 point1 = rigd_startpt + half_width_vector; // Upper left 

@@ -82,6 +82,10 @@ void masselement_store::update_buffer()
 
 	unsigned int ptmass_v_index = 0;
 
+
+	float amplitude_scale = 10.0 * (geom_param_ptr->node_circle_radii / geom_param_ptr->geom_scale);
+
+
 	// Update the point mass vertex buffer
 	for (auto& ptm : *g_ptmass)
 	{
@@ -90,7 +94,7 @@ void masselement_store::update_buffer()
 		if (node->isPtmassexist == true)
 		{
 			// Add the texture vertex buffer
-			glm::vec2 ptm_loc = node->gnode_pt;
+			glm::vec2 ptm_loc = node->gnode_pt + (amplitude_scale * node->gnode_displ);
 
 			get_masselement_vertex_buffer(ptm_loc, ptmass_vertices, ptmass_v_index);
 		}

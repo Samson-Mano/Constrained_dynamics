@@ -1,24 +1,23 @@
-﻿using String_vibration_openTK.src.global_variables;
-using String_vibration_openTK.src.fe_objects;
-using String_vibration_openTK.src.geom_objects;
-// OpenTK library
+﻿// OpenTK Library
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using spring_mass_sys_visualizer.src.global_variables;
+using spring_mass_sys_visualizer.src.model_store;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
+
+
+namespace spring_mass_sys_visualizer.src.events_handler
 {
     public class drawing_events
     {
-        private readonly fedata_store fedata;
+        private readonly modeldata_store modeldata;
 
         private Vector2 click_pt = new Vector2(0);
         // private Vector2 curr_pt = new Vector2(0);
@@ -52,10 +51,10 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
 
         private Timer myTimer = new Timer();
 
-        public drawing_events(fedata_store fedata)
+        public drawing_events(modeldata_store modeldata)
         {
-            // Set the FE data
-            this.fedata = fedata;
+            // Set the model data
+            this.modeldata = modeldata;
 
 
             // Set the default projection matrix
@@ -73,7 +72,7 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
             // Assign it to your class or struct
             this.projectionMatrix = projectionMatrix;
 
-            this.fedata.update_openTK_uniforms(true, true, true);
+            this.modeldata.update_openTK_uniforms();
         }
 
 
@@ -92,20 +91,20 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
                 {
                     // Select operation starts (Left drag)
                     select_operation_start(new Vector2(e_X, e_Y), false);
-               
+
                 }
             }
             else
             {
                 // Left mouse button release
-                // isCtrlDown = false;
-                // isShiftDown = false;
+                isCtrlDown = false;
+                isShiftDown = false;
 
                 if (is_select == true)
                 {
                     select_operation_end(new Vector2(e_X, e_Y));
                 }
-         
+
             }
 
         }
@@ -120,14 +119,13 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
                 {
                     // Pan operation
                     pan_operation_start(new Vector2(e_X, e_Y));
-                  
+
                 }
 
                 if (isShiftDown == true)
                 {
                     // Select operation starts (Right drag)
                     select_operation_start(new Vector2(e_X, e_Y), true);
-                
                 }
 
             }
@@ -145,9 +143,8 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
 
                 if (is_select == true)
                 {
-                       select_operation_end(new Vector2(e_X, e_Y));
+                    select_operation_end(new Vector2(e_X, e_Y));
                 }
-              
             }
 
         }
@@ -160,7 +157,7 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
                 // Perform the mouse move operation
                 Vector2 loc = new Vector2(e_X, e_Y);
                 mouse_location(loc);
-             
+
             }
 
         }
@@ -192,7 +189,6 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
                 {
                     // Perform zoom to fit
                     zoom_to_fit();
-              
                 }
             }
             else
@@ -200,9 +196,8 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
                 // key released
                 isCtrlDown = false;
                 isShiftDown = false;
-         
             }
-  
+
         }
 
         #endregion
@@ -253,13 +248,13 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
             double normalizedScreenHeight = 1.8d * ((double)window_height / (double)max_drawing_area_size);
 
             // 3. Compute scale factor
-            double geom_scale = Math.Min(normalizedScreenWidth / fedata.geom_bounds.X,
-                normalizedScreenHeight / fedata.geom_bounds.Y);
+            double geom_scale = Math.Min(normalizedScreenWidth / modeldata.geom_bounds.X,
+                normalizedScreenHeight / modeldata.geom_bounds.Y);
 
             // 4. Compute translation to center geometry
             Vector3 geomTranslation = new Vector3(
-                -1.0f * (float)((fedata.max_bounds.X + fedata.min_bounds.X) * 0.5 * geom_scale),
-                -1.0f * (float)((fedata.max_bounds.Y + fedata.min_bounds.Y) * 0.5 * geom_scale),
+                -1.0f * (float)((modeldata.max_bounds.X + modeldata.min_bounds.X) * 0.5 * geom_scale),
+                -1.0f * (float)((modeldata.max_bounds.Y + modeldata.min_bounds.Y) * 0.5 * geom_scale),
                 0.0f
             );
 
@@ -270,7 +265,7 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
             // 6. Combine into model matrix
             this.modelMatrix = translationMatrix * scaleMatrix;
 
-            this.fedata.update_openTK_uniforms(true, false, false);
+            this.modeldata.update_openTK_uniforms();
 
         }
 
@@ -328,9 +323,9 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
 
         private void select_operation_end(Vector2 current_loc)
         {
-            //// Location when the selection rectangle ends
-            //fedata.selection_rectangle.update_selection_rectangle(new Vector2(0), new Vector2(0), false);
-            //fedata.selection_circle.update_selection_circle(new Vector2(0), new Vector2(0), false);
+            // Location when the selection rectangle ends
+          //  modeldata.selection_rectangle.UpdateSelectionRectangle(new Vector2(0), new Vector2(0), false);
+         //   modeldata.selection_circle.UpdateSelectionCircle(new Vector2(0), new Vector2(0), false);
 
 
             int max_dim = window_width > window_height ? window_width : window_height;
@@ -345,7 +340,7 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
             Vector2 o_pt = new Vector2(screen_opt_x, screen_opt_y);
             Vector2 c_pt = new Vector2(screen_cpt_x, screen_cpt_y);
 
-            // fedata.select_mesh_objects(o_pt, c_pt, is_rightbutton);
+         //   this.modeldata.select_model_objects(o_pt, c_pt, is_rightbutton);
 
             is_select = false;
         }
@@ -439,7 +434,7 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
 
             this.viewMatrix = Matrix4.Transpose(panTranslation) * scalingMatrix;
 
-            this.fedata.update_openTK_uniforms(false, true, false);
+            this.modeldata.update_openTK_uniforms();
         }
 
 
@@ -459,21 +454,20 @@ namespace String_vibration_openTK.src.opentk_control.opentk_bgdraw
             Vector2 o_pt = new Vector2(screen_opt_x, screen_opt_y);
             Vector2 c_pt = new Vector2(screen_cpt_x, screen_cpt_y);
 
-            if(gvariables_static.is_RectangleSelection == true)
+            if (gvariables_static.is_RectangleSelection == true)
             {
-                //// Update the selection rectangle points
-                //this.fedata.selection_rectangle.update_selection_rectangle(o_pt, c_pt, true);
+                // Update the selection rectangle points
+              //  this.modeldata.selection_rectangle.UpdateSelectionRectangle(o_pt, c_pt, true);
             }
             else
             {
-                //// Update the selection circle points
-                //this.fedata.selection_circle.update_selection_circle(o_pt, c_pt, true);
+                // Update the selection circle points
+              //  this.modeldata.selection_circle.UpdateSelectionCircle(o_pt, c_pt, true);
             }
-            
+
         }
+
+        //__________________
 
     }
 }
-
-
-

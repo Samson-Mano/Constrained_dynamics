@@ -64,7 +64,9 @@
     <Compile Include="src\events_handler\file_events.cs" />
     <Compile Include="src\global_variables\gvariables_static.cs" />
     <Compile Include="src\model_store\geom_objects\axisdata_store.cs" />
+    <Compile Include="src\model_store\geom_objects\circle_store.cs" />
     <Compile Include="src\model_store\geom_objects\labellist_store.cs" />
+    <Compile Include="src\model_store\geom_objects\rectangle_store.cs" />
     <Compile Include="src\model_store\modeldata_store.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\GDIFontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />

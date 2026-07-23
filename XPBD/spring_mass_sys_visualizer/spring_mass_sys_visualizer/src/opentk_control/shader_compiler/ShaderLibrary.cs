@@ -10,15 +10,15 @@ namespace spring_mass_sys_visualizer.src.opentk_control.shader_compiler
     {
         public enum ShaderType
         {
-            MeshShader,
+            DrawingShader,
             TextShader,
             DrawingAxisShader
         }
 
 
-        #region "Mesh Shaders"
+        #region "Drawing Shaders"
 
-        private static string mesh_vert_shader()
+        private static string drawing_vert_shader()
         {
             return @"
 
@@ -44,7 +44,7 @@ namespace spring_mass_sys_visualizer.src.opentk_control.shader_compiler
 
         }
 
-        private static string mesh_frag_shader()
+        private static string drawing_frag_shader()
         {
 
             return @"
@@ -200,8 +200,8 @@ namespace spring_mass_sys_visualizer.src.opentk_control.shader_compiler
             // Returns the vertex shader
             switch (type)
             {
-                case ShaderType.MeshShader:
-                    return mesh_vert_shader();
+                case ShaderType.DrawingShader:
+                    return drawing_vert_shader();
                 case ShaderType.TextShader:
                     return text_vert_shader();
                 case ShaderType.DrawingAxisShader:
@@ -217,8 +217,8 @@ namespace spring_mass_sys_visualizer.src.opentk_control.shader_compiler
             // Returns the fragment shader
             switch (type)
             {
-                case ShaderType.MeshShader:
-                    return mesh_frag_shader();
+                case ShaderType.DrawingShader:
+                    return drawing_frag_shader();
                 case ShaderType.TextShader:
                     return text_frag_shader();
                 case ShaderType.DrawingAxisShader:

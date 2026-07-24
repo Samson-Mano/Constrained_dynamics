@@ -28,6 +28,7 @@ namespace spring_mass_sys_visualizer.src.model_store
 
         // rectangle data
         private rectangle_store rectangles;
+        private circle_store circles;
 
         bool isModelGeomInitialized = false;
 
@@ -47,16 +48,40 @@ namespace spring_mass_sys_visualizer.src.model_store
                 ShaderLibrary.get_fragment_shader(ShaderLibrary.ShaderType.DrawingShader)
                 );
 
+
+            // Step 1: Set the geometry bounds for the model
+            min_bounds = new Vector3(-50);
+            max_bounds = new Vector3(50);
+            geom_bounds = new Vector3(100);
+
+            graphic_events_control.update_drawing_area_size(graphic_events_control.window_width , graphic_events_control.window_height);
+
+
+            // Step 2: Create the geometry data for the model
             // Initialize the rectangle data
             rectangles = new rectangle_store();
 
             // Add a simple rectangle to the model
-            rectangles.AddRectangle(0, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, false);
+           // rectangles.AddRectangle(0, 100.0f, 100.0f, 0.0f, 0.0f, 0.0f, false);
 
-            rectangles.UpdateVertexBuffers();
+          //  rectangles.AddRectangle(1, 80.0f, 60.0f, 0.0f, 0.0f, 0.0f, false);
+
+           // rectangles.AddRectangle(2, 30.0f, 40.0f, 0.0f, 0.0f, 0.0f, false);
+
+            // Initialize the circle data
+            circles = new circle_store();
+
+            // Add a simple circle to the model
+            circles.AddCircle(0, 50.0f, 0.0f, 0.0f, false);
+
+            circles.AddCircle(1, 8.0f, 15.0f, 25.0f, true);
+
+            circles.AddCircle(2, 10.0f, -10.0f, -25.0f, true);
 
 
-
+            // Step 3: Set the buffer data for the geometry data
+            rectangles.SetBufferData();
+            circles.SetBufferData();
 
 
 
@@ -78,6 +103,9 @@ gvariables_static.geom_transparency * 0.8f);
             modelShader.SetVector4("vertexColor", rectColor);
 
             rectangles.PaintRectangles();
+            
+            circles.PaintCircles();
+
 
 
             modelShader.UnBind();

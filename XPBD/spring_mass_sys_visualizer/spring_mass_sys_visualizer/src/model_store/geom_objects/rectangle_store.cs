@@ -23,7 +23,7 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
         public float rotation_angle;
         public bool isFilled = false; // Default to false, can be set later
 
-        public rectangle_data(int rectangle_id, float width, float height, 
+        public rectangle_data(int rectangle_id, float width, float height,
             float x_position, float y_position, float rotation_angle, bool isFilled)
         {
             this.rectangle_id = rectangle_id;
@@ -33,6 +33,12 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
             this.y_position = y_position;
             this.rotation_angle = rotation_angle;
             this.isFilled = isFilled;
+        }
+
+        public void update_position(float new_x, float new_y)
+        {
+            this.x_position = new_x;
+            this.y_position = new_y;
         }
 
 
@@ -87,13 +93,40 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
 
         }
 
+        public List<int> rectangle_boundary_index_data(int vertexOffset)
+        {
+            List<int> indexData = new List<int>();
+            // Indices for the rectangle boundary (lines)
+            indexData.Add(vertexOffset + 0); // Top-left
+            indexData.Add(vertexOffset + 1); // Top-right
+            indexData.Add(vertexOffset + 1);
+            indexData.Add(vertexOffset + 2); // Bottom-right
+            indexData.Add(vertexOffset + 2);
+            indexData.Add(vertexOffset + 3); // Bottom-left
+            indexData.Add(vertexOffset + 3);
+            indexData.Add(vertexOffset + 0); // Top-left
+            return indexData;
+        }
 
 
+        public List<int> rectangle_fill_index_data(int vertexOffset)
+        {
+            List<int> indexData = new List<int>();
+            // Indices for the rectangle fill (two triangles)
+            indexData.Add(vertexOffset + 0); // Top-left
+            indexData.Add(vertexOffset + 1); // Top-right
+            indexData.Add(vertexOffset + 2); // Bottom-right
+            indexData.Add(vertexOffset + 2); // Bottom-right
+            indexData.Add(vertexOffset + 3); // Bottom-left
+            indexData.Add(vertexOffset + 0); // Top-left
+
+            return indexData;
+        }
 
     }
 
 
-    public class rectangle_store
+    public class rectangle_store : IDisposable
     {
         private Dictionary<int, rectangle_data> rectangles;
 
@@ -117,20 +150,20 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
         {
             // Initialize the vertex array, vertex buffer, and index buffer for rectangles
             _rectangleVAO = new VertexArray();
-            _rectangleVBO = new VertexBuffer(10); 
-            _rectangleBoundaryIBO = new IndexBuffer(10); 
+            _rectangleVBO = new VertexBuffer(10);
+            _rectangleBoundaryIBO = new IndexBuffer(10);
             _rectangleFillIBO = new IndexBuffer(10);
 
-            var rectangleLayout = new VertexBufferLayout();
-            rectangleLayout.AddFloat(2); // Each vertex has 2 floats (x, y)
-            
-            _rectangleVAO.Add_vertexBuffer(_rectangleVBO, rectangleLayout);
-                        
+            var rectangleBufferLayout = new VertexBufferLayout();
+            rectangleBufferLayout.AddFloat(2); // Each vertex has 2 floats (x, y)
+
+            _rectangleVAO.Add_vertexBuffer(_rectangleVBO, rectangleBufferLayout);
+
         }
 
 
 
-        public void AddRectangle(int rectangle_id, float width, float height, 
+        public void AddRectangle(int rectangle_id, float width, float height,
             float x_position, float y_position, float rotation_angle, bool isFilled)
         {
             // Add the rectangle to the dictionary
@@ -138,7 +171,7 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
             rectangles.Add(rectangle.rectangle_id, rectangle);
         }
 
-        
+
         public void RemoveRectangle(int rectangle_id)
         {
             // Remove the rectangle from the dictionary
@@ -149,7 +182,19 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
         }
 
 
-        public void UpdateVertexBuffers()
+        public void updateRecanglePosition(int rectangle_id, float new_x, float new_y)
+        {
+            if (rectangles.ContainsKey(rectangle_id))
+            {
+                rectangles[rectangle_id].update_position(new_x, new_y);
+            }
+
+            // After updating the position, we need to update the vertex buffer data
+
+        }
+
+
+        public void SetBufferData()
         {
             // Update the vertex buffer data for all rectangles
             List<float> allVertexData = new List<float>();
@@ -166,43 +211,43 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
                 allVertexData.AddRange(rectangle.rectangle_vertex_data());
 
                 // Add indices for the rectangle boundary (lines)
-                int[] b_ids = new int[] 
-                { vertexOffset, 
-                    vertexOffset + 1,  
-                    vertexOffset + 2, 
-                    vertexOffset + 3};
+                boundaryindex.AddRange(rectangle.rectangle_boundary_index_data(vertexOffset));
 
-                boundaryindex.AddRange(b_ids);
-
-                // Add the triangle indices for the rectangle fill if it is filled
                 if (rectangle.isFilled)
                 {
-
-                    // Add indices for the rectangle fill (two triangles)
-                    int[] f_ids = new int[]
-                { vertexOffset,
-                    vertexOffset + 1,
-                    vertexOffset + 2,
-                    vertexOffset + 2,
-                    vertexOffset + 3,
-                    vertexOffset};
-
-                    fillIndex.AddRange(f_ids);
+                    // Add the triangle indices for the rectangle fill if it is filled
+                    fillIndex.AddRange(rectangle.rectangle_fill_index_data(vertexOffset));
                 }
-
 
                 vertexOffset += 4; // Each rectangle has 4 vertices
 
             }
 
             // Update the VBO with the new vertex data
-            _rectangleVBO.updateVertexBuffer(allVertexData.ToArray());
+            _rectangleVBO.AppendVertexBuffer(allVertexData.ToArray());
 
-            _rectangleBoundaryIBO.AppendIndexBuffer(boundaryindex.ToArray());                    
-            
+            _rectangleBoundaryIBO.AppendIndexBuffer(boundaryindex.ToArray());
+
             _rectangleFillIBO.AppendIndexBuffer(fillIndex.ToArray());
 
         }
+
+
+
+        public void UpdateVertexBuffers()
+        {
+            // Update the vertex buffer data for all rectangles
+            List<float> allVertexData = new List<float>();
+
+            foreach (var rectangle in rectangles.Values)
+            {
+                allVertexData.AddRange(rectangle.rectangle_vertex_data());
+            }
+
+            // Update the VBO with the new vertex data
+            _rectangleVBO.updateVertexBuffer(allVertexData.ToArray());
+        }
+
 
 
         public void PaintRectangles()
@@ -216,11 +261,13 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
                 GL.DrawElements(PrimitiveType.Triangles, _rectangleFillIBO.BufferCount, DrawElementsType.UnsignedInt, 0);
                 _rectangleFillIBO.UnBind();
             }
+
+
             // Draw rectangle boundaries (lines)
             if (_rectangleBoundaryIBO.BufferCount > 0)
             {
                 _rectangleBoundaryIBO.Bind();
-                GL.DrawElements(PrimitiveType.LineLoop, _rectangleBoundaryIBO.BufferCount, DrawElementsType.UnsignedInt, 0);
+                GL.DrawElements(PrimitiveType.Lines, _rectangleBoundaryIBO.BufferCount, DrawElementsType.UnsignedInt, 0);
                 _rectangleBoundaryIBO.UnBind();
             }
 
@@ -229,7 +276,15 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
         }
 
 
-
+        public void Dispose()
+        {
+            // Dispose of the OpenGL resources
+            _rectangleVBO?.Dispose();
+            _rectangleBoundaryIBO?.Dispose();
+            _rectangleFillIBO?.Dispose();
+            _rectangleVAO?.Dispose();
 
         }
+
+    }
 }

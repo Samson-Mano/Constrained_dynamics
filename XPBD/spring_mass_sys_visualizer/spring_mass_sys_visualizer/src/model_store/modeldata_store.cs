@@ -1,5 +1,4 @@
-﻿using OpenTK;
-using spring_mass_sys_visualizer.src.events_handler;
+﻿using spring_mass_sys_visualizer.src.events_handler;
 using spring_mass_sys_visualizer.src.global_variables;
 using spring_mass_sys_visualizer.src.model_store.geom_objects;
 using spring_mass_sys_visualizer.src.opentk_control.shader_compiler;
@@ -8,6 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+
+// OpenTK library
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Input;
+
 
 namespace spring_mass_sys_visualizer.src.model_store
 {
@@ -29,6 +36,9 @@ namespace spring_mass_sys_visualizer.src.model_store
         // rectangle data
         private rectangle_store rectangles;
         private circle_store circles;
+        private spring_store springs;
+        public vector_store vectors;
+
 
         bool isModelGeomInitialized = false;
 
@@ -79,11 +89,29 @@ namespace spring_mass_sys_visualizer.src.model_store
             circles.AddCircle(2, 10.0f, -10.0f, -25.0f, true);
 
 
+            // Initialize the spring data
+            springs = new spring_store();
+
+            // Add a simple spring to the model
+            springs.AddSpring(0, -10.0f, -20.0f, 20.0f, 20.0f);
+
+            springs.AddSpring(1, -30.0f, 10.0f, 30.0f, -10.0f);
+
+
+            // Initialize the vector data
+            vectors = new vector_store();
+
+            // Add a simple vector to the model
+            vectors.AddVector(0, 0.0f, 0.0f, 10.0f, 10.0f);
+
+            vectors.AddVector(1, 10.0f, 10.0f, -40.0f, 30.0f);
+
+
             // Step 3: Set the buffer data for the geometry data
             rectangles.SetBufferData();
             circles.SetBufferData();
-
-
+            springs.SetBufferData();
+            vectors.SetBufferData();
 
             isModelGeomInitialized = true;
             update_openTK_uniforms();
@@ -97,15 +125,33 @@ namespace spring_mass_sys_visualizer.src.model_store
 
             modelShader.Bind();
 
-            Vector4 rectColor = new Vector4(gvariables_static.ColorUtils.get_PtColor(),
+            Vector4 rectColor = new Vector4(gvariables_static.ColorUtils.get_RectangleColor(),
 gvariables_static.geom_transparency * 0.8f);
 
-            modelShader.SetVector4("vertexColor", rectColor);
+            Vector4 springColor = new Vector4(gvariables_static.ColorUtils.get_SpringColor(),
+gvariables_static.geom_transparency * 0.8f);
 
+            Vector4 circleColor = new Vector4(gvariables_static.ColorUtils.get_CircleColor(),
+                gvariables_static.geom_transparency * 0.8f);
+
+            Vector4 vectorColor = new Vector4(gvariables_static.ColorUtils.get_VectorColor(),
+                gvariables_static.geom_transparency * 0.8f);
+
+
+            modelShader.SetVector4("vertexColor", rectColor);
             rectangles.PaintRectangles();
             
+            modelShader.SetVector4("vertexColor", circleColor);
             circles.PaintCircles();
 
+            modelShader.SetVector4("vertexColor", springColor);
+            GL.LineWidth(3.0f);
+            springs.PaintSprings();
+
+
+            modelShader.SetVector4("vertexColor", vectorColor);
+            vectors.PaintVectors();
+            GL.LineWidth(1.0f);
 
 
             modelShader.UnBind();

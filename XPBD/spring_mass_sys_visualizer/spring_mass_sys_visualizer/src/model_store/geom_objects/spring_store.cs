@@ -24,9 +24,10 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
         public float y_end;
         
         public float spring_rest_length = -1.0f;
+        public float spring_current_length = -1.0f;
 
-       public const int turn_count = 11;
-        const float spring_element_width = 200.0f;
+        public const int turn_count = 11;
+        const float spring_element_width = 3.0f;
 
 
         public spring_data(int spring_id, float x_start, float y_start, float x_end, float y_end)
@@ -39,7 +40,7 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
 
             // Set the spring rest length based on the initial positions
             this.spring_rest_length = (float)Math.Sqrt(Math.Pow(x_end - x_start, 2) + Math.Pow(y_end - y_start, 2));
-
+            this.spring_current_length = this.spring_rest_length;
         }
 
 
@@ -49,8 +50,11 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
             this.y_start = new_y_start;
             this.x_end = new_x_end;
             this.y_end = new_y_end;
-        }
 
+            // Update the current length of the spring based on the new positions
+            this.spring_current_length = (float)Math.Sqrt(Math.Pow(new_x_end - new_x_start, 2) + Math.Pow(new_y_end - new_y_start, 2));
+        }
+        
 
 
         public List<float> spring_vertex_data()
@@ -58,30 +62,35 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
             List<float> vertexData = new List<float>();
 
             // Spring portion l_cosine, m_sine
-            float l_cos = (x_end - x_start) / spring_rest_length;
-            float m_sin = (y_end - y_start) / spring_rest_length;
+            float l_cos = (x_end - x_start) / spring_current_length;
+            float m_sin = (y_start  - y_end) / spring_current_length;
 
-            float spring_width_amplitude = spring_element_width *
-    (200.0f / gvariables_static.geom_size);
+            // Find the scale factors 
+            // The idea is to keep the flat line length rigid but only change the spring portion length
+
+            float factor1 = 0.2f * (spring_rest_length / spring_current_length);
+            float factor2 = 1.0f - (2.0f * factor1);
+            float factor3 = 1.0f - factor1;
+
 
             // Spring start flat portion
             vertexData.Add(x_start);
             vertexData.Add(y_start);
 
-            vertexData.Add((1.0f - 0.2f) * x_start + 0.2f * x_end);
-            vertexData.Add((1.0f - 0.2f) * y_start + 0.2f * y_end);
+            vertexData.Add((1.0f - factor1) * x_start + factor1 * x_end);
+            vertexData.Add((1.0f - factor1) * y_start + factor1 * y_end);
 
 
-            Vector2 origin_pt = new Vector2((1.0f - 0.2f) * x_start + 0.2f * x_end, 
-                (1.0f - 0.2f) * y_start + 0.2f * y_end);
+            Vector2 origin_pt = new Vector2((1.0f - factor1) * x_start + factor1 * x_end, 
+                (1.0f - factor1) * y_start + factor1 * y_end);
 
             // Spring zig-zag portion
             for (int i = 1; i < turn_count; i++)
             {
                 float param_t = i / (float)(turn_count);
 
-                float pt_x = (param_t * spring_rest_length * 0.6f);
-                float pt_y = spring_width_amplitude * ((i % 2 == 0) ? 1 : -1);
+                float pt_x = (param_t * spring_current_length * factor2);
+                float pt_y = spring_element_width * ((i % 2 == 0) ? 1 : -1);
 
                 Vector2 curr_pt = new Vector2(((l_cos * pt_x) + (m_sin * pt_y)),
                     ((-1.0f * m_sin * pt_x) + (l_cos * pt_y)));
@@ -96,8 +105,8 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
 
 
             // Spring end flat portion
-            vertexData.Add((1.0f - 0.8f) * x_start + 0.8f * x_end);
-            vertexData.Add((1.0f - 0.8f) * y_start + 0.8f * y_end);
+            vertexData.Add((1.0f - factor3) * x_start + factor3 * x_end);
+            vertexData.Add((1.0f - factor3) * y_start + factor3 * y_end);
 
             vertexData.Add(x_end);
             vertexData.Add(y_end);

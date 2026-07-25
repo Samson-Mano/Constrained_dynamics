@@ -68,6 +68,7 @@
     <Compile Include="src\model_store\geom_objects\labellist_store.cs" />
     <Compile Include="src\model_store\geom_objects\rectangle_store.cs" />
     <Compile Include="src\model_store\geom_objects\spring_store.cs" />
+    <Compile Include="src\model_store\geom_objects\vector_store.cs" />
     <Compile Include="src\model_store\modeldata_store.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\GDIFontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />

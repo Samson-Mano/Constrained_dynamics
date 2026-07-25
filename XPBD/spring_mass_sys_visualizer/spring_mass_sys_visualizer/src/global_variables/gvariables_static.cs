@@ -58,7 +58,7 @@ namespace spring_mass_sys_visualizer.src.global_variables
             }
 
 
-            public static Vector3 get_PtColor()
+            public static Vector3 get_RectangleColor()
             {
                 Color color = Color.Brown;
 
@@ -73,20 +73,26 @@ namespace spring_mass_sys_visualizer.src.global_variables
                 return new Vector3(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
             }
 
-            public static Vector3 get_ConstraintColor()
+            public static Vector3 get_SpringColor()
             {
                 Color color = Color.Magenta;
 
                 return new Vector3(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
             }
 
-            public static Vector3 get_LoadColor()
+            public static Vector3 get_CircleColor()
             {
                 Color color = Color.Green;
 
                 return new Vector3(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
             }
+            
+            public static Vector3 get_VectorColor()
+            {
+                Color color = Color.Blue;
 
+                return new Vector3(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
+            }   
 
             public static Vector3 get_WireframeColor()
             {

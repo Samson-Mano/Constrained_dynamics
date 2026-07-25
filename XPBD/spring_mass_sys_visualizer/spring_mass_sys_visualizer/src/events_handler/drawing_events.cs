@@ -251,6 +251,7 @@ namespace spring_mass_sys_visualizer.src.events_handler
             double geom_scale = Math.Min(normalizedScreenWidth / modeldata.geom_bounds.X,
                 normalizedScreenHeight / modeldata.geom_bounds.Y);
 
+
             // 4. Compute translation to center geometry
             Vector3 geomTranslation = new Vector3(
                 -1.0f * (float)((modeldata.max_bounds.X + modeldata.min_bounds.X) * 0.5 * geom_scale),

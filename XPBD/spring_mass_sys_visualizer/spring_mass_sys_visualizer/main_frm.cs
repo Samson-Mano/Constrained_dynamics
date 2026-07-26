@@ -1,4 +1,10 @@
-﻿using spring_mass_sys_visualizer.src.global_variables;
+﻿// OpenTK library
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Input;
+using spring_mass_sys_visualizer.other_windows;
+using spring_mass_sys_visualizer.src.global_variables;
 using spring_mass_sys_visualizer.src.model_store;
 using spring_mass_sys_visualizer.src.model_store.geom_objects;
 using System;
@@ -11,13 +17,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-
-// OpenTK library
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Input;
 
 
 
@@ -36,6 +35,9 @@ namespace spring_mass_sys_visualizer
 
         // Drawing area Axis data store
         private axisdata_store axisdata;
+
+        // other windows
+        private animation_control_frm animation_Form;
 
 
         public main_frm()
@@ -306,17 +308,52 @@ namespace spring_mass_sys_visualizer
         {
             while (IsApplicationIdle())
             {
-               //  modeldata.update_result_animation();   // Update animation
+                modeldata.update_model_animation();   // Update animation
                 glControl_main_panel.Invalidate(); // Redraw
             }
         }
+
 
 
         #endregion
 
 
 
+        private void animationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Control the animation
 
+            // Check if animation_Form is null or disposed
+            if (animation_Form == null || animation_Form.IsDisposed)
+            {
+                animation_Form = new animation_control_frm(ref this.modeldata);
 
+                // Make it behave like a tool window
+                animation_Form.FormBorderStyle = FormBorderStyle.SizableToolWindow;
+                animation_Form.ShowInTaskbar = false;
+                animation_Form.TopLevel = true;
+                animation_Form.Owner = this;
+
+                // Manually center the form on the parent
+                int x = this.Location.X + (this.Width - animation_Form.Width) / 2;
+                int y = this.Location.Y + (this.Height - animation_Form.Height) / 2;
+                animation_Form.StartPosition = FormStartPosition.Manual;
+                animation_Form.Location = new Point(Math.Max(x, 0), Math.Max(y, 0)); // avoid negative positions
+
+            }
+
+            // Show the form
+            animation_Form.initialize_animation_form();
+
+            if (!animation_Form.Visible)
+            {
+                animation_Form.Show(this);
+            }
+
+            animation_Form.BringToFront();
+
+            glControl_main_panel.Invalidate();
+
+        }
     }
 }

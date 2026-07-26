@@ -147,6 +147,8 @@ namespace spring_mass_sys_visualizer.src.global_variables
         public static bool animate_pause = false;
         public static bool animate_stop = true;
 
+        // Animation speed control
+        public static double animation_speed = 1.0f; // real-time speed
 
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]

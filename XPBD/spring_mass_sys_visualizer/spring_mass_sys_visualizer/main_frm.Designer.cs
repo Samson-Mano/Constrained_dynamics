@@ -37,6 +37,7 @@
             this.controlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel_zoom_value = new System.Windows.Forms.ToolStripStatusLabel();
+            this.animationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -95,6 +96,8 @@
             // 
             // controlToolStripMenuItem
             // 
+            this.controlToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.animationToolStripMenuItem});
             this.controlToolStripMenuItem.Name = "controlToolStripMenuItem";
             this.controlToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
             this.controlToolStripMenuItem.Text = "Control";
@@ -114,6 +117,13 @@
             this.toolStripStatusLabel_zoom_value.Name = "toolStripStatusLabel_zoom_value";
             this.toolStripStatusLabel_zoom_value.Size = new System.Drawing.Size(73, 17);
             this.toolStripStatusLabel_zoom_value.Text = "Zoom: 100%";
+            // 
+            // animationToolStripMenuItem
+            // 
+            this.animationToolStripMenuItem.Name = "animationToolStripMenuItem";
+            this.animationToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.animationToolStripMenuItem.Text = "Animation";
+            this.animationToolStripMenuItem.Click += new System.EventHandler(this.animationToolStripMenuItem_Click);
             // 
             // main_frm
             // 
@@ -149,6 +159,7 @@
         private System.Windows.Forms.ToolStripMenuItem controlToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_zoom_value;
+        private System.Windows.Forms.ToolStripMenuItem animationToolStripMenuItem;
     }
 }
 

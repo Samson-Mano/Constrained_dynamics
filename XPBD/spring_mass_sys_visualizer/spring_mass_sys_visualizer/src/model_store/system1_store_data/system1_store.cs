@@ -24,8 +24,14 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
         private rectangle_store rigidboundary;
         private circle_store pointmass;
         private spring_store springs;
-        public vector_store vectors;
+        private vector_store vectors;
 
+        private sdof1d_rigidcollisionSolver springsolver;
+
+        private double max_displacement;
+        private double min_displacement;
+
+        public double total_simulation_time = 10.0; // seconds
 
 
         public system1_store()
@@ -53,7 +59,36 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
             // Add a simple spring to the model
             springs.AddSpring(0, 0.0f, 40.0f, 0.0f, -10.0f);
 
-  
+            // Example model
+            double mass_m0 = 0.001; // 1 KG
+            double nat_freq = 4.0; // Hz
+            double stiff_k = mass_m0 * (nat_freq * 2.0 * Math.PI) * (nat_freq * 2.0 * Math.PI);
+            double gravity_g = -9806.65; // m/s^2
+
+            // Initialize the rigid collision solver
+            springsolver = new sdof1d_rigidcollisionSolver(mass_m: mass_m0, 
+                stiffness_k: stiff_k, dampratio_zeta: 0.05, const_accla0: gravity_g);
+
+            springsolver.solve_sdof1d_rigidcollision(total_time: total_simulation_time, max_time_increment: 0.01,
+                initial_displacement: 100.0, initial_velocity: 0.0);
+
+            // Find the maximum displacement for the vector representation
+            max_displacement = double.MinValue;
+            min_displacement = double.MaxValue;
+
+            foreach(var rslt in springsolver.responseList)
+            {
+                if (rslt.displacement > max_displacement)
+                {
+                    max_displacement = rslt.displacement;
+                }
+                if (rslt.displacement < min_displacement)
+                {
+                    min_displacement = rslt.displacement;
+                }
+            }
+
+
 
             // Initialize the vector data
             vectors = new vector_store();
@@ -109,9 +144,21 @@ gvariables_static.geom_transparency * 0.8f);
         }
 
 
-        public void update_system1(ref double elapsedRealTime)
+        public void update_system1(double elapsedRealTime)
         {
             // Implement the update logic for system1
+            sdof1d_rigidcollisionResponse response_at_t = springsolver.getResult_at_timet(elapsedRealTime);
+
+            double displ_at_t = response_at_t.displacement;
+
+            // Map to [-1, 1] range for OpenGL coordinates
+            double mapped_displacement = 2.0 * ((displ_at_t - min_displacement) / (max_displacement - min_displacement)) - 1.0;
+
+            pointmass.updateCirclePosition(0, 0.0f, (float)mapped_displacement * 50.0f); // Scale for visualization
+            pointmass.updateCirclePosition(1, 0.0f, (float)mapped_displacement * 50.0f); // Scale for visualization
+
+            pointmass.UpdateVertexBuffers();
+
         }
 
 

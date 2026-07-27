@@ -128,6 +128,8 @@ namespace spring_mass_sys_visualizer.other_windows
                 // Set the status label
                 label_status.Text = "Playing";
 
+                modeldata.start_animation();
+
             }
 
             if (gvariables_static.animate_stop == true)

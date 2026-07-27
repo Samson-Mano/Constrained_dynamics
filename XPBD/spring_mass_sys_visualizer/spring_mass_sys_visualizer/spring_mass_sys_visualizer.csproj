@@ -76,6 +76,7 @@
     <Compile Include="src\model_store\geom_objects\spring_store.cs" />
     <Compile Include="src\model_store\geom_objects\vector_store.cs" />
     <Compile Include="src\model_store\modeldata_store.cs" />
+    <Compile Include="src\model_store\system1_store_data\sdof1d_rigidcollisionSolver.cs" />
     <Compile Include="src\model_store\system1_store_data\system1_store.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\GDIFontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />

@@ -78,6 +78,11 @@ namespace spring_mass_sys_visualizer.src.model_store
 
             system1 = new system1_store();
 
+            gvariables_static.animate_play = true;
+            gvariables_static.animate_pause = false;
+            gvariables_static.animate_stop = false;
+            _state = AnimationState.Running;
+            _stopwatch.Start();
 
             isModelGeomInitialized = true;
             update_openTK_uniforms();
@@ -95,9 +100,6 @@ namespace spring_mass_sys_visualizer.src.model_store
             system1.paint_system1(ref modelShader);
 
 
-
-
-
             modelShader.UnBind();
         }
 
@@ -106,12 +108,21 @@ namespace spring_mass_sys_visualizer.src.model_store
         {
             if (_state == AnimationState.Running)
             {
-                elapsedRealTime = _stopwatch.Elapsed.TotalSeconds;
+                elapsedRealTime = (_stopwatch.Elapsed.TotalSeconds * gvariables_static.animation_speed);
+
+                if(elapsedRealTime > system1.total_simulation_time)
+                {
+                    // Reset the animation stopwatch and time step
+                    _stopwatch.Reset();
+                    _stopwatch.Start();
+                    elapsedRealTime = 0;
+                }
+
 
                 if (!isModelGeomInitialized)
                     return;
 
-                system1.update_system1(ref elapsedRealTime);
+                system1.update_system1(elapsedRealTime);
             }
         }
 
@@ -147,7 +158,7 @@ namespace spring_mass_sys_visualizer.src.model_store
             elapsedRealTime = 0.0;
             _state = AnimationState.Stopped;
 
-            system1.update_system1(ref elapsedRealTime);
+            system1.update_system1(elapsedRealTime);
 
         }
 

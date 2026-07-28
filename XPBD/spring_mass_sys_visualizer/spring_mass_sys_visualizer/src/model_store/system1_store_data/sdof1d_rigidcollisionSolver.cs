@@ -7,15 +7,17 @@ using System.Threading.Tasks;
 
 namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
 {
+
     public struct sdof1d_rigidcollisionResponse
     {
         public double time;
         public double displacement;
         public double velocity;
         public double acceleration;
-        // public double contact_force;
+        public double contact_force;
 
     }
+
 
     public class sdof1d_rigidcollisionSolver
     {
@@ -31,6 +33,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
 
         public List<sdof1d_rigidcollisionResponse> responseList = new List<sdof1d_rigidcollisionResponse>();
         private double total_time;
+
 
         public sdof1d_rigidcollisionSolver(double mass_m, double stiffness_k, double dampratio_zeta, double const_accla0)
         {
@@ -51,6 +54,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
 
         }
 
+
         private sdof1d_rigidcollisionResponse get_flight_solution(double time_t, double u_inl, double v_inl)
         {
             /// <summary>
@@ -65,6 +69,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
             response.acceleration = a0;
             response.velocity = v_inl + (a0 * time_t);
             response.displacement = u_inl + (v_inl * time_t) + (0.5 * a0 * time_t * time_t);
+            response.contact_force = (stiffness_k * response.displacement) + (damping_c * response.velocity);
 
             return response;
         }
@@ -78,39 +83,43 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
 
             sdof1d_rigidcollisionResponse response = new sdof1d_rigidcollisionResponse();
 
-            double exp_term = Math.Exp(-dampratio_zeta * omega_n * time_t);
-            double cos_term = Math.Cos(omega_D * time_t);
-            double sin_term = Math.Sin(omega_D * time_t);
+            double exp_term = Math.Exp(-dampratio_zeta * omega_n * time_t); // e^{‑ζ ωn τ}
+            double cos_term = Math.Cos(omega_D * time_t); // cos(ωD t)
+            double sin_term = Math.Sin(omega_D * time_t); // sin(ωD t)
+
+            double dampratio_zeta_squared = dampratio_zeta * dampratio_zeta; // ζ²
+            double damp_term = (dampratio_zeta / Math.Sqrt(1 - dampratio_zeta_squared)); // ζ / √(1 - ζ²)
+
+            double omega_n_squared = omega_n * omega_n; // ωn²
 
             // Particular (Forced response) solution 
-            double u_static = const_accla0 / (omega_n * omega_n);
+            double u_static = const_accla0 / omega_n_squared; // u_static = a0 / ωn²
 
             double A1 = -u_static;
-            double A2 = -u_static * (dampratio_zeta / Math.Sqrt(1 - (dampratio_zeta * dampratio_zeta)));
+            double A2 = -u_static * damp_term;
 
-            double u_particular = exp_term * ((A1 * cos_term) + (A2 * sin_term));
+            double u_particular = exp_term * ((A1 * cos_term) + (A2 * sin_term)) + u_static;
             double v_particular = exp_term * (const_accla0 / omega_D) * sin_term;
 
-            double A3 = dampratio_zeta * (omega_n / omega_D);
 
-            double a_particular = const_accla0 * exp_term * (cos_term - A3 * sin_term);
+            double a_particular = const_accla0 * exp_term * (cos_term - (damp_term * sin_term));
 
 
             // Homogeneous (Free response) complementary solution
             double C1 = u_inl;
-            double C2 = v_inl + ((dampratio_zeta * omega_n * u_inl) / omega_D);
+            double C2 = (v_inl / omega_D) + (damp_term * u_inl);
 
-            double u_homogeneous = exp_term * (C1 * cos_term + C2 * sin_term);
+            double u_homogeneous = exp_term * ((C1 * cos_term) + (C2 * sin_term));
 
 
-            double C3 = ((u_inl * (omega_n * omega_n)) + (dampratio_zeta * omega_n * v_inl)) / omega_D;
+            double C3 = ((u_inl * omega_n_squared) / omega_D) + (damp_term * v_inl);
 
-            double v_homogeneous = -exp_term * (C3 * sin_term - v_inl * cos_term);
+            double v_homogeneous = -exp_term * ((C3 * sin_term) - (v_inl * cos_term));
 
-            double C4 = (2.0 * dampratio_zeta * omega_n * v_inl) + ((omega_n * omega_n) * u_inl);
-            double C5_1 = (dampratio_zeta * omega_n * omega_n * u_inl);
-            double C5_2 = ((2.0 * dampratio_zeta * dampratio_zeta) - 1.0) * omega_n * v_inl;
-            double C5 = (C5_1 + C5_2) / Math.Sqrt(1.0 - (dampratio_zeta * dampratio_zeta));
+            double C4 = (2.0 * dampratio_zeta * omega_n * v_inl) + (omega_n_squared * u_inl);
+            double C5_1 = (dampratio_zeta * omega_n_squared * u_inl);
+            double C5_2 = ((2.0 * dampratio_zeta_squared) - 1.0) * omega_n * v_inl;
+            double C5 = (C5_1 + C5_2) / Math.Sqrt(1.0 - dampratio_zeta_squared);
 
             double a_homogeneous = -exp_term * (C4 * cos_term - C5 * sin_term);
 
@@ -119,8 +128,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
             response.displacement = u_particular + u_homogeneous;
             response.velocity = v_particular + v_homogeneous;
             response.acceleration = a_particular + a_homogeneous;
-            return response;
+            response.contact_force = (stiffness_k * response.displacement) + (damping_c * response.velocity);
 
+            return response;
         }
 
 
@@ -268,13 +278,14 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
             double displ_at_event = initial_displacement;
             double velo_at_event = initial_velocity;
 
+            // Track the contact force
+            double contact_force = (stiffness_k * initial_displacement) + (damping_c * initial_velocity);
+
             response_at_t.time = time_t;
             response_at_t.displacement = initial_displacement;
             response_at_t.velocity = initial_velocity;
             response_at_t.acceleration = const_accla0;
-
-            // Track the contact force
-            double contact_force = (stiffness_k * initial_displacement) + (damping_c * initial_velocity);
+            response_at_t.contact_force = contact_force;
 
             // Initialize the event tracker
             bool IsContact = false;
@@ -345,6 +356,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
                     response_at_t.displacement = displ_at_event;
                     response_at_t.velocity = velo_at_event;
                     response_at_t.acceleration = response_at_event.acceleration;
+                    response_at_t.contact_force = response_at_event.contact_force;
 
                 }
                 else if(contact_force <= 0.0 && IsContact == false)
@@ -371,6 +383,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
                     response_at_t.displacement = displ_at_event;
                     response_at_t.velocity = velo_at_event;
                     response_at_t.acceleration = response_at_event.acceleration;
+                    response_at_t.contact_force = response_at_event.contact_force;
+
                 }
 
 
@@ -433,7 +447,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
                 time = time_t,
                 displacement = lowerPoint.displacement + (upperPoint.displacement - lowerPoint.displacement) * param_t,
                 velocity = lowerPoint.velocity + (upperPoint.velocity - lowerPoint.velocity) * param_t,
-                acceleration = lowerPoint.acceleration + (upperPoint.acceleration - lowerPoint.acceleration) * param_t
+                acceleration = lowerPoint.acceleration + (upperPoint.acceleration - lowerPoint.acceleration) * param_t,
+                contact_force = lowerPoint.contact_force + (upperPoint.contact_force - lowerPoint.contact_force) * param_t
             };
 
             return interpolated;

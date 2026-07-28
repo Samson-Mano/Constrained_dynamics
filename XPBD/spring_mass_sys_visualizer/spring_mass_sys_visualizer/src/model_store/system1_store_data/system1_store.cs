@@ -29,9 +29,10 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
         private sdof1d_rigidcollisionSolver springsolver;
 
         private double max_displacement;
-        private double min_displacement;
+        private double max_velocity;
+        private double max_acceleration;
 
-        public double total_simulation_time = 10.0; // seconds
+        public double total_simulation_time = 20.0; // seconds
 
 
         public system1_store()
@@ -43,13 +44,14 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
 
             // Add rigid boundary rectangles to the model
             rigidboundary.AddRectangle(0, 100.0f, 10.0f, 0.0f, -50.0f, 0.0f, true);
+            // rigidboundary.AddRectangle(1, 200.0f, 0.05f, 0.0f, 0.0f, 0.0f, false);
 
 
             // Initialize the circle data
             pointmass = new circle_store();
 
             // Add a simple circle to the model
-            pointmass.AddCircle(0, 50.0f, 0.0f, 40.0f, false);
+            pointmass.AddCircle(0, 45.0f, 0.0f, 40.0f, false);
             pointmass.AddCircle(1, 5.0f, 0.0f, 40.0f, true);
 
 
@@ -63,29 +65,26 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
             double mass_m0 = 0.001; // 1 KG
             double nat_freq = 4.0; // Hz
             double stiff_k = mass_m0 * (nat_freq * 2.0 * Math.PI) * (nat_freq * 2.0 * Math.PI);
-            double gravity_g = -9806.65; // m/s^2
+            double gravity_g = -9806.65 * 1.0; // m/s^2
 
             // Initialize the rigid collision solver
-            springsolver = new sdof1d_rigidcollisionSolver(mass_m: mass_m0, 
-                stiffness_k: stiff_k, dampratio_zeta: 0.05, const_accla0: gravity_g);
+            springsolver = new sdof1d_rigidcollisionSolver(mass_m: mass_m0,
+                stiffness_k: stiff_k, dampratio_zeta: 0.001, const_accla0: gravity_g);
 
-            springsolver.solve_sdof1d_rigidcollision(total_time: total_simulation_time, max_time_increment: 0.01,
-                initial_displacement: 100.0, initial_velocity: 0.0);
+            springsolver.solve_sdof1d_rigidcollision(total_time: total_simulation_time, max_time_increment: 0.001,
+                initial_displacement: 2000.0, initial_velocity: -0.0);
 
             // Find the maximum displacement for the vector representation
             max_displacement = double.MinValue;
-            min_displacement = double.MaxValue;
+            max_velocity = double.MinValue;
+            max_acceleration = double.MinValue;
 
-            foreach(var rslt in springsolver.responseList)
+            foreach (var rslt in springsolver.responseList)
             {
-                if (rslt.displacement > max_displacement)
-                {
-                    max_displacement = rslt.displacement;
-                }
-                if (rslt.displacement < min_displacement)
-                {
-                    min_displacement = rslt.displacement;
-                }
+                max_displacement = Math.Max(max_displacement, Math.Abs(rslt.displacement));
+                max_velocity = Math.Max(max_velocity, Math.Abs(rslt.velocity));
+                max_acceleration = Math.Max(max_acceleration, Math.Abs(rslt.acceleration));
+
             }
 
 
@@ -94,9 +93,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
             vectors = new vector_store();
 
             // Add a simple vector to the model
-            // vectors.AddVector(0, 0.0f, 0.0f, 10.0f, 10.0f);
-
-            // vectors.AddVector(1, 10.0f, 10.0f, -40.0f, 30.0f);
+            vectors.AddVector(0, 0.0f, 0.0f, 10.0f, 10.0f);
+            vectors.AddVector(1, 10.0f, 10.0f, -40.0f, 30.0f);
 
 
             // Step 3: Set the buffer data for the geometry data
@@ -152,12 +150,46 @@ gvariables_static.geom_transparency * 0.8f);
             double displ_at_t = response_at_t.displacement;
 
             // Map to [-1, 1] range for OpenGL coordinates
-            double mapped_displacement = 2.0 * ((displ_at_t - min_displacement) / (max_displacement - min_displacement)) - 1.0;
+            // double mapped_displacement = 2.0 * ((displ_at_t - min_displacement) / (max_displacement - min_displacement)) - 1.0;
+            double mapped_displacement = displ_at_t / Math.Abs(max_displacement); // Scale down for visualization
 
-            pointmass.updateCirclePosition(0, 0.0f, (float)mapped_displacement * 50.0f); // Scale for visualization
-            pointmass.updateCirclePosition(1, 0.0f, (float)mapped_displacement * 50.0f); // Scale for visualization
+
+            float scale_value = 30.0f; // Scale for visualization   
+
+            pointmass.updateCirclePosition(0, 0.0f, (float)mapped_displacement * scale_value); // Scale for visualization
+            pointmass.updateCirclePosition(1, 0.0f, (float)mapped_displacement * scale_value); // Scale for visualization
+
+            if (response_at_t.contact_force > 0.0f)
+            {
+                // No contact
+                springs.updateSpringPosition(0, 0.0f, (float)mapped_displacement * scale_value, 0.0f,
+                ((float)mapped_displacement * scale_value) - 45.0f);
+
+            }
+            else
+            {
+                // Contact with the rigid boundary
+                // You can implement any additional logic here if needed
+
+                springs.updateSpringPosition(0, 0.0f, (float)mapped_displacement * scale_value, 0.0f, -45.0f);
+
+            }
+
+            // Update the vector position based on velocity and acceleration
+            double mapped_velocity = response_at_t.velocity / Math.Abs(max_velocity);
+            double mapped_acceleration = response_at_t.acceleration / Math.Abs(max_acceleration);
+
+            vectors.updateVectorPosition(0, 10.0f, (float)mapped_displacement * scale_value, 
+                0.0f, scale_value * (float)mapped_velocity);
+
+            vectors.updateVectorPosition(1, 20.0f, (float)mapped_displacement * scale_value,
+                0.0f, scale_value * (float)mapped_acceleration);
+
+
 
             pointmass.UpdateVertexBuffers();
+            springs.UpdateVertexBuffers();
+            vectors.UpdateVertexBuffers();
 
         }
 

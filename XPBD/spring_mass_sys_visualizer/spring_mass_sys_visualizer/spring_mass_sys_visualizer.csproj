@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net48\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.3.3.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.3.3\lib\net20\OpenTK.dll</HintPath>
     </Reference>
@@ -41,6 +44,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,6 +82,7 @@
     <Compile Include="src\model_store\modeldata_store.cs" />
     <Compile Include="src\model_store\system1_store_data\sdof1d_rigidcollisionSolver.cs" />
     <Compile Include="src\model_store\system1_store_data\system1_store.cs" />
+    <Compile Include="src\model_store\system2_store_data\sdof2d_rigidcollisionSolver.cs" />
     <Compile Include="src\model_store\system2_store_data\system2dof_store.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\GDIFontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />

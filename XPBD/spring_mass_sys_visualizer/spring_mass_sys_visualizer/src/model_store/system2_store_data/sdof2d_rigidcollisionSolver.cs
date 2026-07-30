@@ -1,5 +1,6 @@
 ﻿// using System.Numerics;
 using MathNet.Numerics;
+using MathNet.Numerics.Integration;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.LinearAlgebra.Factorization;
@@ -22,6 +23,24 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         public double acceleration;
 
     }
+
+    public class sdof2d_rigidcollisionSolverResult
+    {
+        public List<double> TimePoints { get; set; }
+        public List<double> ContactForce { get; set; }
+        public List<double> TimeContactBand { get; set; }
+        public List<sdof2d_rigidcollisionResponse> Node1Response { get; set; }
+        public List<sdof2d_rigidcollisionResponse> Node2Response { get; set; }
+        public sdof2d_rigidcollisionSolverResult()
+        {
+            TimePoints = new List<double>();
+            ContactForce = new List<double>();
+            TimeContactBand = new List<double>();
+            Node1Response = new List<sdof2d_rigidcollisionResponse>();
+            Node2Response = new List<sdof2d_rigidcollisionResponse>();
+        }
+    }
+
 
     public class ModalProperties
     {
@@ -100,13 +119,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         private ModalProperties _contactModalProperties;  // 2 DOF - The system is fully connected with both springs k1 and k2 active
 
 
-        // Results storage for time history
-        public List<double> TimeHistory { get; private set; } = new List<double>();
-        public List<double> ContactForce { get; private set; } = new List<double>();
-
-        public List<sdof2d_rigidcollisionResponse> node1Response { get; private set; } = new List<sdof2d_rigidcollisionResponse>();
-
-        public List<sdof2d_rigidcollisionResponse> node2Response { get; private set; } = new List<sdof2d_rigidcollisionResponse>();
+        public sdof2d_rigidcollisionSolverResult SimulationResults { get; private set; } = new sdof2d_rigidcollisionSolverResult();
 
 
 
@@ -198,7 +211,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             });
 
             // Solve eigenproblem (1 DOF)
-            ModalProperties modalProps = SolveGeneralizedEigenproblem(M, K, "Contact", 1);
+            ModalProperties modalProps = SolveGeneralizedEigenproblem(M, K, "Contact", 2);
 
             // Calculate damping
             CalculateDamping(modalProps, M, K, new double[] { dampratio_zeta, dampratio_zeta });
@@ -439,25 +452,32 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         // =====================================================================
 
         /// <summary>
-        /// Get modal response at time t
+        /// Get Response at time t
         /// </summary>
-        public (Vector<double> q, Vector<double> q_dot, Vector<double> q_ddot)
-            GetModalResponse(double t, Vector<double> q0, Vector<double> q0_dot,
+        private (Vector<double> u, Vector<double> v, Vector<double> a)
+            GetResponse(double t, Vector<double> u_at_event, Vector<double> v_at_event,
                             ModalProperties modalProps)
         {
-            int n = q0.Count;
-            var q = Vector<double>.Build.Dense(n);
-            var q_dot = Vector<double>.Build.Dense(n);
-            var q_ddot = Vector<double>.Build.Dense(n);
+
+            // Transform the initial conditions to modal coordinates
+            Vector<double> q0 = modalProps.ModeShapeMatrix.Transpose() * u_at_event;
+            Vector<double> q0_dot = modalProps.ModeShapeMatrix.Transpose() * v_at_event;
 
             // External force in modal coordinates
-            var Fext = Vector<double>.Build.Dense(new double[] {
+            Vector<double> Fext = Vector<double>.Build.Dense(new double[] {
                 mass_m1 * const_accla0,
                 mass_m2 * const_accla0
             });
 
             // Transform force to modal coordinates: P_modal = Φᵀ * F_ext
-            var P_modal = modalProps.ModeShapeMatrix.Transpose() * Fext;
+            Vector<double> P_modal = modalProps.ModeShapeMatrix.Transpose() * Fext;
+
+
+            int n = q0.Count;
+            Vector<double> q = Vector<double>.Build.Dense(n);
+            Vector<double> q_dot = Vector<double>.Build.Dense(n);
+            Vector<double> q_ddot = Vector<double>.Build.Dense(n);
+
 
             for (int i = 0; i < n; i++)
             {
@@ -467,7 +487,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
                 double Km = modalProps.ModalStiffness[i, i];
 
                 // Handle rigid body mode (ω = 0)
-                if (ω < 1e-12)
+                if (ω < 1e-8)
                 {
                     // For rigid body mode, the effective acceleration is the modal force / modal mass
                     double acc_m = P_modal[i] / Mm;
@@ -496,29 +516,126 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
 
             }
 
-            return (q, q_dot, q_ddot);
+            // Transform back to physical coordinates
+            Vector<double> u_at_t = modalProps.ModeShapeMatrix * q;
+            Vector<double> v_at_t = modalProps.ModeShapeMatrix * q_dot;
+            Vector<double> a_at_t = modalProps.ModeShapeMatrix * q_ddot;
+
+            return (u_at_t, v_at_t, a_at_t);
         }
+
+
+
+
+        private (double t_exact, Vector<double> u, Vector<double> v, Vector<double> a)
+            DetectPhaseTransition(double t_end, Vector<double> u_start, Vector<double> v_start,
+            double k1, double c1, ModalProperties modalProps)
+        {
+
+            double tau_low = 0.0;
+            double tau_high = t_end;
+
+            // Start with bisection to bracket the root
+            for (int i = 0; i < 5; ++i)
+            {
+
+                double tau_mid = 0.5 * (tau_low + tau_high);
+
+                (Vector<double> u_mid, Vector<double> v_mid, Vector<double> a_mid) = GetResponse(tau_mid, u_start, v_start, modalProps);
+                (Vector<double> u_low, Vector<double> v_low, Vector<double> a_low) = GetResponse(tau_low, u_start, v_start, modalProps);
+
+                double contact_force_mid = (k1 * u_mid[0]) + (c1 * v_mid[0]);
+                double contact_force_low = (k1 * u_low[0]) + (c1 * v_low[0]);
+
+                if ((contact_force_mid * contact_force_low) < 0.0)
+                {
+                    tau_high = tau_mid;
+                }
+                else
+                {
+                    tau_low = tau_mid;
+                }
+            }
+
+
+            // Switch to Newton-Raphson for refinement
+            double tau = 0.5 * (tau_low + tau_high);
+            Vector<double> u_tau = null, v_tau = null, a_tau = null;
+
+            for (int i = 0; i < 20; ++i)
+            {
+                (u_tau, v_tau, a_tau) = GetResponse(tau, u_start, v_start, modalProps);
+                double contact_force_tau = (k1 * u_tau[0]) + (c1 * v_tau[0]);
+                double derivative_contact_force_tau = (k1 * v_tau[0]) + (c1 * a_tau[0]);
+
+                if(Math.Abs(contact_force_tau) < 1e-10)
+                {
+                    return (tau, u_tau, v_tau, a_tau);
+                }
+
+                tau = tau - (contact_force_tau / derivative_contact_force_tau);
+
+                // Keep within bracket
+                tau = Math.Max(tau_low, Math.Min(tau_high, tau));
+            }
+
+            return (tau, u_tau, v_tau, a_tau);
+
+        }
+
 
 
 
         public void solve_sdof2_rigidcollision(double total_simulation_time, double max_time_increment,
             double u1_inl, double u2_inl, double v1_inl, double v2_inl)
         {
+            // Clear previous results
+            SimulationResults.TimePoints.Clear();
+            SimulationResults.TimeContactBand.Clear();
+            SimulationResults.ContactForce.Clear();
+            SimulationResults.Node1Response.Clear();
+            SimulationResults.Node2Response.Clear();
 
             // Physical initial conditions
-            Vector<double> physical_u0 = Vector<double>.Build.Dense(new double[] { u1_inl, u2_inl });
-            Vector<double> physical_v0 = Vector<double>.Build.Dense(new double[] { v1_inl, v2_inl });
+            Vector<double> u_at_event = Vector<double>.Build.Dense(new double[] { u1_inl, u2_inl });
+            Vector<double> v_at_event = Vector<double>.Build.Dense(new double[] { v1_inl, v2_inl });
+
+            Vector<double> u_at_t = u_at_event.Clone();
+            Vector<double> v_at_t = v_at_event.Clone();
+            Vector<double> a_at_t = Vector<double>.Build.Dense(2);
 
             double time_t = 0.0;
             double t_event = 0.0;
-            double t_tau = 0.0;
-
-            // Initialize the event tracker
-            bool IsContact = false;
-            double contact_force = 0.0;
 
 
+            // Calculate the contact force at time step 0
+            double c1 = 2.0 * dampratio_zeta * Math.Sqrt(stiffness_k1 * mass_m1); // Damping coefficient for mass 1
+            double contact_force_at_t = (stiffness_k1 * u_at_event[0]) + (c1 * v_at_event[0]);
 
+            // Determine initial phase
+            bool IsContact = contact_force_at_t <= 0.0;
+
+
+            if (!IsContact)
+            {
+
+                // Calculate the acceleration at time step 0 for flight phase
+                (_, _, a_at_t) = GetResponse(time_t, u_at_event, v_at_event, _flightModalProperties);
+            }
+            else
+            {
+                // Calculate the acceleration at time step 0 for contact phase
+                (_, _, a_at_t) = GetResponse(time_t, u_at_event, v_at_event, _contactModalProperties);
+
+                SimulationResults.TimeContactBand.Add(time_t);
+            }
+
+
+            // Add the first increment to the Response lists 
+            StoreResults(time_t, u_at_t, v_at_t, a_at_t, contact_force_at_t);
+
+
+            // Main simulation loop
             while (time_t < total_simulation_time)
             {
                 // Time increment for the next iteration
@@ -530,51 +647,139 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
                 }
 
                 // Event span
-                t_tau = time_t - t_event;
+                double t_tau = time_t - t_event;
 
 
                 if (!IsContact)
                 {
                     // Flight phase
-
-
+                    (u_at_t, v_at_t, a_at_t) = GetResponse(t_tau, u_at_event, v_at_event, _flightModalProperties);
                 }
                 else
                 {
                     // Contact phase
- 
+                    (u_at_t, v_at_t, a_at_t) = GetResponse(t_tau, u_at_event, v_at_event, _contactModalProperties);
                 }
 
-                // store the time
-
+                // Calculate the contact force at the current time step
+                contact_force_at_t = (stiffness_k1 * u_at_t[0]) + (c1 * v_at_t[0]);
 
 
                 // Transition check: Determine if the system transitions from flight to contact or vice versa
-
-
-                if (contact_force > 0.0 && IsContact == true)
+                if (contact_force_at_t > 0.0 && IsContact == true)
                 {
                     IsContact = false;
 
-               
+                    // Get previous state
+                    Vector<double> u_prev = Vector<double>.Build.DenseOfArray(new double[]
+                    {
+                SimulationResults.Node1Response.Last().displacement,
+                SimulationResults.Node2Response.Last().displacement
+                    });
+
+                    Vector<double> v_prev = Vector<double>.Build.DenseOfArray(new double[]
+                    {
+                SimulationResults.Node1Response.Last().velocity,
+                SimulationResults.Node2Response.Last().velocity
+                    });
+
+
+                    double tau_exact = 0.0;
+
+                    (tau_exact, u_at_t, v_at_t, a_at_t) = DetectPhaseTransition(max_time_increment, u_prev, v_prev, 
+                        stiffness_k1, c1, _contactModalProperties);
+
+                    // Recalculate the contact force at the exact transition time
+                    contact_force_at_t = (stiffness_k1 * u_at_t[0]) + (c1 * v_at_t[0]);
+
+
+                    // Adjust the time and event time based on the exact transition time
+                    time_t = (time_t - max_time_increment) + tau_exact;
+
+                    // Update state to transition point
+                    t_event = time_t;
+                    u_at_event = u_at_t.Clone();
+                    v_at_event = v_at_t.Clone();
+
+                    SimulationResults.TimeContactBand.Add(time_t);
 
                 }
-                else if (contact_force <= 0.0 && IsContact == false)
+                else if (contact_force_at_t <= 0.0 && IsContact == false)
                 {
                     IsContact = true;
 
-                   
+                    // Get previous state
+                    Vector<double> u_prev = Vector<double>.Build.DenseOfArray(new double[]
+                    {
+                SimulationResults.Node1Response.Last().displacement,
+                SimulationResults.Node2Response.Last().displacement
+                    });
+                    Vector<double> v_prev = Vector<double>.Build.DenseOfArray(new double[]
+                    {
+                SimulationResults.Node1Response.Last().velocity,
+                SimulationResults.Node2Response.Last().velocity
+                    });
+
+
+                    double tau_exact = 0.0;
+
+                    (tau_exact, u_at_t, v_at_t, a_at_t) = DetectPhaseTransition(max_time_increment, u_prev, v_prev, 
+                        stiffness_k1, c1, _flightModalProperties);
+
+                    // Recalculate the contact force at the exact transition time
+                    contact_force_at_t = (stiffness_k1 * u_at_t[0]) + (c1 * v_at_t[0]);
+
+
+                    // Adjust the time and event time based on the exact transition time
+                    time_t = (time_t - max_time_increment) + tau_exact;
+
+                    // Update state to transition point
+                    t_event = time_t;
+                    u_at_event = u_at_t.Clone();
+                    v_at_event = v_at_t.Clone();
+
+                    SimulationResults.TimeContactBand.Add(time_t);
+
                 }
 
 
                 // Add the computed response to the list
+                StoreResults(time_t, u_at_t, v_at_t, a_at_t, contact_force_at_t);
 
 
             }
 
 
+            // Ensure the last contact band time is recorded if the simulation ends in contact
+            if ((SimulationResults.TimeContactBand.Count % 2) != 0)
+            {
+                SimulationResults.TimeContactBand.Add(time_t);
+            }
+
+
         }
 
+
+        private void StoreResults(double time, Vector<double> u, Vector<double> v,
+                         Vector<double> a, double contactForce)
+        {
+            SimulationResults.TimePoints.Add(time);
+            SimulationResults.ContactForce.Add(contactForce);
+
+            SimulationResults.Node1Response.Add(new sdof2d_rigidcollisionResponse
+            {
+                displacement = u[0],
+                velocity = v[0],
+                acceleration = a[0]
+            });
+
+            SimulationResults.Node2Response.Add(new sdof2d_rigidcollisionResponse
+            {
+                displacement = u[1],
+                velocity = v[1],
+                acceleration = a[1]
+            });
+        }
 
 
         //

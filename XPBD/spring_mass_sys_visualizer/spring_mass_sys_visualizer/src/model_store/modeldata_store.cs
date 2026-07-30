@@ -40,9 +40,7 @@ namespace spring_mass_sys_visualizer.src.model_store
         // Model object visualization
         private Shader modelShader;
 
-        // System control
-        private system1_store system1;
-
+        private system_wrapper_store systemWrapper;
 
         bool isModelGeomInitialized = false;
 
@@ -76,7 +74,8 @@ namespace spring_mass_sys_visualizer.src.model_store
 
             graphic_events_control.update_drawing_area_size(graphic_events_control.window_width, graphic_events_control.window_height);
 
-            system1 = new system1_store();
+            systemWrapper = new system_wrapper_store(system_wrapper_store.SystemType.System2Dof);
+
 
             gvariables_static.animate_play = true;
             gvariables_static.animate_pause = false;
@@ -96,8 +95,7 @@ namespace spring_mass_sys_visualizer.src.model_store
 
             modelShader.Bind();
 
-
-            system1.paint_system1(ref modelShader);
+            systemWrapper.paintSystem(ref modelShader);
 
 
             modelShader.UnBind();
@@ -110,7 +108,7 @@ namespace spring_mass_sys_visualizer.src.model_store
             {
                 elapsedRealTime = (_stopwatch.Elapsed.TotalSeconds * gvariables_static.animation_speed);
 
-                if(elapsedRealTime > system1.total_simulation_time)
+                if(elapsedRealTime > systemWrapper.total_simulation_time)
                 {
                     // Reset the animation stopwatch and time step
                     _stopwatch.Reset();
@@ -122,7 +120,7 @@ namespace spring_mass_sys_visualizer.src.model_store
                 if (!isModelGeomInitialized)
                     return;
 
-                system1.update_system1(elapsedRealTime);
+                systemWrapper.update_system(elapsedRealTime);
             }
         }
 
@@ -158,7 +156,7 @@ namespace spring_mass_sys_visualizer.src.model_store
             elapsedRealTime = 0.0;
             _state = AnimationState.Stopped;
 
-            system1.update_system1(elapsedRealTime);
+            systemWrapper.update_system(elapsedRealTime);
 
         }
 

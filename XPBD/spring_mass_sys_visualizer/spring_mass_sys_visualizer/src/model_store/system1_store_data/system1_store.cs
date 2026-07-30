@@ -20,7 +20,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
     public class system1_store
     {
 
-        // rectangle data
+        // Geometry data
         private rectangle_store rigidboundary;
         private circle_store pointmass;
         private spring_store springs;
@@ -32,12 +32,13 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
         private double max_velocity;
         private double max_acceleration;
 
-        public double total_simulation_time = 20.0; // seconds
+        private double total_simulation_time = 20.0; // seconds
 
 
-        public system1_store()
+        public system1_store(double total_simulation_time)
         {
             // Initialize the system1_store
+            this.total_simulation_time = total_simulation_time;
 
             // Initialize the rectangle data
             rigidboundary = new rectangle_store();
@@ -65,7 +66,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
             double mass_m0 = 0.001; // 1 KG
             double nat_freq = 4.0; // Hz
             double stiff_k = mass_m0 * (nat_freq * 2.0 * Math.PI) * (nat_freq * 2.0 * Math.PI);
-            double gravity_g = -9806.65 * 1.0; // m/s^2
+            double gravity_g = -9806.65 * 1.0; // mm/s^2
 
             // Initialize the rigid collision solver
             springsolver = new sdof1d_rigidcollisionSolver(mass_m: mass_m0,

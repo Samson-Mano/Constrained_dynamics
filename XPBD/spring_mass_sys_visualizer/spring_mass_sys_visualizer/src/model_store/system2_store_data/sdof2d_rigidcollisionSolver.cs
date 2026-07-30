@@ -120,7 +120,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
 
 
         public sdof2d_rigidcollisionSolverResult SimulationResults { get; private set; } = new sdof2d_rigidcollisionSolverResult();
-
+        private double total_time;
 
 
         public sdof2d_rigidcollisionSolver(double mass_m1, double stiffness_k1,
@@ -307,7 +307,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
                     ModeShapeMatrix = massNormalizedVectors,
                     ModeShapeTransformationMatrix = modeShapeMatrix.Transpose() * M,
                     ModalMass = modalMassMatrix,
-                    ModalStiffness = modalStiffnessMatrix
+                    ModalStiffness = modalStiffnessMatrix,
+                    ModalDampingRatios = new double[n] // Placeholder, will be calculated later
                 };
 
                 return modalProps;
@@ -589,6 +590,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         public void solve_sdof2_rigidcollision(double total_simulation_time, double max_time_increment,
             double u1_inl, double u2_inl, double v1_inl, double v2_inl)
         {
+            this.total_time = total_simulation_time;
+
+
             // Clear previous results
             SimulationResults.TimePoints.Clear();
             SimulationResults.TimeContactBand.Clear();
@@ -780,6 +784,100 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
                 acceleration = a[1]
             });
         }
+
+
+        public List<sdof2d_rigidcollisionResponse> getResult_at_timet(double time_t)
+        {
+            /// <summary>
+            /// Retrieves the response at a specific time from the response list.
+            /// </summary>
+
+            if (time_t >  total_time || time_t < 0.0)
+            {
+                // Reset the time to 0.0 if it exceeds the total simulation time
+                time_t = 0.0;
+            }
+
+
+            // Find the two points to interpolate between
+            int lowerIndex = 0;
+            int upperIndex = SimulationResults.TimePoints.Count - 1;
+            int midIndex;
+
+            // Binary search to find the interval containing time_t
+            while (upperIndex - lowerIndex > 1)
+            {
+                midIndex = (lowerIndex + upperIndex) / 2;
+
+                if (SimulationResults.TimePoints[midIndex] <= time_t)
+                    lowerIndex = midIndex;
+                else
+                    upperIndex = midIndex;
+            }
+
+
+
+            // Get the two bounding points
+            var lowerTimePoint = SimulationResults.TimePoints[lowerIndex];
+            var upperTimePoint = SimulationResults.TimePoints[upperIndex];
+
+            // Calculate interpolation factor (0.0 to 1.0)
+            double dt = upperTimePoint - lowerTimePoint;
+
+            List<sdof2d_rigidcollisionResponse> respList = new List<sdof2d_rigidcollisionResponse>();
+
+            // Handle case where time difference is zero (shouldn't happen with proper data)
+            if (dt < 1e-12)
+            {
+
+                respList.Add(SimulationResults.Node1Response[lowerIndex]);
+                respList.Add(SimulationResults.Node2Response[lowerIndex]);
+
+                return respList;
+            }
+
+
+            // Clamp interpolation factor to [0,1] for safety
+            double param_t = (time_t - lowerTimePoint) / dt;
+            param_t = Math.Max(0.0, Math.Min(1.0, param_t));
+
+
+            // Get the lower and upper response points
+            var lowerRespPoint1 = SimulationResults.Node1Response[lowerIndex];
+            var upperRespPoint1 = SimulationResults.Node1Response[upperIndex];
+
+            // Linear interpolation
+            sdof2d_rigidcollisionResponse interpolatedNode1 = new sdof2d_rigidcollisionResponse
+            {
+                // time = time_t,
+                displacement = lowerRespPoint1.displacement + (upperRespPoint1.displacement - lowerRespPoint1.displacement) * param_t,
+                velocity = lowerRespPoint1.velocity + (upperRespPoint1.velocity - lowerRespPoint1.velocity) * param_t,
+                acceleration = lowerRespPoint1.acceleration + (upperRespPoint1.acceleration - lowerRespPoint1.acceleration) * param_t
+                // contact_force = lowerRespPoint.contact_force + (upperRespPoint.contact_force - lowerRespPoint.contact_force) * param_t
+            };
+
+            // Get the lower and upper response points
+            var lowerRespPoint2 = SimulationResults.Node2Response[lowerIndex];
+            var upperRespPoint2 = SimulationResults.Node2Response[upperIndex];
+
+            // Linear interpolation
+            sdof2d_rigidcollisionResponse interpolatedNode2 = new sdof2d_rigidcollisionResponse
+            {
+                // time = time_t,
+                displacement = lowerRespPoint2.displacement + (upperRespPoint2.displacement - lowerRespPoint2.displacement) * param_t,
+                velocity = lowerRespPoint2.velocity + (upperRespPoint2.velocity - lowerRespPoint2.velocity) * param_t,
+                acceleration = lowerRespPoint2.acceleration + (upperRespPoint2.acceleration - lowerRespPoint2.acceleration) * param_t
+                // contact_force = lowerRespPoint.contact_force + (upperRespPoint.contact_force - lowerRespPoint.contact_force) * param_t
+            };
+
+
+
+            respList.Add(interpolatedNode1);
+            respList.Add(interpolatedNode2);
+
+            return respList;
+        }
+
 
 
         //

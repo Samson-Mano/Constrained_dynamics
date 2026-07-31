@@ -23,9 +23,10 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         private rectangle_store rigidboundary;
         private circle_store pointmass;
         private spring_store springs;
-        private vector_store vectors;
+        private vector_store velocity_vectors;
+        private vector_store acceleration_vectors;
 
-        private sdof2d_rigidcollisionSolver twodof_springsolver;
+        private twodof1d_rigidcollisionSolver twodof_springsolver;
 
 
         private double max_displacement;
@@ -70,22 +71,22 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             double mass_m1 = 0.001; // 1 KG
             double mass_m2 = 0.002; // 2 KG
 
-            double stiff_k1 = 0.5; // Stiffness k1 spring
-            double stiff_k2 = 0.2; // Stiffness k2 spring
+            double stiff_k1 = 1.8; // Stiffness k1 spring
+            double stiff_k2 = 0.15; // Stiffness k2 spring
 
-            double dampratio_zeta = 0.015; // Damping ratio
+            double dampratio_zeta = 0.02; // Damping ratio
 
             double gravity_g = -9806.65 * 1.0; // mm/s^2
 
             // Initialize the two DOF rigid collision solver
-            twodof_springsolver = new sdof2d_rigidcollisionSolver(mass_m1: mass_m1,
+            twodof_springsolver = new twodof1d_rigidcollisionSolver(mass_m1: mass_m1,
                 stiffness_k1: stiff_k1, mass_m2: mass_m2,
                 stiffness_k2: stiff_k2, dampratio_zeta: dampratio_zeta,
                 const_accla0: gravity_g);
 
 
             twodof_springsolver.solve_sdof2_rigidcollision(total_simulation_time: total_simulation_time,
-                max_time_increment: 0.01, u1_inl: 100.0, u2_inl: 100.0, v1_inl: 0.0, v2_inl: 0.0);
+                max_time_increment: 0.001, u1_inl: 200.0, u2_inl: 200.0, v1_inl: 0.0, v2_inl: 0.0);
 
 
             // Find the maximum displacement for the vector representation
@@ -113,21 +114,23 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
 
 
             // Initialize the vector data
-            vectors = new vector_store();
+            velocity_vectors = new vector_store();
+            acceleration_vectors = new vector_store();
 
             // Add a simple vector to the model
-           vectors.AddVector(0, 0.0f, 0.0f, 10.0f, 10.0f); // Velocity vector for mass M1
-           vectors.AddVector(1, 10.0f, 10.0f, -40.0f, 30.0f); // Acceleration vector for mass M1
+           velocity_vectors.AddVector(0, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M1
+           acceleration_vectors.AddVector(0, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M1
 
-           vectors.AddVector(2, 0.0f, 0.0f, 10.0f, 10.0f); // Velocity vector for mass M2
-           vectors.AddVector(3, 10.0f, 10.0f, -40.0f, 30.0f); // Acceleration vector for mass M2
+           velocity_vectors.AddVector(1, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M2
+           acceleration_vectors.AddVector(1, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M2
 
 
             // Step 3: Set the buffer data for the geometry data
             rigidboundary.SetBufferData();
             pointmass.SetBufferData();
             springs.SetBufferData();
-            vectors.SetBufferData();
+            velocity_vectors.SetBufferData();
+            acceleration_vectors.SetBufferData();
 
 
         }
@@ -145,9 +148,12 @@ gvariables_static.geom_transparency * 0.8f);
             Vector4 circleColor = new Vector4(gvariables_static.ColorUtils.get_CircleColor(),
                 gvariables_static.geom_transparency * 0.8f);
 
-            Vector4 vectorColor = new Vector4(gvariables_static.ColorUtils.get_VectorColor(),
+            Vector4 velocityVectorColor = new Vector4(gvariables_static.ColorUtils.get_VelocityVectorColor(),
                 gvariables_static.geom_transparency * 0.8f);
 
+            Vector4 accelerationVectorColor = new Vector4(gvariables_static.ColorUtils.get_AccelerationVectorColor(),
+                gvariables_static.geom_transparency * 0.8f);
+    
 
             modelShader.SetVector4("vertexColor", rectColor);
             rigidboundary.PaintRectangles();
@@ -160,77 +166,102 @@ gvariables_static.geom_transparency * 0.8f);
             springs.PaintSprings();
 
 
-            modelShader.SetVector4("vertexColor", vectorColor);
-            vectors.PaintVectors();
+            modelShader.SetVector4("vertexColor", velocityVectorColor);
+            velocity_vectors.PaintVectors();
+
+            modelShader.SetVector4("vertexColor", accelerationVectorColor);
+            acceleration_vectors.PaintVectors();
+
             GL.LineWidth(1.0f);
         }
 
         public void update_system2(double elapsedRealTime)
         {
             // Get the response for the current time from the simulation results
-            List<sdof2d_rigidcollisionResponse> respList = twodof_springsolver.getResult_at_timet(elapsedRealTime);
+            (List<twodof1d_rigidcollisionResponse> respList, double contactForce) = twodof_springsolver.getResult_at_timet(elapsedRealTime);
 
             float scale_value = 30.0f; // Scale for visualization   
 
             // node 1 Response
-            sdof2d_rigidcollisionResponse node1Resp = respList[0];
+            twodof1d_rigidcollisionResponse node1Resp = respList[0];
 
             double node1_displ_at_t = node1Resp.displacement;
 
             // Map to [-1, 1] range for OpenGL coordinates
-            // double mapped_displacement = 2.0 * ((displ_at_t - min_displacement) / (max_displacement - min_displacement)) - 1.0;
             double node1_mapped_displacement = node1_displ_at_t / Math.Abs(max_displacement); // Scale down for visualization
 
 
             pointmass.updateCirclePosition(1, 0.0f, -(40.0f / 3.0f) + (float)node1_mapped_displacement * scale_value); // Scale for visualization
-            // pointmass.updateCirclePosition(1, 0.0f, (float)node1_mapped_displacement * scale_value); // Scale for visualization
-
-            //if (response_at_t.contact_force > 0.0f)
-            //{
-            //    // No contact
-            //    springs.updateSpringPosition(0, 0.0f, (float)mapped_displacement * scale_value, 0.0f,
-            //    ((float)mapped_displacement * scale_value) - 45.0f);
-
-            //}
-            //else
-            //{
-            //    // Contact with the rigid boundary
-            //    // You can implement any additional logic here if needed
-
-            //    springs.updateSpringPosition(0, 0.0f, (float)mapped_displacement * scale_value, 0.0f, -45.0f);
-
-            //}
-
-            //// Update the vector position based on velocity and acceleration
-            //double mapped_velocity = response_at_t.velocity / Math.Abs(max_velocity);
-            //double mapped_acceleration = response_at_t.acceleration / Math.Abs(max_acceleration);
-
-            //vectors.updateVectorPosition(0, 10.0f, (float)mapped_displacement * scale_value,
-            //    0.0f, scale_value * (float)mapped_velocity);
-
-            //vectors.updateVectorPosition(1, 20.0f, (float)mapped_displacement * scale_value,
-            //    0.0f, scale_value * (float)mapped_acceleration);
-
-
-
-
 
 
             // node 2 Response
-            sdof2d_rigidcollisionResponse node2Resp = respList[1];
+            twodof1d_rigidcollisionResponse node2Resp = respList[1];
 
             double node2_displ_at_t = node2Resp.displacement;
 
             // Map to [-1, 1] range for OpenGL coordinates
-            // double mapped_displacement = 2.0 * ((displ_at_t - min_displacement) / (max_displacement - min_displacement)) - 1.0;
             double node2_mapped_displacement = node2_displ_at_t / Math.Abs(max_displacement); // Scale down for visualization
 
 
             pointmass.updateCirclePosition(2, 0.0f, (40.0f / 3.0f) + (float)node2_mapped_displacement * scale_value); // Scale for visualization
 
 
+            // Update the reference circle with index 0
+            pointmass.updateCirclePosition(0, 0.0f, (float)node1_mapped_displacement * scale_value);
+
 
             pointmass.UpdateVertexBuffers();
+
+            //_______________________________________________________________________________________________________________________________
+
+            springs.updateSpringPosition(0, 0.0f, (40.0f / 3.0f) + (float)node2_mapped_displacement * scale_value, 0.0f,
+                -(40.0f / 3.0f) + (float)node1_mapped_displacement * scale_value);
+
+            if (contactForce > 0.0f)
+            {
+                // No contact
+                springs.updateSpringPosition(1, 0.0f, -(40.0f / 3.0f) + (float)node1_mapped_displacement * scale_value, 0.0f,
+                             -45.0f + ((float)node1_mapped_displacement * scale_value)); 
+
+            }
+            else
+            {
+                // Contact with the rigid boundary
+                // You can implement any additional logic here if needed
+                springs.updateSpringPosition(1, 0.0f, -(40.0f / 3.0f) + (float)node1_mapped_displacement * scale_value, 0.0f,
+              -45.0f);
+
+            }
+
+            springs.UpdateVertexBuffers();
+
+
+            //_______________________________________________________________________________________________________________________________
+
+            // Update the vector position based on velocity and acceleration
+            double node1_mapped_velocity = node1Resp.velocity / Math.Abs(max_velocity);
+            double node1_mapped_acceleration = node1Resp.acceleration / Math.Abs(max_acceleration);
+
+            velocity_vectors.updateVectorPosition(0, 10.0f, -(40.0f / 3.0f) + (float)node1_mapped_displacement * scale_value,
+                    0.0f, scale_value * (float)node1_mapped_velocity);
+
+            acceleration_vectors.updateVectorPosition(0, 20.0f, -(40.0f / 3.0f) + (float)node1_mapped_displacement * scale_value,
+                0.0f, scale_value * (float)node1_mapped_acceleration);
+
+
+
+            double node2_mapped_velocity = node2Resp.velocity / Math.Abs(max_velocity);
+            double node2_mapped_acceleration = node2Resp.acceleration / Math.Abs(max_acceleration);
+
+            velocity_vectors.updateVectorPosition(1, 10.0f, (40.0f / 3.0f) + (float)node2_mapped_displacement * scale_value,
+                    0.0f, scale_value * (float)node2_mapped_velocity);
+
+            acceleration_vectors.updateVectorPosition(1, 20.0f, (40.0f / 3.0f) + (float)node2_mapped_displacement * scale_value,
+                0.0f, scale_value * (float)node2_mapped_acceleration);
+
+
+            velocity_vectors.UpdateVertexBuffers();
+            acceleration_vectors.UpdateVertexBuffers();
 
 
         }

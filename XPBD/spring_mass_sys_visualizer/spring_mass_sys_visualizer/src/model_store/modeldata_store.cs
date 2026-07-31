@@ -6,7 +6,7 @@ using OpenTK.Input;
 using spring_mass_sys_visualizer.src.events_handler;
 using spring_mass_sys_visualizer.src.global_variables;
 using spring_mass_sys_visualizer.src.model_store.geom_objects;
-using spring_mass_sys_visualizer.src.model_store.system1_store_data;
+using spring_mass_sys_visualizer.src.model_store.system2_store_data;
 using spring_mass_sys_visualizer.src.opentk_control.shader_compiler;
 using System;
 using System.Collections.Generic;
@@ -74,7 +74,7 @@ namespace spring_mass_sys_visualizer.src.model_store
 
             graphic_events_control.update_drawing_area_size(graphic_events_control.window_width, graphic_events_control.window_height);
 
-            systemWrapper = new system_wrapper_store(system_wrapper_store.SystemType.System2Dof);
+            systemWrapper = new system_wrapper_store(system_wrapper_store.SystemType.SystemMDOF);
 
 
             gvariables_static.animate_play = true;

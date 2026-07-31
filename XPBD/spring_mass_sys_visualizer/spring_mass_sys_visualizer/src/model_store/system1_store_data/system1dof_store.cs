@@ -17,14 +17,15 @@ using OpenTK.Input;
 
 namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
 {
-    public class system1_store
+    public class system1dof_store
     {
 
         // Geometry data
         private rectangle_store rigidboundary;
         private circle_store pointmass;
         private spring_store springs;
-        private vector_store vectors;
+        private vector_store velocity_vectors;
+        private vector_store acceleration_vectors;
 
         private sdof1d_rigidcollisionSolver springsolver;
 
@@ -35,7 +36,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
         private double total_simulation_time = 20.0; // seconds
 
 
-        public system1_store(double total_simulation_time)
+        public system1dof_store(double total_simulation_time)
         {
             // Initialize the system1_store
             this.total_simulation_time = total_simulation_time;
@@ -91,18 +92,21 @@ namespace spring_mass_sys_visualizer.src.model_store.system1_store_data
 
 
             // Initialize the vector data
-            vectors = new vector_store();
+            velocity_vectors = new vector_store();
+            acceleration_vectors = new vector_store();
 
             // Add a simple vector to the model
-            vectors.AddVector(0, 0.0f, 0.0f, 10.0f, 10.0f);
-            vectors.AddVector(1, 10.0f, 10.0f, -40.0f, 30.0f);
+            velocity_vectors.AddVector(0, 0.0f, 10.0f, 0.0f, 10.0f);
+
+            acceleration_vectors.AddVector(0, 0.0f, 20.0f, 0.0f, 30.0f);
 
 
             // Step 3: Set the buffer data for the geometry data
             rigidboundary.SetBufferData();
             pointmass.SetBufferData();
             springs.SetBufferData();
-            vectors.SetBufferData();
+            velocity_vectors.SetBufferData();
+            acceleration_vectors.SetBufferData();
 
 
         }
@@ -120,9 +124,11 @@ gvariables_static.geom_transparency * 0.8f);
             Vector4 circleColor = new Vector4(gvariables_static.ColorUtils.get_CircleColor(),
                 gvariables_static.geom_transparency * 0.8f);
 
-            Vector4 vectorColor = new Vector4(gvariables_static.ColorUtils.get_VectorColor(),
+            Vector4 velocity_vectorColor = new Vector4(gvariables_static.ColorUtils.get_VelocityVectorColor(),
                 gvariables_static.geom_transparency * 0.8f);
 
+            Vector4 acceleration_vectorColor = new Vector4(gvariables_static.ColorUtils.get_AccelerationVectorColor(),
+                gvariables_static.geom_transparency * 0.8f);
 
             modelShader.SetVector4("vertexColor", rectColor);
             rigidboundary.PaintRectangles();
@@ -135,8 +141,12 @@ gvariables_static.geom_transparency * 0.8f);
             springs.PaintSprings();
 
 
-            modelShader.SetVector4("vertexColor", vectorColor);
-            vectors.PaintVectors();
+            modelShader.SetVector4("vertexColor", velocity_vectorColor);
+            velocity_vectors.PaintVectors();
+
+            modelShader.SetVector4("vertexColor", acceleration_vectorColor);
+            acceleration_vectors.PaintVectors();
+
             GL.LineWidth(1.0f);
 
 
@@ -180,17 +190,18 @@ gvariables_static.geom_transparency * 0.8f);
             double mapped_velocity = response_at_t.velocity / Math.Abs(max_velocity);
             double mapped_acceleration = response_at_t.acceleration / Math.Abs(max_acceleration);
 
-            vectors.updateVectorPosition(0, 10.0f, (float)mapped_displacement * scale_value, 
+            velocity_vectors.updateVectorPosition(0, 10.0f, (float)mapped_displacement * scale_value, 
                 0.0f, scale_value * (float)mapped_velocity);
 
-            vectors.updateVectorPosition(1, 20.0f, (float)mapped_displacement * scale_value,
+            acceleration_vectors.updateVectorPosition(0, 20.0f, (float)mapped_displacement * scale_value,
                 0.0f, scale_value * (float)mapped_acceleration);
 
 
 
             pointmass.UpdateVertexBuffers();
             springs.UpdateVertexBuffers();
-            vectors.UpdateVertexBuffers();
+            velocity_vectors.UpdateVertexBuffers();
+            acceleration_vectors.UpdateVertexBuffers();
 
         }
 

@@ -81,9 +81,11 @@
     <Compile Include="src\model_store\geom_objects\vector_store.cs" />
     <Compile Include="src\model_store\modeldata_store.cs" />
     <Compile Include="src\model_store\system1_store_data\sdof1d_rigidcollisionSolver.cs" />
-    <Compile Include="src\model_store\system1_store_data\system1_store.cs" />
-    <Compile Include="src\model_store\system2_store_data\sdof2d_rigidcollisionSolver.cs" />
+    <Compile Include="src\model_store\system1_store_data\system1dof_store.cs" />
+    <Compile Include="src\model_store\system2_store_data\twodof1d_rigidcollisionSolver.cs" />
     <Compile Include="src\model_store\system2_store_data\system2dof_store.cs" />
+    <Compile Include="src\model_store\system3_mdof_data\mdof1d_rigidcollisionSolver.cs" />
+    <Compile Include="src\model_store\system3_mdof_data\system_mdof_store.cs" />
     <Compile Include="src\model_store\system_wrapper_store.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\GDIFontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />

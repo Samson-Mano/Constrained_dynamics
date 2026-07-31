@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
 {
 
-    public struct sdof2d_rigidcollisionResponse
+    public struct twodof1d_rigidcollisionResponse
     {
         public double displacement;
         public double velocity;
@@ -24,20 +24,20 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
 
     }
 
-    public class sdof2d_rigidcollisionSolverResult
+    public class twodof1d_rigidcollisionSolverResult    
     {
         public List<double> TimePoints { get; set; }
         public List<double> ContactForce { get; set; }
         public List<double> TimeContactBand { get; set; }
-        public List<sdof2d_rigidcollisionResponse> Node1Response { get; set; }
-        public List<sdof2d_rigidcollisionResponse> Node2Response { get; set; }
-        public sdof2d_rigidcollisionSolverResult()
+        public List<twodof1d_rigidcollisionResponse> Node1Response { get; set; }
+        public List<twodof1d_rigidcollisionResponse> Node2Response { get; set; }
+        public twodof1d_rigidcollisionSolverResult()
         {
             TimePoints = new List<double>();
             ContactForce = new List<double>();
             TimeContactBand = new List<double>();
-            Node1Response = new List<sdof2d_rigidcollisionResponse>();
-            Node2Response = new List<sdof2d_rigidcollisionResponse>();
+            Node1Response = new List<twodof1d_rigidcollisionResponse>();
+            Node2Response = new List<twodof1d_rigidcollisionResponse>();
         }
     }
 
@@ -99,7 +99,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
     //  ------> +ive direction       
 
 
-    public class sdof2d_rigidcollisionSolver
+    public class twodof1d_rigidcollisionSolver
     {
 
 
@@ -119,11 +119,11 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         private ModalProperties _contactModalProperties;  // 2 DOF - The system is fully connected with both springs k1 and k2 active
 
 
-        public sdof2d_rigidcollisionSolverResult SimulationResults { get; private set; } = new sdof2d_rigidcollisionSolverResult();
+        public twodof1d_rigidcollisionSolverResult SimulationResults { get; private set; } = new twodof1d_rigidcollisionSolverResult();
         private double total_time;
 
 
-        public sdof2d_rigidcollisionSolver(double mass_m1, double stiffness_k1,
+        public twodof1d_rigidcollisionSolver(double mass_m1, double stiffness_k1,
             double mass_m2, double stiffness_k2,
             double dampratio_zeta, double const_accla0)
         {
@@ -460,9 +460,11 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
                             ModalProperties modalProps)
         {
 
-            // Transform the initial conditions to modal coordinates
-            Vector<double> q0 = modalProps.ModeShapeMatrix.Transpose() * u_at_event;
-            Vector<double> q0_dot = modalProps.ModeShapeMatrix.Transpose() * v_at_event;
+            // Transform physical to modal coordinates using Φᵀ * M * u
+            // For mass-normalized eigenvectors: q = Φᵀ * M * u
+            Vector<double> q0 = modalProps.ModeShapeMatrix.Transpose() * modalProps.MassMatrix * u_at_event;
+            Vector<double> q0_dot = modalProps.ModeShapeMatrix.Transpose() * modalProps.MassMatrix * v_at_event;
+
 
             // External force in modal coordinates
             Vector<double> Fext = Vector<double>.Build.Dense(new double[] {
@@ -484,8 +486,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             {
                 double ω = modalProps.AngularNaturalFrequencies[i];
                 double ζ = modalProps.ModalDampingRatios[i];
-                double Mm = modalProps.ModalMass[i, i];
-                double Km = modalProps.ModalStiffness[i, i];
+                double Mm = modalProps.ModalMass[i, i]; // Should be 1.0 for mass-normalized
+                double Km = modalProps.ModalStiffness[i, i]; // Should be ω²
 
                 // Handle rigid body mode (ω = 0)
                 if (ω < 1e-8)
@@ -770,14 +772,14 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             SimulationResults.TimePoints.Add(time);
             SimulationResults.ContactForce.Add(contactForce);
 
-            SimulationResults.Node1Response.Add(new sdof2d_rigidcollisionResponse
+            SimulationResults.Node1Response.Add(new twodof1d_rigidcollisionResponse
             {
                 displacement = u[0],
                 velocity = v[0],
                 acceleration = a[0]
             });
 
-            SimulationResults.Node2Response.Add(new sdof2d_rigidcollisionResponse
+            SimulationResults.Node2Response.Add(new twodof1d_rigidcollisionResponse
             {
                 displacement = u[1],
                 velocity = v[1],
@@ -786,7 +788,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         }
 
 
-        public List<sdof2d_rigidcollisionResponse> getResult_at_timet(double time_t)
+        public (List<twodof1d_rigidcollisionResponse> respList, double contact_force) getResult_at_timet(double time_t)
         {
             /// <summary>
             /// Retrieves the response at a specific time from the response list.
@@ -824,7 +826,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             // Calculate interpolation factor (0.0 to 1.0)
             double dt = upperTimePoint - lowerTimePoint;
 
-            List<sdof2d_rigidcollisionResponse> respList = new List<sdof2d_rigidcollisionResponse>();
+            List<twodof1d_rigidcollisionResponse> respList = new List<twodof1d_rigidcollisionResponse>();
 
             // Handle case where time difference is zero (shouldn't happen with proper data)
             if (dt < 1e-12)
@@ -833,7 +835,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
                 respList.Add(SimulationResults.Node1Response[lowerIndex]);
                 respList.Add(SimulationResults.Node2Response[lowerIndex]);
 
-                return respList;
+                return (respList, SimulationResults.ContactForce[lowerIndex]);
             }
 
 
@@ -847,7 +849,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             var upperRespPoint1 = SimulationResults.Node1Response[upperIndex];
 
             // Linear interpolation
-            sdof2d_rigidcollisionResponse interpolatedNode1 = new sdof2d_rigidcollisionResponse
+            twodof1d_rigidcollisionResponse interpolatedNode1 = new twodof1d_rigidcollisionResponse
             {
                 // time = time_t,
                 displacement = lowerRespPoint1.displacement + (upperRespPoint1.displacement - lowerRespPoint1.displacement) * param_t,
@@ -861,7 +863,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             var upperRespPoint2 = SimulationResults.Node2Response[upperIndex];
 
             // Linear interpolation
-            sdof2d_rigidcollisionResponse interpolatedNode2 = new sdof2d_rigidcollisionResponse
+            twodof1d_rigidcollisionResponse interpolatedNode2 = new twodof1d_rigidcollisionResponse
             {
                 // time = time_t,
                 displacement = lowerRespPoint2.displacement + (upperRespPoint2.displacement - lowerRespPoint2.displacement) * param_t,
@@ -871,11 +873,15 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             };
 
 
+            // Contact force interpolation
+            double lowerContactForce = SimulationResults.ContactForce[lowerIndex];
+            double upperContactForce = SimulationResults.ContactForce[upperIndex];
+            double interpolatedContactForce = lowerContactForce + (upperContactForce - lowerContactForce) * param_t;
 
             respList.Add(interpolatedNode1);
             respList.Add(interpolatedNode2);
 
-            return respList;
+            return (respList, interpolatedContactForce);
         }
 
 

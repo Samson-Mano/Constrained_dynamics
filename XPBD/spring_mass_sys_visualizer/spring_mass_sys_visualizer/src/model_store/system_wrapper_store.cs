@@ -1,5 +1,6 @@
 ﻿using spring_mass_sys_visualizer.src.model_store.system1_store_data;
 using spring_mass_sys_visualizer.src.model_store.system2_store_data;
+using spring_mass_sys_visualizer.src.model_store.system3_mdof_data;
 using spring_mass_sys_visualizer.src.opentk_control.shader_compiler;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,15 @@ namespace spring_mass_sys_visualizer.src.model_store
         public enum SystemType
         {
             System1Dof,
-            System2Dof
+            System2Dof,
+            SystemMDOF,
         }
 
 
         // System control
-        private system1_store system1;
+        private system1dof_store system1;
         private system2dof_store system2;
+        private system_mdof_store systemMDOF;
 
         private SystemType currentSystemType = SystemType.System1Dof;
 
@@ -35,14 +38,18 @@ namespace spring_mass_sys_visualizer.src.model_store
             if (currentSystemType == SystemType.System1Dof)
             {
                 // system 1dof
-                system1 = new system1_store(total_simulation_time);
+                system1 = new system1dof_store(total_simulation_time);
             }
             else if (currentSystemType == SystemType.System2Dof)
             {
                 // system 2dof
                 system2 = new system2dof_store(total_simulation_time);
             }
-
+            else if (currentSystemType == SystemType.SystemMDOF)
+            {
+                // system MDOF
+                systemMDOF = new system_mdof_store(total_simulation_time);
+            }
 
         }
 
@@ -60,6 +67,12 @@ namespace spring_mass_sys_visualizer.src.model_store
                 // Implement the painting logic for system 2dof here
                 system2.paint_system2(ref modelShader);
             }
+            else if (currentSystemType == SystemType.SystemMDOF)
+            {
+                // Paint system MDOF
+                // Implement the painting logic for system MDOF here
+                systemMDOF.paint_system3(ref modelShader);
+            }
         }
 
 
@@ -72,6 +85,10 @@ namespace spring_mass_sys_visualizer.src.model_store
             else if (currentSystemType == SystemType.System2Dof)
             {
                 system2.update_system2(elapsedRealTime);
+            }
+            else if (currentSystemType == SystemType.SystemMDOF)
+            {
+                systemMDOF.update_system3(elapsedRealTime);
             }
         }
 

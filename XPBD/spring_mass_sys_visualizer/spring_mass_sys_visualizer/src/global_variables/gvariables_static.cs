@@ -87,12 +87,20 @@ namespace spring_mass_sys_visualizer.src.global_variables
                 return new Vector3(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
             }
             
-            public static Vector3 get_VectorColor()
+            public static Vector3 get_VelocityVectorColor()
             {
                 Color color = Color.Blue;
 
                 return new Vector3(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
             }   
+
+            public static Vector3 get_AccelerationVectorColor()
+            {
+                Color color = Color.Red;
+
+                return new Vector3(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f);
+            }
+
 
             public static Vector3 get_WireframeColor()
             {

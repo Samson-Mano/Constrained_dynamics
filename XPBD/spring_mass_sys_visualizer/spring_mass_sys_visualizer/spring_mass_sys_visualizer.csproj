@@ -128,6 +128,8 @@
   <ItemGroup>
     <Content Include="logo_ico_png.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="src\model_store\system4_sdofflexible\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

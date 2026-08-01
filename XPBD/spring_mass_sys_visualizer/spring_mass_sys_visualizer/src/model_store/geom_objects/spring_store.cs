@@ -27,7 +27,7 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
         public float spring_current_length = -1.0f;
 
         public const int turn_count = 11;
-        const float spring_element_width = 3.0f;
+        // const float spring_element_width = 3.0f;
 
 
         public spring_data(int spring_id, float x_start, float y_start, float x_end, float y_end)
@@ -90,7 +90,7 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
                 float param_t = i / (float)(turn_count);
 
                 float pt_x = (param_t * spring_current_length * factor2);
-                float pt_y = spring_element_width * ((i % 2 == 0) ? 1 : -1);
+                float pt_y = gvariables_static.spring_element_width * ((i % 2 == 0) ? 1 : -1);
 
                 Vector2 curr_pt = new Vector2(((l_cos * pt_x) + (m_sin * pt_y)),
                     ((-1.0f * m_sin * pt_x) + (l_cos * pt_y)));

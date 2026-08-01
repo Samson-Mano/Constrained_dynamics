@@ -56,12 +56,17 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             // Add a simple circle to the model
             pointmass.AddCircle(0, 45.0f, 0.0f, 0.0f, false);
 
-            pointmass.AddCircle(1, 5.0f, 0.0f, 0.0f - (40.0f / 3.0f), true); // Mass M1
-            pointmass.AddCircle(2, 5.0f, 0.0f, 0.0f + (40.0f / 3.0f), true); // Mass M2
+            float point_mass_radius = 3.0f; // Radius of the point mass circles
+
+            pointmass.AddCircle(1, point_mass_radius, 0.0f, 0.0f - (40.0f / 3.0f), true); // Mass M1
+            pointmass.AddCircle(2, point_mass_radius, 0.0f, 0.0f + (40.0f / 3.0f), true); // Mass M2
 
 
             // Initialize the spring data
             springs = new spring_store();
+
+            // Set the spring width for visualization
+            gvariables_static.spring_element_width = 2.0f;
 
             // Add a simple spring to the model
             springs.AddSpring(0, 0.0f, 0.0f - (40.0f / 3.0f), 0.0f, -45.0f); // Spring between mass M1 and the rigid boundary
@@ -69,12 +74,12 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
 
             // Example model
             double mass_m1 = 0.001; // 1 KG
-            double mass_m2 = 0.002; // 2 KG
+            double mass_m2 = 0.001; // 2 KG
 
-            double stiff_k1 = 1.8; // Stiffness k1 spring
+            double stiff_k1 = 0.3; // Stiffness k1 spring
             double stiff_k2 = 0.15; // Stiffness k2 spring
 
-            double dampratio_zeta = 0.02; // Damping ratio
+            double dampratio_zeta = 0.00; // Damping ratio
 
             double gravity_g = -9806.65 * 1.0; // mm/s^2
 

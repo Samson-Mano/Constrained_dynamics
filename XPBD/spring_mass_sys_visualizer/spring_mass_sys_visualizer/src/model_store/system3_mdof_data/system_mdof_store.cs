@@ -40,7 +40,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system3_mdof_data
 
         private double total_simulation_time = 20.0; // seconds
 
-        int num_DOF = 4; // Number of degrees of freedom
+        int num_DOF = 10; // Number of degrees of freedom
 
         public system_mdof_store(double total_simulation_time)
         {
@@ -77,10 +77,12 @@ namespace spring_mass_sys_visualizer.src.model_store.system3_mdof_data
             pointmass.AddCircle(0, 45.0f, 0.0f, 0.0f, false);
 
             int ptmass_id = 1;
+            float ptmass_radius = 2.0f;
+
 
             foreach (float location in default_ptmass_location)
             {
-                pointmass.AddCircle(ptmass_id, 5.0f, 0.0f, location, true);
+                pointmass.AddCircle(ptmass_id, ptmass_radius, 0.0f, location, true);
                 ptmass_id++;
             }
 
@@ -89,6 +91,87 @@ namespace spring_mass_sys_visualizer.src.model_store.system3_mdof_data
 
             // Initialize the spring data
             springs = new spring_store();
+            gvariables_static.spring_element_width = 1.5f; // Set the spring element width to 2.0f
+
+            // First spring connecting the reference circle to the first point mass
+            // Final spring connecting the last point mass to the reference circle
+            springs.AddSpring(0, 0.0f, -45.0f, 0.0f, default_ptmass_location[0]);
+
+
+            for (int i = 1; i < default_ptmass_location.Count; i++)
+            {
+                float start_x = 0.0f;
+                float start_y = default_ptmass_location[i - 1];
+                float end_x = 0.0f;
+                float end_y = default_ptmass_location[i];
+                springs.AddSpring(i, start_x, start_y, end_x, end_y);
+            }
+
+
+
+
+
+
+            // Example model
+            double mass_m = 0.001; // 1 KG
+            double stiff_k = 1.5; // Stiffness k1 spring
+            double dampratio_zeta = 0.0; // Damping ratio
+            double gravity_g = -9806.65 * 0.1; // mm/s^2
+
+            List<double> mass_list = new List<double>();
+            List<double> stiff_list = new List<double>();
+
+
+            for (int i = 0; i < num_DOF; i++)
+            {
+                mass_list.Add(mass_m);
+                stiff_list.Add(stiff_k);
+            }
+
+
+            // Initialize the multi degree of freedom spring solver
+            mdof_springsolver = new mdof1d_rigidcollisionSolver(num_DOF, mass_list, stiff_list, dampratio_zeta, gravity_g);
+
+
+            double inl_displ = 500.0; // Initial displacement in mm
+            double inl_vel = -000.0; // Initial velocity in mm/s
+
+            // Set the initial conditions for the multi degree of freedom spring solver
+            List<double> inl_dipl_list = new List<double>();
+            List<double> inl_vel_list = new List<double>();
+
+            for (int i = 0; i < num_DOF; i++)
+            {
+                inl_dipl_list.Add(inl_displ);
+                inl_vel_list.Add(inl_vel);
+            }
+
+
+            mdof_springsolver.solve_multidof_rigidcollision(total_simulation_time, max_time_increment: 0.01,
+                inl_dipl_list, inl_vel_list);
+
+
+
+            // Find the maximum displacement for the vector representation
+            max_displacement = double.MinValue;
+            max_velocity = double.MinValue;
+            max_acceleration = double.MinValue;
+
+            int time_points = mdof_springsolver.SimulationResults.TimePoints.Count;
+
+            for (int i = 0; i < time_points; i++)
+            {
+
+                (List<double> displacement_at_t, List<double> velocity_at_t, List<double> acceleration_at_t)
+                    = mdof_springsolver.SimulationResults.GetStateListAtTimeIndex(i);
+
+                for (int j = 0; j < num_DOF; j++)
+                {
+                    max_displacement = Math.Max(max_displacement, Math.Abs(displacement_at_t[j]));
+                    max_velocity = Math.Max(max_velocity, Math.Abs(velocity_at_t[j]));
+                    max_acceleration = Math.Max(max_acceleration, Math.Abs(acceleration_at_t[j]));
+                }
+            }
 
 
 
@@ -104,6 +187,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system3_mdof_data
             // Step 3: Set the buffer data for the geometry data
             rigidboundary.SetBufferData();
             pointmass.SetBufferData();
+            springs.SetBufferData();
 
         }
 
@@ -134,9 +218,9 @@ gvariables_static.geom_transparency * 0.8f);
             modelShader.SetVector4("vertexColor", circleColor);
             pointmass.PaintCircles();
 
-            //modelShader.SetVector4("vertexColor", springColor);
-            //GL.LineWidth(3.0f);
-            //springs.PaintSprings();
+            modelShader.SetVector4("vertexColor", springColor);
+            GL.LineWidth(3.0f);
+            springs.PaintSprings();
 
 
             //modelShader.SetVector4("vertexColor", velocityVectorColor);
@@ -151,6 +235,78 @@ gvariables_static.geom_transparency * 0.8f);
 
         public void update_system3(double elapsedRealTime)
         {
+            float scale_value = 80.0f; // Scale for visualization   
+
+            (List<double> Displacement, List<double> Velocity, List<double> Acceleration, double contact_force)
+                = mdof_springsolver.getResult_at_timet(elapsedRealTime);
+
+
+            int ptmass_id = 1;
+
+            foreach (float location in default_ptmass_location)
+            {
+
+                double node_mapped_displacement = Displacement[ptmass_id - 1] / Math.Abs(max_displacement); // Scale down for visualization
+                float scaled_displacement = (float)(node_mapped_displacement * scale_value);
+
+                pointmass.updateCirclePosition(ptmass_id, 0.0f, location + scaled_displacement);
+                ptmass_id++;
+            }
+
+            // update the reference circle with Radius 45.0f to the model
+            pointmass.updateCirclePosition(0, 0.0f, 0.0f + (float)(Displacement[0] / Math.Abs(max_displacement)) * scale_value);
+
+
+            pointmass.UpdateVertexBuffers();
+
+
+            if (contact_force > 0.0f)
+            {
+                // No contact
+                double startnode_mapped_displacement = Displacement[0] / Math.Abs(max_displacement); // Scale down for visualization
+                float scaled_startnodedisplacement = (float)(startnode_mapped_displacement * scale_value);
+
+                springs.updateSpringPosition(0, 0.0f,
+                             -45.0f + scaled_startnodedisplacement, 0.0f, default_ptmass_location[0] + scaled_startnodedisplacement);
+
+            }
+            else
+            {
+                // Contact with the rigid boundary
+                // You can implement any additional logic here if needed
+                double startnode_mapped_displacement = Displacement[0] / Math.Abs(max_displacement); // Scale down for visualization
+                float scaled_startnodedisplacement = (float)(startnode_mapped_displacement * scale_value);
+
+
+                springs.updateSpringPosition(0, 0.0f, -45.0f, 0.0f, default_ptmass_location[0] + scaled_startnodedisplacement);
+
+            }
+
+
+
+            for (int i = 1; i < default_ptmass_location.Count; i++)
+            {
+                double startnode_mapped_displacement = Displacement[i - 1] / Math.Abs(max_displacement); // Scale down for visualization
+                float scaled_startnodedisplacement = (float)(startnode_mapped_displacement * scale_value);
+
+                float start_x = 0.0f;
+                float start_y = default_ptmass_location[i - 1] + scaled_startnodedisplacement;
+
+
+                double endnode_mapped_displacement = Displacement[i] / Math.Abs(max_displacement); // Scale down for visualization
+                float scaled_endnodedisplacement = (float)(endnode_mapped_displacement * scale_value);
+
+                float end_x = 0.0f;
+                float end_y = default_ptmass_location[i] + scaled_endnodedisplacement;
+
+                springs.updateSpringPosition(i, start_x, start_y, end_x, end_y);
+            }
+
+            springs.UpdateVertexBuffers();
+
+
+
+
 
         }
 

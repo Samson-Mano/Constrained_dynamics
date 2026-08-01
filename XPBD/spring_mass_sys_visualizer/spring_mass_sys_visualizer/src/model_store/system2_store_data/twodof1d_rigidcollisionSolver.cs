@@ -210,7 +210,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
                 { -stiffness_k2, stiffness_k2 }
             });
 
-            // Solve eigenproblem (1 DOF)
+            // Solve eigenproblem (2 DOF)
             ModalProperties modalProps = SolveGeneralizedEigenproblem(M, K, "Contact", 2);
 
             // Calculate damping

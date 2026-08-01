@@ -139,6 +139,7 @@ namespace spring_mass_sys_visualizer.src.global_variables
 
         public static float geom_size = 0.0f;
 
+        public static float spring_element_width = 3.0f;
 
         public static float PointSize = 1.0f;
         public static float LineWidth = 1.0f;

@@ -86,6 +86,8 @@
     <Compile Include="src\model_store\system2_store_data\system2dof_store.cs" />
     <Compile Include="src\model_store\system3_mdof_data\mdof1d_rigidcollisionSolver.cs" />
     <Compile Include="src\model_store\system3_mdof_data\system_mdof_store.cs" />
+    <Compile Include="src\model_store\system4_sdofflexible\system_flexible_store.cs" />
+    <Compile Include="src\model_store\system4_sdofflexible\twodof_flexiblecollisionSolver.cs" />
     <Compile Include="src\model_store\system_wrapper_store.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\GDIFontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />
@@ -128,8 +130,6 @@
   <ItemGroup>
     <Content Include="logo_ico_png.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\model_store\system4_sdofflexible\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

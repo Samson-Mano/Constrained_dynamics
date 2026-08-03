@@ -25,8 +25,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system3_mdof_data
         private rectangle_store rigidboundary;
         private circle_store pointmass;
         private spring_store springs;
-        private vector_store velocity_vectors;
-        private vector_store acceleration_vectors;
+        // private vector_store velocity_vectors;
+        // private vector_store acceleration_vectors;
 
         private mdof1d_rigidcollisionSolver mdof_springsolver;
 
@@ -108,9 +108,27 @@ namespace spring_mass_sys_visualizer.src.model_store.system3_mdof_data
             }
 
 
+            performSolve();
+
+
+            // // Initialize the velocity vectors
+            // velocity_vectors = new vector_store();
+
+            // // Initialize the acceleration vectors
+            // acceleration_vectors = new vector_store();
 
 
 
+            // Step 3: Set the buffer data for the geometry data
+            rigidboundary.SetBufferData();
+            pointmass.SetBufferData();
+            springs.SetBufferData();
+
+        }
+
+
+        private void performSolve()
+        {
 
             // Example model
             double mass_m = 0.001; // 1 KG
@@ -176,20 +194,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system3_mdof_data
 
 
 
-            // Initialize the velocity vectors
-            velocity_vectors = new vector_store();
-
-            // Initialize the acceleration vectors
-            acceleration_vectors = new vector_store();
-
-
-
-            // Step 3: Set the buffer data for the geometry data
-            rigidboundary.SetBufferData();
-            pointmass.SetBufferData();
-            springs.SetBufferData();
-
         }
+
 
         public void paint_system3(ref Shader modelShader)
         {

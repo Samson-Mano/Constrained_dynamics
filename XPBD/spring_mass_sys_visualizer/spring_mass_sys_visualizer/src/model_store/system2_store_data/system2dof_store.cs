@@ -72,6 +72,36 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             springs.AddSpring(0, 0.0f, 0.0f - (40.0f / 3.0f), 0.0f, -45.0f); // Spring between mass M1 and the rigid boundary
             springs.AddSpring(1, 0.0f, 0.0f - (40.0f / 3.0f), 0.0f, 0.0f + (40.0f / 3.0f)); // Spring between mass M1 and mass M2
 
+           
+            PerformSolve(); // Perform the simulation to get the results
+
+
+            // Initialize the vector data
+            velocity_vectors = new vector_store();
+            acceleration_vectors = new vector_store();
+
+            // Add a simple vector to the model
+           velocity_vectors.AddVector(0, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M1
+           acceleration_vectors.AddVector(0, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M1
+
+           velocity_vectors.AddVector(1, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M2
+           acceleration_vectors.AddVector(1, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M2
+
+
+            // Step 3: Set the buffer data for the geometry data
+            rigidboundary.SetBufferData();
+            pointmass.SetBufferData();
+            springs.SetBufferData();
+            velocity_vectors.SetBufferData();
+            acceleration_vectors.SetBufferData();
+
+
+        }
+
+
+
+        private void PerformSolve()
+        {
             // Example model
             double mass_m1 = 0.001; // 1 KG
             double mass_m2 = 0.001; // 2 KG
@@ -116,29 +146,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
             }
 
 
-
-
-            // Initialize the vector data
-            velocity_vectors = new vector_store();
-            acceleration_vectors = new vector_store();
-
-            // Add a simple vector to the model
-           velocity_vectors.AddVector(0, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M1
-           acceleration_vectors.AddVector(0, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M1
-
-           velocity_vectors.AddVector(1, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M2
-           acceleration_vectors.AddVector(1, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M2
-
-
-            // Step 3: Set the buffer data for the geometry data
-            rigidboundary.SetBufferData();
-            pointmass.SetBufferData();
-            springs.SetBufferData();
-            velocity_vectors.SetBufferData();
-            acceleration_vectors.SetBufferData();
-
-
         }
+
+
 
         public void paint_system2(ref Shader modelShader)
         {

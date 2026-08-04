@@ -25,7 +25,7 @@ namespace spring_mass_sys_visualizer.src.model_store.geom_objects
         public float dir_y;
         public float vector_amplitude = -1.0f;
 
-        const float arrow_size = 0.8f; // Length of the arrowhead
+        const float arrow_size = 0.4f; // Length of the arrowhead
 
 
         public vector_data(int vector_id, float x_start, float y_start, float dir_x, float dir_y)

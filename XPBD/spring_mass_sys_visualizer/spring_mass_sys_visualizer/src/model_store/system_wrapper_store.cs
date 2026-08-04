@@ -31,7 +31,7 @@ namespace spring_mass_sys_visualizer.src.model_store
 
         private SystemType currentSystemType = SystemType.System1Dof;
 
-        public double total_simulation_time = 20.0; // seconds
+        public double total_simulation_time = 8.0; // seconds
 
         public system_wrapper_store(SystemType systemType)
         {

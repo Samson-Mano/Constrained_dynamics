@@ -39,7 +39,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
         private double max_acceleration;
 
 
-        private double total_simulation_time = 20.0; // seconds
+        private double total_simulation_time = -1.0f; // seconds
 
         public system_flexible_store(double total_simulation_time)
         {
@@ -72,14 +72,14 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
             // Initialize the circle (point mass) data
             pointmass = new circle_store();
 
-            // Add the reference circle with Radius 45.0f to the model
-            pointmass.AddCircle(0, 45.0f, 0.0f, 0.0f, false); // Reference circle
+            // // Add the reference circle with Radius 45.0f to the model
+            // pointmass.AddCircle(0, 45.0f, 0.0f, 0.0f, false); // Reference circle
 
             // First mass m1 (attached to the flexible boundary)
-            pointmass.AddCircle(1, 5.0f, 0.0f, default_ptmass_location[0], true); // First mass
+            pointmass.AddCircle(0, 5.0f, 0.0f, default_ptmass_location[0], true); // First mass
 
             // Second mass m2 (free floating mass)
-            pointmass.AddCircle(2, 5.0f, 0.0f, default_ptmass_location[1], true); // Second mass
+            pointmass.AddCircle(1, 5.0f, 0.0f, default_ptmass_location[1], true); // Second mass
 
 
 
@@ -97,10 +97,25 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
             PerformSolve();
 
 
+            // Initialize the vector data
+            velocity_vectors = new vector_store();
+            acceleration_vectors = new vector_store();
+
+            // Add a simple vector to the model
+            velocity_vectors.AddVector(0, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M1
+            acceleration_vectors.AddVector(0, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M1
+
+            velocity_vectors.AddVector(1, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M2
+            acceleration_vectors.AddVector(1, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M2
+
+
+
             // Set the buffer data for the geometry data
             rigidboundary.SetBufferData();
             pointmass.SetBufferData();
             springs.SetBufferData();
+            velocity_vectors.SetBufferData();
+            acceleration_vectors.SetBufferData();
 
         }
 
@@ -108,15 +123,19 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
         private void PerformSolve()
         {
             // Example model
-            double mass_m1 = 0.001; // 1 KG
-            double mass_m2 = 0.002; // 2 KG
+            double mass_m1 = 0.02; // 1 KG
+            double mass_m2 = 0.02; // 2 KG
 
-            double stiff_k1 = 1.4; // Stiffness k1 spring
-            double stiff_k2 = 1.8; // Stiffness k2 spring
+            double stiff_k1 = 0.018; // Stiffness k1 spring
+            double stiff_k2 = 0.18; // 0.045; // Stiffness k2 spring
 
-            double dampratio_zeta = 0.01; // Damping ratio
+            // Intersting case
+            // m1 = m2 = 0.02, k1 = 0.018, k2 = 0.18
 
-            double gravity_g = -9806.65 * 1.0; // mm/s^2
+
+            double dampratio_zeta = 0.0; // Damping ratio
+
+            double gravity_g = -9806.65 * 0.0; // mm/s^2
 
 
             twodofflexiblecollisionSolver = new twodof_flexiblecollisionSolver(mass_m1, mass_m2, stiff_k1, stiff_k2, dampratio_zeta, gravity_g);
@@ -127,7 +146,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
             double u2_inl = 1000.0;
 
             double v1_inl = 0.0; // Initial velocity for mass m1
-            double v2_inl = 0.0;
+            double v2_inl = -400.0;
 
 
             twodofflexiblecollisionSolver.solve_sdof_collision_with_flexible_boundary(total_simulation_time,
@@ -194,13 +213,14 @@ gvariables_static.geom_transparency * 0.8f);
             springs.PaintSprings();
 
 
-            //modelShader.SetVector4("vertexColor", velocityVectorColor);
-            //velocity_vectors.PaintVectors();
+            modelShader.SetVector4("vertexColor", velocityVectorColor);
+            velocity_vectors.PaintVectors();
 
-            //modelShader.SetVector4("vertexColor", accelerationVectorColor);
-            //acceleration_vectors.PaintVectors();
+            modelShader.SetVector4("vertexColor", accelerationVectorColor);
+            acceleration_vectors.PaintVectors();
 
-            //GL.LineWidth(1.0f);
+            GL.LineWidth(1.0f);
+
         }
 
 
@@ -219,8 +239,8 @@ gvariables_static.geom_transparency * 0.8f);
             double node1_mapped_displacement = node1_displ_at_t / Math.Abs(max_displacement); // Scale down for visualization
             double node2_mapped_displacement = node2_displ_at_t / Math.Abs(max_displacement); // Scale down for visualization
 
-            pointmass.updateCirclePosition(1, 0.0f, (float)(default_ptmass_location[0] + node1_mapped_displacement * scale_value));
-            pointmass.updateCirclePosition(2, 0.0f, (float)(default_ptmass_location[1] + node2_mapped_displacement * scale_value));
+            pointmass.updateCirclePosition(0, 0.0f, (float)(default_ptmass_location[0] + node1_mapped_displacement * scale_value));
+            pointmass.updateCirclePosition(1, 0.0f, (float)(default_ptmass_location[1] + 5.0f + node2_mapped_displacement * scale_value));
 
             pointmass.UpdateVertexBuffers();
 
@@ -230,10 +250,10 @@ gvariables_static.geom_transparency * 0.8f);
 
             if(contact_force > 0)
             {
-
+                // No Contact
                 springs.updateSpringPosition(1, 
-                    0.0f, (float)( - default_ptmass_location[1] + node2_mapped_displacement * scale_value),
-                    0.0f, (float)(default_ptmass_location[1] + node2_mapped_displacement * scale_value));
+                    0.0f, (float)( -default_ptmass_location[1] + 5.0f + node2_mapped_displacement * scale_value),
+                    0.0f, (float)(default_ptmass_location[1] + 5.0f + node2_mapped_displacement * scale_value));
 
             }
             else
@@ -241,12 +261,49 @@ gvariables_static.geom_transparency * 0.8f);
                 // Contact with the flexible boundary
                 // Mass m2 is in contact with the flexible boundary, so we need to update the spring position accordingly
                 springs.updateSpringPosition(1, 
-                    0.0f, (float)(default_ptmass_location[0] + 2.5f + node1_mapped_displacement * scale_value),
-                    0.0f, (float)(default_ptmass_location[1] + 0.0f + node2_mapped_displacement * scale_value));
+                    0.0f, (float)(default_ptmass_location[0] + 5.0f + node1_mapped_displacement * scale_value),
+                    0.0f, (float)(default_ptmass_location[1] + 5.0f + node2_mapped_displacement * scale_value));
 
             }
 
             springs.UpdateVertexBuffers();
+
+            //_______________________________________________________________________________________________________________________________
+
+            float vector_scale_value = 20.0f; // Scale for visualization   
+
+            double node1_velo_at_t = Velocity[0];
+            double node2_velo_at_t = Velocity[1];
+
+            double node1_accel_at_t = Acceleration[0];
+            double node2_accel_at_t = Acceleration[1];
+
+
+            // Update the vector position based on velocity and acceleration
+            double node1_mapped_velocity = node1_velo_at_t / Math.Abs(max_velocity);
+            double node1_mapped_acceleration = node1_accel_at_t / Math.Abs(max_acceleration);
+
+            velocity_vectors.updateVectorPosition(0, 10.0f, (float)(default_ptmass_location[0] + node1_mapped_displacement * scale_value),
+                    0.0f, vector_scale_value * (float)node1_mapped_velocity);
+
+            acceleration_vectors.updateVectorPosition(0, 20.0f, (float)(default_ptmass_location[0] + node1_mapped_displacement * scale_value),
+                0.0f, vector_scale_value * (float)node1_mapped_acceleration);
+
+
+
+            double node2_mapped_velocity = node2_velo_at_t / Math.Abs(max_velocity);
+            double node2_mapped_acceleration = node2_accel_at_t / Math.Abs(max_acceleration);
+
+            velocity_vectors.updateVectorPosition(1, 10.0f, (float)(default_ptmass_location[1] + 5.0f + node2_mapped_displacement * scale_value),
+                    0.0f, vector_scale_value * (float)node2_mapped_velocity);
+
+            acceleration_vectors.updateVectorPosition(1, 20.0f, (float)(default_ptmass_location[1] + 5.0f + node2_mapped_displacement * scale_value),
+                0.0f, vector_scale_value * (float)node2_mapped_acceleration);
+
+
+            velocity_vectors.UpdateVertexBuffers();
+            acceleration_vectors.UpdateVertexBuffers();
+
 
 
         }

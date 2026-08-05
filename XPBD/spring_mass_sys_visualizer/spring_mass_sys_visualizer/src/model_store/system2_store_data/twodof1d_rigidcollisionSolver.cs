@@ -52,7 +52,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         public double[] NaturalFrequenciesHz { get; set; }          // Hz
         public double[] Periods { get; set; }                       // seconds
         public Matrix<double> ModeShapeMatrix { get; set; }         // Mass-normalized
-        public Matrix<double> ModeShapeTransformationMatrix { get; set; } // ΦᵀM
+        public Matrix<double> ModeShapeInverseMatrix { get; set; } // ΦᵀM
         public Matrix<double> ModalMass { get; set; }
         public Matrix<double> ModalStiffness { get; set; }
         public Matrix<double> ModalDamping { get; set; }
@@ -305,7 +305,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
                     NaturalFrequenciesHz = sortedOmega.Select(w => w / (2 * Math.PI)).ToArray(),
                     Periods = sortedOmega.Select(w => w > 1e-12 ? 2 * Math.PI / w : double.PositiveInfinity).ToArray(),
                     ModeShapeMatrix = massNormalizedVectors,
-                    ModeShapeTransformationMatrix = modeShapeMatrix.Transpose() * M,
+                    ModeShapeInverseMatrix = modeShapeMatrix.Transpose() * M,
                     ModalMass = modalMassMatrix,
                     ModalStiffness = modalStiffnessMatrix,
                     ModalDampingRatios = new double[n] // Placeholder, will be calculated later
@@ -461,7 +461,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system2_store_data
         {
 
             // Transform physical to modal coordinates using Φᵀ * M * u
-            // For mass-normalized eigenvectors: q = Φᵀ * M * u
+            // For mass-normalized eigenvectors: q = Φ⁻¹ * u
             Vector<double> q0 = modalProps.ModeShapeMatrix.Transpose() * modalProps.MassMatrix * u_at_event;
             Vector<double> q0_dot = modalProps.ModeShapeMatrix.Transpose() * modalProps.MassMatrix * v_at_event;
 

@@ -123,19 +123,19 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
         private void PerformSolve()
         {
             // Example model
-            double mass_m1 = 0.02; // 1 KG
-            double mass_m2 = 0.02; // 2 KG
+            double mass_m1 = 0.001; // 1 KG
+            double mass_m2 = 0.002; // 2 KG
 
-            double stiff_k1 = 0.018; // Stiffness k1 spring
-            double stiff_k2 = 0.18; // 0.045; // Stiffness k2 spring
+            double stiff_k1 = 1.4; // Stiffness k1 spring
+            double stiff_k2 = 1.8; // 0.045; // Stiffness k2 spring
 
             // Intersting case
             // m1 = m2 = 0.02, k1 = 0.018, k2 = 0.18
 
 
-            double dampratio_zeta = 0.0; // Damping ratio
+            double dampratio_zeta = 0.01; // Damping ratio
 
-            double gravity_g = -9806.65 * 0.0; // mm/s^2
+            double gravity_g = -9806.65 * 1.0; // mm/s^2
 
 
             twodofflexiblecollisionSolver = new twodof_flexiblecollisionSolver(mass_m1, mass_m2, stiff_k1, stiff_k2, dampratio_zeta, gravity_g);
@@ -146,7 +146,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
             double u2_inl = 1000.0;
 
             double v1_inl = 0.0; // Initial velocity for mass m1
-            double v2_inl = -400.0;
+            double v2_inl = -400.0 * 0.0;
 
 
             twodofflexiblecollisionSolver.solve_sdof_collision_with_flexible_boundary(total_simulation_time,
@@ -173,7 +173,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
                 }
             }
 
-            max_displacement = u2_inl; // Use the initial displacement of mass m1 as the maximum displacement for scaling
+            // max_displacement = u2_inl; // Use the initial displacement of mass m1 as the maximum displacement for scaling
 
 
         }

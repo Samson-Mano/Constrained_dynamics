@@ -27,6 +27,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
         public multidof1d_rigidcollisionSolverResult SimulationResults { get; private set; }
         private double total_time;
 
+        private double Cc; // Damping coefficient for contact phase (Rayleigh damping)
 
         public twodof_flexiblecollisionSolver(double m1, double m2, double k1, double k2, double zeta, double accla0)
         {
@@ -167,7 +168,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
                     NaturalFrequenciesHz = sortedOmega.Select(w => w / (2 * Math.PI)).ToArray(),
                     Periods = sortedOmega.Select(w => w > 1e-12 ? 2 * Math.PI / w : double.PositiveInfinity).ToArray(),
                     ModeShapeMatrix = massNormalizedVectors,
-                    ModeShapeTransformationMatrix = modeShapeMatrix.Transpose() * M,
+                    ModeShapeInverseMatrix = modeShapeMatrix.Transpose() * M, // Φ⁻¹
                     ModalMass = modalMassMatrix,
                     ModalStiffness = modalStiffnessMatrix,
                     ModalDampingRatios = new double[n] // Placeholder, will be calculated later
@@ -214,14 +215,19 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
                 if (ω2 > ω1 && ω1 > 1e-12)
                 {
                     double alpha = 2 * (ζ1 * ω1 * ω2 * ω2 - ζ2 * ω1 * ω1 * ω2) / (ω2 * ω2 - ω1 * ω1);
-                    double beta = 2 * (ζ2 * ω2 - ζ1 * ω1) / (ω2 * ω2 - ω1 * ω1);
+                    double beta = 2 * ((ζ2 * ω2) - (ζ1 * ω1)) / ((ω2 * ω2) - (ω1 * ω1));
 
                     dampingMatrix = alpha * M + beta * K;
+
+                    // Contact damping coefficient for the contact phase (Rayleigh damping)
+                    this.Cc = beta * stiffness_k2; // Damping coefficient for mass 2 in contact phase
                 }
                 else
                 {
                     // If we can't fit Rayleigh damping, use mass-proportional
                     dampingMatrix = 2 * dampingRatios[0] * M;
+
+                    this.Cc = 2 * dampingRatios[0] * Math.Sqrt(stiffness_k2 * mass_m2); // Damping coefficient for mass 2 in contact phase
                 }
             }
             else if (n == 1)
@@ -231,6 +237,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
                 if (ω > 1e-12)
                 {
                     dampingMatrix[0, 0] = 2 * dampingRatios[0] * ω * M[0, 0];
+
+                    this.Cc = 2.0 * dampingRatios[0] * Math.Sqrt(stiffness_k2 * mass_m2); // Damping coefficient for mass 2 in contact phase
                 }
             }
 
@@ -339,9 +347,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
             ModalProperties modalProps = _contactModalProperties;
 
             // Transform physical to modal coordinates using Φᵀ * M * u
-            // For mass-normalized eigenvectors: q = Φᵀ * M * u
-            Vector<double> q0 = modalProps.ModeShapeMatrix.Transpose() * modalProps.MassMatrix * u_at_event;
-            Vector<double> q0_dot = modalProps.ModeShapeMatrix.Transpose() * modalProps.MassMatrix * v_at_event;
+            // For mass-normalized eigenvectors: q = Φ⁻¹ * u
+            Vector<double> q0 = modalProps.ModeShapeInverseMatrix * u_at_event;
+            Vector<double> q0_dot = modalProps.ModeShapeInverseMatrix * v_at_event;
 
 
             // External force in modal coordinates
@@ -548,7 +556,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
 
             // Calculate the contact force at time step 0
             double k2 = stiffness_k2;
-            double c2 = 2.0 * dampratio_zeta * Math.Sqrt(stiffness_k2 * mass_m2); // Damping coefficient for mass 2
+            double c2 = this.Cc; // Damping coefficient for mass 2 in contact phase
             double contact_force_at_t = (k2 * (u_at_event[1] - u_at_event[0])) + (c2 * (v_at_event[1] - v_at_event[0]));
 
             // Determine initial phase

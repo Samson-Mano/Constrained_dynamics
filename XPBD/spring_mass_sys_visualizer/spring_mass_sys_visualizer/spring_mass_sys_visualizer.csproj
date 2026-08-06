@@ -87,7 +87,9 @@
     <Compile Include="src\model_store\system3_mdof_data\mdof1d_rigidcollisionSolver.cs" />
     <Compile Include="src\model_store\system3_mdof_data\system_mdof_store.cs" />
     <Compile Include="src\model_store\system4_sdofflexible\system_flexible_store.cs" />
-    <Compile Include="src\model_store\system4_sdofflexible\twodof_flexiblecollisionSolver.cs" />
+    <Compile Include="src\model_store\system4_sdofflexible\sdof_flexiblecollisionSolver.cs" />
+    <Compile Include="src\model_store\system4_sdofflexible\sdof_flexiblecollisionSolver_num.cs" />
+    <Compile Include="src\model_store\system5_twodofflexible\system_twodofflexible_store.cs" />
     <Compile Include="src\model_store\system_wrapper_store.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\GDIFontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />

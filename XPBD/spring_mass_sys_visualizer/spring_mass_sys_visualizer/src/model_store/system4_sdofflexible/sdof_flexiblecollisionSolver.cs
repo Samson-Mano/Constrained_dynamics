@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
 {
-    public class twodof_flexiblecollisionSolver
+    public class sdof_flexiblecollisionSolver
     {
 
         private double mass_m1;
@@ -29,7 +29,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
 
         private double Cc; // Damping coefficient for contact phase (Rayleigh damping)
 
-        public twodof_flexiblecollisionSolver(double m1, double m2, double k1, double k2, double zeta, double accla0)
+        public sdof_flexiblecollisionSolver(double m1, double m2, double k1, double k2, double zeta, double accla0)
         {
             mass_m1 = m1;
             mass_m2 = m2;
@@ -686,7 +686,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system4_sdofflexible
             // Ensure the last contact band time is recorded if the simulation ends in contact
             if ((SimulationResults.TimeContactBand.Count % 2) != 0)
             {
-                SimulationResults.TimeContactBand.Add(time_t);
+                SimulationResults.TimeContactBand.Add(total_simulation_time);
             }
 
         }

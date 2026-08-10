@@ -338,6 +338,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             this.freeend_dof = freeend_mass.Count;
             this.total_dof = this.fixedend_dof + this.freeend_dof;
 
+            this.SimulationResults = new multidof1d_rigidcollisionSolverResult(this.total_dof);
+
+
             // Set the fixed end and free end mass and stiffness values
             this.fixedend_mass = fixedend_mass;
             this.fixedend_stiffness = fixedend_stiffness;
@@ -356,14 +359,19 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
                 M_fixed[i, i] = fixedend_mass[i];
             }
 
+            // Assemble stiffness matrix for chain of masses fixed to wall
+            // K[i,i] = k_i + k_{i+1} (with k_0 = 0 for first mass? Actually wall spring is k1)
+            // K[i,i-1] = K[i-1,i] = -k_i
 
-            K_fixed[0, 0] = fixedend_stiffness[0];
+            K_fixed[0, 0] = fixedend_stiffness[0]; // Spring to wall
 
             for (int i = 1; i < this.fixedend_dof; i++)
             {
-                K_fixed[i, i] = K_fixed[i - 1, i - 1] + fixedend_stiffness[i];
-                K_fixed[i, i - 1] = -fixedend_stiffness[i];
-                K_fixed[i - 1, i] = -fixedend_stiffness[i];
+                // Spring k_i connects mass i-1 to mass i
+                K_fixed[i - 1, i - 1] = K_fixed[i - 1, i - 1] + fixedend_stiffness[i]; // Add to left mass
+                K_fixed[i, i - 1] = -fixedend_stiffness[i];  // Off-diagonal
+                K_fixed[i - 1, i] = -fixedend_stiffness[i];  // Off-diagonal (symmetric)
+                K_fixed[i, i] = fixedend_stiffness[i]; // Right mass diagonal
             }
 
             fixedend_system = new SystemMatrixData(M_fixed, K_fixed, dampratio_zeta, const_accla0, false);
@@ -381,9 +389,10 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
             for (int i = 1; i < this.freeend_dof; i++)
             {
-                K_free[i, i] = K_free[i - 1, i - 1] + freeend_stiffness[i];
-                K_free[i, i - 1] = -freeend_stiffness[i];
-                K_free[i - 1, i] = -freeend_stiffness[i];
+                K_free[i - 1, i - 1] = K_free[i - 1, i - 1] + freeend_stiffness[i]; // Add to left mass
+                K_free[i, i - 1] = -freeend_stiffness[i];  // Off-diagonal
+                K_free[i - 1, i] = -freeend_stiffness[i];  // Off-diagonal (symmetric)
+                K_free[i, i] = freeend_stiffness[i]; // Right mass diagonal
             }
 
             freeend_system = new SystemMatrixData(M_free, K_free, dampratio_zeta, const_accla0, true);
@@ -409,25 +418,27 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
             for (int i = 1; i < this.fixedend_dof; i++)
             {
-                K_contact[i, i] = K_contact[i - 1, i - 1] + fixedend_stiffness[i];
-                K_contact[i, i - 1] = -fixedend_stiffness[i];
-                K_contact[i - 1, i] = -fixedend_stiffness[i];
+                K_contact[i - 1, i - 1] = K_contact[i - 1, i - 1] + fixedend_stiffness[i]; // Add to left mass
+                K_contact[i, i - 1] = -fixedend_stiffness[i];  // Off-diagonal
+                K_contact[i - 1, i] = -fixedend_stiffness[i];  // Off-diagonal (symmetric)
+                K_contact[i, i] = fixedend_stiffness[i]; // Right mass diagonal
             }
 
             for (int i = 0; i < this.freeend_dof; i++)
             {
                 int offset = i + this.fixedend_dof;
 
-                K_contact[offset, offset] = K_contact[offset - 1, offset - 1] + freeend_stiffness[i];
-                K_contact[offset, offset - 1] = -freeend_stiffness[i];
-                K_contact[offset - 1, offset] = -freeend_stiffness[i];
+                K_contact[offset - 1, offset - 1] = K_contact[offset - 1, offset - 1] + freeend_stiffness[i]; // Add to left mass
+                K_contact[offset, offset - 1] = -freeend_stiffness[i];  // Off-diagonal
+                K_contact[offset - 1, offset] = -freeend_stiffness[i];  // Off-diagonal (symmetric)
+                K_contact[offset, offset] = freeend_stiffness[i]; // Right mass diagonal
             }
 
             contact_system = new SystemMatrixData(M_contact, K_contact, dampratio_zeta, const_accla0, false);
 
             // First spring of free end system is the contact spring, so we can set the contact stiffness
             this.contact_stiffness = freeend_stiffness[0];
-            this.contact_damping = contact_system.GetDampingMatrix()[this.fixedend_dof, this.fixedend_dof + 1]; // beta * k_contact
+            this.contact_damping = contact_system.GetDampingMatrix()[this.fixedend_dof - 1, this.fixedend_dof]; // beta * k_contact
 
             //_____________________________________________________________________________________________________________________________
 
@@ -864,8 +875,6 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
             // Add the first increment to the Response lists 
             SimulationResults.AddResponse(time_t, u_at_t, v_at_t, a_at_t, contact_force_at_t);
-
-
 
 
             // Main simulation loop

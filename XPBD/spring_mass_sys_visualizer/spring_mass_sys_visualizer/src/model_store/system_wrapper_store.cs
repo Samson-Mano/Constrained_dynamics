@@ -2,6 +2,7 @@
 using spring_mass_sys_visualizer.src.model_store.system2_store_data;
 using spring_mass_sys_visualizer.src.model_store.system3_mdof_data;
 using spring_mass_sys_visualizer.src.model_store.system4_sdofflexible;
+using spring_mass_sys_visualizer.src.model_store.system5_twodofflexible;
 using spring_mass_sys_visualizer.src.opentk_control.shader_compiler;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace spring_mass_sys_visualizer.src.model_store
             System2Dof,
             SystemMDOF,
             SystemFlexible1Dof,
+            SystemFlexible1Dof_Rotated,
+            SystemFlexible2Dof,
         }
 
 
@@ -28,6 +31,8 @@ namespace spring_mass_sys_visualizer.src.model_store
         private system2dof_store system2;
         private system_mdof_store systemMDOF;
         private system_flexible_store systemFlexible1Dof;
+        private system_flexible_store_rotated systemFlexible1Dof_Rotated;
+        private system_twodofflexible_store system2DofFlexible;
 
         private SystemType currentSystemType = SystemType.System1Dof;
 
@@ -58,7 +63,16 @@ namespace spring_mass_sys_visualizer.src.model_store
                 // system Flexible 1dof
                 systemFlexible1Dof = new system_flexible_store(total_simulation_time);
             }
-
+            else if (currentSystemType == SystemType.SystemFlexible1Dof_Rotated)
+            {
+                // system Flexible 1dof rotated
+                systemFlexible1Dof_Rotated = new system_flexible_store_rotated(total_simulation_time);
+            }
+            else if (currentSystemType == SystemType.SystemFlexible2Dof)
+            {
+                // system Flexible 2dof
+                system2DofFlexible = new system_twodofflexible_store(total_simulation_time);
+            }
         }
 
         public void paintSystem(ref Shader modelShader)
@@ -87,6 +101,18 @@ namespace spring_mass_sys_visualizer.src.model_store
                 // Implement the painting logic for system Flexible 1dof here
                 systemFlexible1Dof.paint_sdof_flexibleboundary(ref modelShader);
             }
+            else if (currentSystemType == SystemType.SystemFlexible1Dof_Rotated)
+            {
+                // Paint system Flexible 1dof rotated
+                // Implement the painting logic for system Flexible 1dof rotated here
+                systemFlexible1Dof_Rotated.paint_sdof_flexibleboundary_rotated(ref modelShader);
+            }
+            else if (currentSystemType == SystemType.SystemFlexible2Dof)
+            {
+                // Paint system Flexible 2dof
+                // Implement the painting logic for system Flexible 2dof here
+                system2DofFlexible.paint_twodof_flexibleboundary(ref modelShader);
+            }
         }
 
 
@@ -108,6 +134,14 @@ namespace spring_mass_sys_visualizer.src.model_store
             else if (currentSystemType == SystemType.SystemFlexible1Dof)
             {
                 systemFlexible1Dof.update_sdof_flexibleboundary_collision(elapsedRealTime);
+            }
+            else if (currentSystemType == SystemType.SystemFlexible1Dof_Rotated)
+            {
+                systemFlexible1Dof_Rotated.update_sdof_flexibleboundary_collision_rotated(elapsedRealTime);
+            }
+            else if (currentSystemType == SystemType.SystemFlexible2Dof)
+            {
+                system2DofFlexible.update_twodof_flexibleboundary_collision(elapsedRealTime);
             }
         }
 

@@ -5,6 +5,7 @@ using spring_mass_sys_visualizer.src.model_store.system3_mdof_data;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -109,6 +110,12 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
                 // Modal stiffness vector
                 this.ModalStiffness = (modeShapeMatrix.Transpose() * K_matrix * modeShapeMatrix).Diagonal();
+
+                if(IsFreeSystem)
+                {
+                    this.ModalStiffness[0] = 0.0; // For free system, the first modal stiffness is zero (rigid body mode)
+                }
+
 
                 // Modal force vector
                 this.ModalForce = modeShapeMatrix.Transpose() * ForceVector;
@@ -491,6 +498,17 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             double omega_n = Math.Sqrt(stiff_k / mass_m); // ωn = √(k/m)
             double omega_D = omega_n * Math.Sqrt(1 - zeta * zeta); // ωD = ωn √(1 - ζ²)
 
+            if (omega_n < 1E-8)
+            {
+                // Rigid body mode (no stiffness)
+                double u = u_inl + (v_inl * time_t) + (0.5 * const_a0 * time_t * time_t);
+                double v = v_inl + (const_a0 * time_t);
+                double a = const_a0;
+
+                return (u, v, a);
+            }
+
+
 
             double exp_term = Math.Exp(-zeta * omega_n * time_t); // e^{‑ζ ωn τ}
             double cos_term = Math.Cos(omega_D * time_t); // cos(ωD t)
@@ -554,43 +572,65 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
 
             //______________________________________________________________________________________________________
-            // Fixed End Response (attached to wall) 
-            // Transform to modal coordinates  q = Φ⁻¹ * u
-
-            Vector<double> modal_u_fixedend_0 = fixedend_system.ModeShapeMatrixInverse * u_fixedend;
-            Vector<double> modal_v_fixedend_0 = fixedend_system.ModeShapeMatrixInverse * v_fixedend;
-            
-            // Compute modal responses
-            Vector<double> modal_u_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
-            Vector<double> modal_v_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
-            Vector<double> modal_a_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
-
-
-            for(int i = 0; i < this.fixedend_dof; i++)
-            {
-                double mass_m = fixedend_system.ModalMass[i];
-                double stiff_k = fixedend_system.ModalStiffness[i];
-                double zeta = fixedend_system.ModalZeta[i];
-                double const_a0 = fixedend_system.ModalForce[i];
-
-
-                (double u, double v, double a) = GetSDOFResponse(time_t, mass_m, stiff_k, 
-                    zeta, modal_u_fixedend_0[i], modal_v_fixedend_0[i], const_a0);
-
-
-                modal_u_fixedend_response[i] = u;
-                modal_v_fixedend_response[i] = v;
-                modal_a_fixedend_response[i] = a;
-            }
-
-            // Convert back to physical coordinates
             Vector<double> u_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
             Vector<double> v_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
             Vector<double> a_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
 
-            u_fixedend_response = fixedend_system.ModeShapeMatrix * modal_u_fixedend_response;
-            v_fixedend_response = fixedend_system.ModeShapeMatrix * modal_v_fixedend_response;
-            a_fixedend_response = fixedend_system.ModeShapeMatrix * modal_a_fixedend_response;
+
+            if (fixedend_dof > 1)
+            {
+                //______________________________________________________________________________________________________
+                // Fixed End Response (attached to wall) 
+                // Transform to modal coordinates  q = Φ⁻¹ * u
+
+                Vector<double> modal_u_fixedend_0 = fixedend_system.ModeShapeMatrixInverse * u_fixedend;
+                Vector<double> modal_v_fixedend_0 = fixedend_system.ModeShapeMatrixInverse * v_fixedend;
+
+                // Compute modal responses
+                Vector<double> modal_u_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
+                Vector<double> modal_v_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
+                Vector<double> modal_a_fixedend_response = Vector<double>.Build.Dense(this.fixedend_dof);
+
+
+                for (int i = 0; i < this.fixedend_dof; i++)
+                {
+                    double mass_m = fixedend_system.ModalMass[i];
+                    double stiff_k = fixedend_system.ModalStiffness[i];
+                    double zeta = fixedend_system.ModalZeta[i];
+                    double const_a0 = fixedend_system.ModalForce[i];
+
+
+                    (double u, double v, double a) = GetSDOFResponse(time_t, mass_m, stiff_k,
+                        zeta, modal_u_fixedend_0[i], modal_v_fixedend_0[i], const_a0);
+
+
+                    modal_u_fixedend_response[i] = u;
+                    modal_v_fixedend_response[i] = v;
+                    modal_a_fixedend_response[i] = a;
+                }
+
+                // Convert back to physical coordinates
+
+                u_fixedend_response = fixedend_system.ModeShapeMatrix * modal_u_fixedend_response;
+                v_fixedend_response = fixedend_system.ModeShapeMatrix * modal_v_fixedend_response;
+                a_fixedend_response = fixedend_system.ModeShapeMatrix * modal_a_fixedend_response;
+            }
+            else
+            {
+                // Single DOF fixed end
+                double mass_m = fixedend_system.ModalMass[0];
+                double stiff_k = fixedend_system.ModalStiffness[0];
+                double zeta = fixedend_system.ModalZeta[0];
+                double effective_Accl_i = fixedend_system.ModalForce[0] / mass_m;
+
+
+                (double u, double v, double a) = GetSDOFResponse(time_t, mass_m, stiff_k,
+                    zeta, u_fixedend[0], v_fixedend[0], effective_Accl_i);
+
+                u_fixedend_response[0] = u;
+                v_fixedend_response[0] = v;
+                a_fixedend_response[0] = a;
+            }
 
 
             //______________________________________________________________________________________________________
@@ -602,7 +642,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             Vector<double> a_freeend_response = Vector<double>.Build.Dense(this.freeend_dof);
 
 
-            if (freeend_dof > 2)
+            if (freeend_dof > 1)
             {
                 // Transform to modal coordinates
                 Vector<double> modal_u_freeend_0 = freeend_system.ModeShapeMatrixInverse * u_freeend;
@@ -970,8 +1010,51 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
                 // Add the computed response to the list
                 SimulationResults.AddResponse(time_t, u_at_t, v_at_t, a_at_t, contact_force_at_t);
 
-
             }
+
+
+
+            //using (StreamWriter writer = new StreamWriter("debug.txt"))
+            //{
+            //    // Optional: Write header
+            //    // writer.WriteLine("Time,Displacement1,Displacement2,Displacement3,Velocity1,Velocity2,Velocity3,Acceleration1,Acceleration2,Acceleration3");
+
+            //    for (int i = 0; i < SimulationResults.TimePoints.Count; i++)
+            //    {
+            //        (List<double> displacements, List<double> velocities, List<double> accelerations)
+            //            = SimulationResults.GetStateListAtTimeIndex(i);
+
+            //        double time_t1 = SimulationResults.TimePoints[i];
+
+            //        // Build the line using StringBuilder for better performance
+            //        StringBuilder line = new StringBuilder();
+            //        line.Append($"{time_t1:F6},");  // Format with 6 decimal places
+
+            //        foreach (double displacement in displacements)
+            //        {
+            //            line.Append($"{displacement:F6},");
+            //        }
+
+            //        foreach (double velocity in velocities)
+            //        {
+            //            line.Append($"{velocity:F6},");
+            //        }
+
+            //        foreach (double acceleration in accelerations)
+            //        {
+            //            line.Append($"{acceleration:F6},");
+            //        }
+
+            //        // Remove trailing comma if you want
+            //        if (line.Length > 0)
+            //        {
+            //            line.Length--; // Remove last comma
+            //        }
+
+            //        writer.WriteLine(line.ToString());
+            //    }
+            //}
+
 
 
             // Ensure the last contact band time is recorded if the simulation ends in contact
@@ -1051,7 +1134,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
                 SimulationResults.GetStateAtTimeIndex(upperIndex);
 
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < (fixedend_dof + freeend_dof); i++)
             {
                 // Linear interpolation for displacement, velocity, and acceleration
                 double interpolatedDisplacement = lowerDisplacement[i] + (upperDisplacement[i] - lowerDisplacement[i]) * param_t;

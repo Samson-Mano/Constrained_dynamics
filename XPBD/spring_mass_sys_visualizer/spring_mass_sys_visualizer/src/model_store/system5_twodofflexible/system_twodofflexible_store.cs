@@ -42,9 +42,11 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
         private double total_simulation_time = -1.0f; // seconds
 
-        private float ptmass_radius = 2.0f; // Radius of the point mass circles
-        private int fixedendDOF = 1; // Number of fixed end degrees of freedom (DOF) for the system
-        private int freeendDOF = 1; // Number of free end degrees of freedom (DOF) for the system
+        const float ptmass_radius = 1.0f; // Radius of the point mass circles
+        const float spring_element_wd = 0.5f; // Width of the spring elements
+
+        private int fixedendDOF = 4; // Number of fixed end degrees of freedom (DOF) for the system
+        private int freeendDOF = 4; // Number of free end degrees of freedom (DOF) for the system
 
 
         public system_twodofflexible_store(double total_simulation_time)
@@ -89,7 +91,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
             // Initialize the spring data
             springs = new spring_store();
-            gvariables_static.spring_element_width = 1.5f; // Set the spring element width to 2.0f
+            gvariables_static.spring_element_width = spring_element_wd; // Set the spring element width to 1.5f
 
 
             for (int i = 0; i < numDOF; i++)
@@ -141,13 +143,13 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         private void PerformSolve()
         {
 
-            List<double> fixedend_mass = new List<double> { 0.002 }; // Mass of the fixed end segment
-            List< double > fixedend_stiffness = new List<double> { 0.018 }; // Stiffness of the fixed end segment
-            List<double> freeend_mass = new List<double> { 0.002 }; // Mass of the free end segment
-            List< double > freeend_stiffness = new List<double> { 0.018 }; // Stiffness of the free end segment
+            List<double> fixedend_mass = new List<double> { 0.002, 0.002, 0.002, 0.002 }; // Mass of the fixed end segment
+            List< double > fixedend_stiffness = new List<double> { 0.018, 0.018, 0.018, 0.018 }; // Stiffness of the fixed end segment
+            List<double> freeend_mass = new List<double> { 0.002, 0.002, 0.002, 0.002 }; // Mass of the free end segment
+            List< double > freeend_stiffness = new List<double> { 0.018, 0.018, 0.018, 0.018 }; // Stiffness of the free end segment
 
-            List<double> u_inl = new List<double> {0.0, 1000.0  }; 
-            List< double > v_inl = new List<double> {0.0, -500.0 };
+            List<double> u_inl = new List<double> {0.0, 0.0, 0.0, 0.0, 1000.0, 1000.0, 1000.0, 1000.0  }; 
+            List< double > v_inl = new List<double> {0.0, 0.0,  0.0, 0.0, -400.0, -400.0, -400.0, -400.0 };
 
 
             if (fixedendDOF != fixedend_mass.Count || fixedendDOF != fixedend_stiffness.Count ||
@@ -191,7 +193,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
                 (List<double> displacement_at_t, List<double> velocity_at_t, List<double> acceleration_at_t)
                     = multidofflexiblecollisionSolver.SimulationResults.GetStateListAtTimeIndex(i);
 
-                for (int j = 0; j < 2; j++)
+                for (int j = 0; j < (fixedendDOF + freeendDOF); j++)
                 {
                     max_displacement = Math.Max(max_displacement, Math.Abs(displacement_at_t[j]));
                     max_velocity = Math.Max(max_velocity, Math.Abs(velocity_at_t[j]));

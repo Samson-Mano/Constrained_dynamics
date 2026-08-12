@@ -29,6 +29,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         private vector_store velocity_vectors;
         private vector_store acceleration_vectors;
 
+        private vector_store group_velocity_vector;
+
         private twodof_flexiblecollisionSolver multidofflexiblecollisionSolver;
 
 
@@ -48,6 +50,14 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         private int fixedendDOF = 4; // Number of fixed end degrees of freedom (DOF) for the system
         private int freeendDOF = 4; // Number of free end degrees of freedom (DOF) for the system
 
+        private float average_fixedend_location = 0.0f; // Average location of the fixed end masses
+        private float average_freeend_location = 0.0f; // Average location of the free end masses
+
+        private List<double> fixedend_mass_data; // Mass of the fixed end segment
+        private List<double> freeend_mass_data; // Mass of the free end segment
+
+        private double total_fixedend_mass = 0.0f; // Total mass of the fixed end segment
+        private double total_freeend_mass = 0.0f; // Total mass of the free end segment
 
         public system_twodofflexible_store(double total_simulation_time)
         {
@@ -128,13 +138,41 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             }
 
 
+            // Average location for the group velocity vector
+            float average_location = 0.0f;
+
+            for (int i = 0; i < fixedendDOF; i++)
+            {
+                average_location += default_ptmass_location[i];
+            }
+
+            average_location /= fixedendDOF;
+            this.average_fixedend_location = average_location;
+
+            group_velocity_vector = new vector_store();
+            group_velocity_vector.AddVector(0, average_location, 20.0f, 1.0f, 0.0f); // Group velocity vector
+
+
+            average_location = 0.0f;
+            for (int i = 0;i < freeendDOF; i++ )
+            {
+                average_location += default_ptmass_location[fixedendDOF + i];
+            }
+
+            average_location /= freeendDOF;
+            this.average_freeend_location = average_location;
+
+            group_velocity_vector.AddVector(1, average_location, 20.0f, 1.0f, 0.0f); // Group velocity vector
+
+
+
             // Set the buffer data for the geometry data
             rigidboundary.SetBufferData();
             pointmass.SetBufferData();
             springs.SetBufferData();
             velocity_vectors.SetBufferData();
             acceleration_vectors.SetBufferData();
-
+            group_velocity_vector.SetBufferData();
 
         }
 
@@ -144,12 +182,12 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         {
 
             List<double> fixedend_mass = new List<double> { 0.002, 0.002, 0.002, 0.002 }; // Mass of the fixed end segment
-            List< double > fixedend_stiffness = new List<double> { 0.018, 0.018, 0.018, 0.018 }; // Stiffness of the fixed end segment
+            List<double> fixedend_stiffness = new List<double> { 0.018, 0.018, 0.018, 0.018 }; // Stiffness of the fixed end segment
             List<double> freeend_mass = new List<double> { 0.002, 0.002, 0.002, 0.002 }; // Mass of the free end segment
-            List< double > freeend_stiffness = new List<double> { 0.018, 0.018, 0.018, 0.018 }; // Stiffness of the free end segment
+            List<double> freeend_stiffness = new List<double> { 0.018, 0.018, 0.018, 0.018 }; // Stiffness of the free end segment
 
             List<double> u_inl = new List<double> {0.0, 0.0, 0.0, 0.0, 1000.0, 1000.0, 1000.0, 1000.0  }; 
-            List< double > v_inl = new List<double> {0.0, 0.0,  0.0, 0.0, -400.0, -400.0, -400.0, -400.0 };
+            List<double> v_inl = new List<double> {0.0, 0.0,  0.0, 0.0, -400.0, -400.0, -400.0, -400.0 };
 
 
             if (fixedendDOF != fixedend_mass.Count || fixedendDOF != fixedend_stiffness.Count ||
@@ -161,6 +199,23 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             if((fixedendDOF + freeendDOF) != u_inl.Count || (fixedendDOF + freeendDOF) != v_inl.Count)
             {
                 throw new ArgumentException("Mismatch between DOF and initial condition list lengths.");
+            }
+
+
+            this.total_fixedend_mass = 0.0f;
+            this.fixedend_mass_data = new List<double>();
+            foreach (double mass in fixedend_mass)
+            {
+                this.total_fixedend_mass += mass;
+                this.fixedend_mass_data.Add(mass);
+            }
+
+            this.total_freeend_mass = 0.0f;
+            this.freeend_mass_data = new List<double>();
+            foreach (double mass in freeend_mass)
+            {
+                this.total_freeend_mass += mass;
+                this.freeend_mass_data.Add(mass);
             }
 
 
@@ -247,6 +302,7 @@ gvariables_static.geom_transparency * 0.8f);
 
             modelShader.SetVector4("vertexColor", velocityVectorColor);
             velocity_vectors.PaintVectors();
+            group_velocity_vector.PaintVectors();
 
             modelShader.SetVector4("vertexColor", accelerationVectorColor);
             acceleration_vectors.PaintVectors();
@@ -349,6 +405,56 @@ gvariables_static.geom_transparency * 0.8f);
             velocity_vectors.UpdateVertexBuffers();
             acceleration_vectors.UpdateVertexBuffers();
 
+
+            //_______________________________________________________________________________________________________________________________
+            // Update the group velocity vector based on the average location of the fixed end masses
+            updateGroupVelocityVector(mapped_displacement_list, Displacement, Velocity, vector_scale_value);
+
+
+        }
+
+
+        private void updateGroupVelocityVector(List<float> mapped_displacement_list , List<double> Displacement, List<double> Velocity, float vector_scale_value)
+        {
+            // Update the group velocity vector based on the average location of the fixed end masses
+            double fixedend_average_displ = 0;
+            double fixedend_group_velocity = 0.0f;
+            int idx = 0;
+            foreach (double fixedend_mass in fixedend_mass_data)
+            {
+                fixedend_average_displ += mapped_displacement_list[idx];
+                fixedend_group_velocity += fixedend_mass * Velocity[idx];
+                idx++;
+            }
+
+            fixedend_average_displ /= fixedendDOF;
+            fixedend_group_velocity /= total_fixedend_mass;
+
+            double freeend_average_displ = 0;
+            double freeend_group_velocity = 0.0f;
+            foreach (double freeend_mass in freeend_mass_data)
+            {
+                freeend_average_displ += mapped_displacement_list[idx];
+                freeend_group_velocity += freeend_mass * Velocity[idx];
+                idx++;
+            }
+
+            freeend_average_displ /= freeendDOF;
+            freeend_group_velocity /= total_freeend_mass;
+
+
+
+            float groupvelocity_fixed_scaled = ((float)fixedend_group_velocity / Math.Abs((float)max_velocity)) * vector_scale_value;
+
+            group_velocity_vector.updateVectorPosition(0, (float)fixedend_average_displ, 20.0f, groupvelocity_fixed_scaled, 0.0f); // Group velocity vector for fixed end
+
+
+            float groupvelocity_free_scaled = ((float)freeend_group_velocity / Math.Abs((float)max_velocity)) * vector_scale_value;
+
+            group_velocity_vector.updateVectorPosition(1, (float)freeend_average_displ, 20.0f, groupvelocity_free_scaled, 0.0f); // Group velocity vector for free end
+
+
+            group_velocity_vector.UpdateVertexBuffers();
 
         }
 

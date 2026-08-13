@@ -92,6 +92,8 @@
     <Compile Include="src\model_store\system4_sdofflexible\system_flexible_store_rotated.cs" />
     <Compile Include="src\model_store\system5_twodofflexible\system_twodofflexible_store.cs" />
     <Compile Include="src\model_store\system5_twodofflexible\twodof_flexiblecollisionSolver.cs" />
+    <Compile Include="src\model_store\system6_sdofflexible_doublesided\sdof_doublesided_flexiblecollisionSolver.cs" />
+    <Compile Include="src\model_store\system6_sdofflexible_doublesided\system_flexible_doublesided_store.cs" />
     <Compile Include="src\model_store\system_wrapper_store.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\GDIFontAtlas.cs" />
     <Compile Include="src\opentk_control\opentk_buffer\IndexBuffer.cs" />

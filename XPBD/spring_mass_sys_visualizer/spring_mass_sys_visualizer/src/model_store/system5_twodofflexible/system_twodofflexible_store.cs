@@ -30,6 +30,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         private vector_store acceleration_vectors;
 
         private vector_store group_velocity_vector;
+        private vector_store group_acceleration_vector;
 
         private twodof_flexiblecollisionSolver multidofflexiblecollisionSolver;
 
@@ -152,6 +153,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             group_velocity_vector = new vector_store();
             group_velocity_vector.AddVector(0, average_location, 20.0f, 1.0f, 0.0f); // Group velocity vector
 
+            group_acceleration_vector = new vector_store();
+            group_acceleration_vector.AddVector(0, average_location, -20.0f, 1.0f, 0.0f); // Group acceleration vector
+
 
             average_location = 0.0f;
             for (int i = 0;i < freeendDOF; i++ )
@@ -163,8 +167,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             this.average_freeend_location = average_location;
 
             group_velocity_vector.AddVector(1, average_location, 20.0f, 1.0f, 0.0f); // Group velocity vector
-
-
+            group_acceleration_vector.AddVector(1, average_location, -20.0f, 1.0f, 0.0f); // Group acceleration vector
 
             // Set the buffer data for the geometry data
             rigidboundary.SetBufferData();
@@ -173,6 +176,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             velocity_vectors.SetBufferData();
             acceleration_vectors.SetBufferData();
             group_velocity_vector.SetBufferData();
+            group_acceleration_vector.SetBufferData();
 
         }
 
@@ -306,6 +310,7 @@ gvariables_static.geom_transparency * 0.8f);
 
             modelShader.SetVector4("vertexColor", accelerationVectorColor);
             acceleration_vectors.PaintVectors();
+            group_acceleration_vector.PaintVectors();
 
             GL.LineWidth(1.0f);
 
@@ -409,7 +414,7 @@ gvariables_static.geom_transparency * 0.8f);
             //_______________________________________________________________________________________________________________________________
             // Update the group velocity vector based on the average location of the fixed end masses
             updateGroupVelocityVector(mapped_displacement_list, Displacement, Velocity, vector_scale_value);
-
+            updateGroupAccelerationVector(mapped_displacement_list, Displacement, Acceleration, vector_scale_value);
 
         }
 
@@ -455,6 +460,51 @@ gvariables_static.geom_transparency * 0.8f);
 
 
             group_velocity_vector.UpdateVertexBuffers();
+
+        }
+
+
+        private void updateGroupAccelerationVector(List<float> mapped_displacement_list, List<double> Displacement, List<double> Acceleration, float vector_scale_value)
+        {
+            // Update the group acceleration vector based on the average location of the fixed end masses
+            double fixedend_average_displ = 0;
+            double fixedend_group_acceleration = 0.0f;
+            int idx = 0;
+            foreach (double fixedend_mass in fixedend_mass_data)
+            {
+                fixedend_average_displ += mapped_displacement_list[idx];
+                fixedend_group_acceleration += fixedend_mass * Acceleration[idx];
+                idx++;
+            }
+
+            fixedend_average_displ /= fixedendDOF;
+            fixedend_group_acceleration /= total_fixedend_mass;
+
+            double freeend_average_displ = 0;
+            double freeend_group_acceleration = 0.0f;
+            foreach (double freeend_mass in freeend_mass_data)
+            {
+                freeend_average_displ += mapped_displacement_list[idx];
+                freeend_group_acceleration += freeend_mass * Acceleration[idx];
+                idx++;
+            }
+
+            freeend_average_displ /= freeendDOF;
+            freeend_group_acceleration /= total_freeend_mass;
+
+
+
+            float groupacceleration_fixed_scaled = ((float)fixedend_group_acceleration / Math.Abs((float)max_acceleration)) * vector_scale_value;
+
+            group_acceleration_vector.updateVectorPosition(0, (float)fixedend_average_displ, -20.0f, groupacceleration_fixed_scaled, 0.0f); // Group acceleration vector for fixed end
+
+
+            float groupacceleration_free_scaled = ((float)freeend_group_acceleration / Math.Abs((float)max_acceleration)) * vector_scale_value;
+
+            group_acceleration_vector.updateVectorPosition(1, (float)freeend_average_displ, -20.0f, groupacceleration_free_scaled, 0.0f); // Group acceleration vector for free end
+
+
+            group_acceleration_vector.UpdateVertexBuffers();
 
         }
 

@@ -48,11 +48,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         const float ptmass_radius = 1.0f; // Radius of the point mass circles
         const float spring_element_wd = 0.5f; // Width of the spring elements
 
-        private int fixedendDOF = 4; // Number of fixed end degrees of freedom (DOF) for the system
-        private int freeendDOF = 4; // Number of free end degrees of freedom (DOF) for the system
+        private int fixedendDOF = 2; // Number of fixed end degrees of freedom (DOF) for the system
+        private int freeendDOF = 1; // Number of free end degrees of freedom (DOF) for the system
 
-        private float average_fixedend_location = 0.0f; // Average location of the fixed end masses
-        private float average_freeend_location = 0.0f; // Average location of the free end masses
 
         private List<double> fixedend_mass_data; // Mass of the fixed end segment
         private List<double> freeend_mass_data; // Mass of the free end segment
@@ -148,7 +146,6 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             }
 
             average_location /= fixedendDOF;
-            this.average_fixedend_location = average_location;
 
             group_velocity_vector = new vector_store();
             group_velocity_vector.AddVector(0, average_location, 20.0f, 1.0f, 0.0f); // Group velocity vector
@@ -164,7 +161,6 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             }
 
             average_location /= freeendDOF;
-            this.average_freeend_location = average_location;
 
             group_velocity_vector.AddVector(1, average_location, 20.0f, 1.0f, 0.0f); // Group velocity vector
             group_acceleration_vector.AddVector(1, average_location, -20.0f, 1.0f, 0.0f); // Group acceleration vector
@@ -185,13 +181,18 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         private void PerformSolve()
         {
 
-            List<double> fixedend_mass = new List<double> { 0.002, 0.002, 0.002, 0.002 }; // Mass of the fixed end segment
-            List<double> fixedend_stiffness = new List<double> { 0.018, 0.018, 0.018, 0.018 }; // Stiffness of the fixed end segment
-            List<double> freeend_mass = new List<double> { 0.002, 0.002, 0.002, 0.002 }; // Mass of the free end segment
-            List<double> freeend_stiffness = new List<double> { 0.018, 0.018, 0.018, 0.018 }; // Stiffness of the free end segment
+            double total_mass = 0.002;
 
-            List<double> u_inl = new List<double> {0.0, 0.0, 0.0, 0.0, 1000.0, 1000.0, 1000.0, 1000.0  }; 
-            List<double> v_inl = new List<double> {0.0, 0.0,  0.0, 0.0, -400.0, -400.0, -400.0, -400.0 };
+            double sr = 0.6;
+            double mr = 1.0;
+
+            List<double> fixedend_mass = new List<double> { total_mass * sr, total_mass* (1.0 -sr) }; // Mass of the fixed end segment
+            List<double> fixedend_stiffness = new List<double> { 0.018, 0.018}; // Stiffness of the fixed end segment
+            List<double> freeend_mass = new List<double> { total_mass * mr }; // Mass of the free end segment
+            List<double> freeend_stiffness = new List<double> { 0.018 }; // Stiffness of the free end segment
+
+            List<double> u_inl = new List<double> {0.0, 0.0, 1000.0 }; 
+            List<double> v_inl = new List<double> {0.0, 0.0,  -400.0 };
 
 
             if (fixedendDOF != fixedend_mass.Count || fixedendDOF != fixedend_stiffness.Count ||

@@ -74,7 +74,7 @@ namespace spring_mass_sys_visualizer.src.model_store
 
             graphic_events_control.update_drawing_area_size(graphic_events_control.window_width, graphic_events_control.window_height);
 
-            systemWrapper = new system_wrapper_store(system_wrapper_store.SystemType.SystemFlexible2Dof);
+            systemWrapper = new system_wrapper_store(system_wrapper_store.SystemType.SystemFlexibleDoublesided);
 
 
             gvariables_static.animate_play = true;

@@ -52,6 +52,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
             // Add rigid boundary rectangles to the model
             rigidboundary.AddRectangle(0, 10.0f, 100.0f, -50.0f, 0.0f, 0.0f, true);
+            rigidboundary.AddRectangle(1, 10.0f, 100.0f, 50.0f, 0.0f, 0.0f, true);
 
 
             default_ptmass_location = new List<float>();
@@ -61,7 +62,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             {
                 float param_t = (float)i / (float)(numDOF + 1);
 
-                float location = -45.0f * (1.0f - param_t) + 45.0f * param_t;
+                float location = -50.0f * (1.0f - param_t) + 50.0f * param_t;
 
                 default_ptmass_location.Add(location); // Example: 40.0, 50.0, 60.0 for 3 DOF
             }

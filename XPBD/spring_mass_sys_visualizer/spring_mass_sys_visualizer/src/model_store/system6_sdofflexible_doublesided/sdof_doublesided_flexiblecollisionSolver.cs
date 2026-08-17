@@ -28,6 +28,11 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
         private ModalProperties _rightcontactModalProperties;  // 2 DOF - The system is fully connected with both springs k2 and k3 active
 
+        // Store the left and right end origin
+        private double _leftend_origin = 0.0; // Left end origin (fixed wall)
+        private double _rightend_origin = 0.0; // Right end origin (fixed wall)
+
+
 
         public multidof1d_rigidcollisionSolverResult SimulationResults { get; private set; }
         private double total_time;
@@ -616,7 +621,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             GetLeftContactForce(Vector<double> u_at_t, Vector<double> v_at_t, Vector<double> a_at_t)
         {
             // Contact force at the left contact (between mass 2 and mass 1 attached to the wall)
-            double delta_u = u_at_t[1] - u_at_t[0]; // Relative displacement between mass 2 and mass 1
+            double delta_u = u_at_t[1] - (u_at_t[0] - this._leftend_origin); // Relative displacement between mass 2 and mass 1
             double delta_v = v_at_t[1] - v_at_t[0]; // Relative velocity between mass 2 and mass 1
             double delta_a = a_at_t[1] - a_at_t[0]; // Relative acceleration between mass 2 and mass 1
 
@@ -634,7 +639,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             GetRightContactForce(Vector<double> u_at_t, Vector<double> v_at_t, Vector<double> a_at_t)
         {
             // Contact force at the right contact (between mass 2 and mass 3 attached to the wall)
-            double delta_u = u_at_t[1] - u_at_t[2]; // Relative displacement between mass 2 and mass 3
+            double delta_u = u_at_t[1] - (u_at_t[2] - this._rightend_origin); // Relative displacement between mass 2 and mass 3
             double delta_v = v_at_t[1] - v_at_t[2]; // Relative velocity between mass 2 and mass 3
             double delta_a = a_at_t[1] - a_at_t[2]; // Relative acceleration between mass 2 and mass 3
 
@@ -721,13 +726,13 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
 
 
-        public void solve_sdof_collision_with_flexible_boundary(double total_simulation_time, double max_time_increment,
+        public void solve_sdof_collision_with_doublesided_flexible_boundary(double total_simulation_time, double max_time_increment,
     double strikemass_initial_velocity, double total_width)
         {
             this.total_time = total_simulation_time;
 
-            double left_width = -0.5 * total_width;
-            double right_width = 0.5 * total_width;
+            this._leftend_origin = -0.5 * total_width;
+            this._rightend_origin = 0.5 * total_width;
 
             // Clear previous results
             SimulationResults.ClearData();
@@ -735,7 +740,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
             // Physical initial conditions 
             // Left end --- strike mass --- Right end
-            Vector<double> u_at_event = Vector<double>.Build.Dense(new double[] { left_width, 0.0, right_width });
+            Vector<double> u_at_event = Vector<double>.Build.Dense(new double[] { 0.0, 0.0, 0.0 });
             Vector<double> v_at_event = Vector<double>.Build.Dense(new double[] { 0.0,  strikemass_initial_velocity, 0.0 });
 
             Vector<double> u_at_t = u_at_event.Clone();
@@ -987,7 +992,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
                 SimulationResults.GetStateAtTimeIndex(upperIndex);
 
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 3; i++)
             {
                 // Linear interpolation for displacement, velocity, and acceleration
                 double interpolatedDisplacement = lowerDisplacement[i] + (upperDisplacement[i] - lowerDisplacement[i]) * param_t;

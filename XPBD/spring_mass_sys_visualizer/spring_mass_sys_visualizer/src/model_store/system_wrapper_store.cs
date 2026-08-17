@@ -4,6 +4,7 @@ using spring_mass_sys_visualizer.src.model_store.system3_mdof_data;
 using spring_mass_sys_visualizer.src.model_store.system4_sdofflexible;
 using spring_mass_sys_visualizer.src.model_store.system5_twodofflexible;
 using spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_doublesided;
+using spring_mass_sys_visualizer.src.model_store.system7_twodofflexible_doublesided;
 using spring_mass_sys_visualizer.src.opentk_control.shader_compiler;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace spring_mass_sys_visualizer.src.model_store
             SystemFlexible1Dof_Rotated,
             SystemFlexible2Dof,
             SystemFlexibleDoublesided,
+            SystemFlexible2DofDoublesided
         }
 
 
@@ -36,6 +38,7 @@ namespace spring_mass_sys_visualizer.src.model_store
         private system_flexible_store_rotated systemFlexible1Dof_Rotated;
         private system_twodofflexible_store system2DofFlexible;
         private system_flexible_doublesided_store systemFlexibleDoublesided;
+        private system_2dofflexible_doublesided_store system2DofFlexibleDoublesided;
 
         private SystemType currentSystemType = SystemType.System1Dof;
 
@@ -81,7 +84,11 @@ namespace spring_mass_sys_visualizer.src.model_store
                 // system Flexible doublesided
                 systemFlexibleDoublesided = new system_flexible_doublesided_store(total_simulation_time);
             }
-
+            else if (currentSystemType == SystemType.SystemFlexible2DofDoublesided)
+            {
+                // system Flexible 2dof doublesided
+                system2DofFlexibleDoublesided = new system_2dofflexible_doublesided_store(total_simulation_time);
+            }
         }
 
         public void paintSystem(ref Shader modelShader)
@@ -128,6 +135,12 @@ namespace spring_mass_sys_visualizer.src.model_store
                 // Implement the painting logic for system Flexible doublesided here
                 systemFlexibleDoublesided.paint_sdof_doublesided_flexibleboundary(ref modelShader);
             }
+            else if (currentSystemType == SystemType.SystemFlexible2DofDoublesided)
+            {
+                // Paint system Flexible 2dof doublesided
+                // Implement the painting logic for system Flexible 2dof doublesided here
+                system2DofFlexibleDoublesided.paint_twodof_doublesided_flexibleboundary(ref modelShader);
+            }
         }
 
 
@@ -161,6 +174,10 @@ namespace spring_mass_sys_visualizer.src.model_store
             else if (currentSystemType == SystemType.SystemFlexibleDoublesided)
             {
                 systemFlexibleDoublesided.update_sdof_doublesided_flexibleboundary_collision(elapsedRealTime);
+            }
+            else if (currentSystemType == SystemType.SystemFlexible2DofDoublesided)
+            {
+                system2DofFlexibleDoublesided.update_twodof_doublesided_flexibleboundary_collision(elapsedRealTime);
             }
         }
 

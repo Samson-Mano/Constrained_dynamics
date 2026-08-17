@@ -1,18 +1,18 @@
-﻿using spring_mass_sys_visualizer.src.global_variables;
+﻿// OpenTK library
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Input;
+using spring_mass_sys_visualizer.src.global_variables;
 using spring_mass_sys_visualizer.src.model_store.geom_objects;
 using spring_mass_sys_visualizer.src.model_store.system4_sdofflexible;
+using spring_mass_sys_visualizer.src.model_store.system5_twodofflexible;
 using spring_mass_sys_visualizer.src.opentk_control.shader_compiler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-// OpenTK library
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Input;
 
 
 
@@ -41,6 +41,12 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
         private double total_simulation_time = -1.0f; // seconds
 
 
+        const float ptmass_radius = 1.0f; // Radius of the point mass circles
+        const float spring_element_wd = 0.5f; // Width of the spring elements
+        const float total_width = 100.0f; // Total width of the system
+
+        const float relaxed_spring_length = 10.0f; // Relaxed length of the springs
+
         public system_flexible_doublesided_store(double total_simulation_time)
         {
 
@@ -51,48 +57,58 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             rigidboundary = new rectangle_store();
 
             // Add rigid boundary rectangles to the model
-            rigidboundary.AddRectangle(0, 10.0f, 100.0f, -50.0f, 0.0f, 0.0f, true);
-            rigidboundary.AddRectangle(1, 10.0f, 100.0f, 50.0f, 0.0f, 0.0f, true);
+            // Left end of the rigid boundary
+            rigidboundary.AddRectangle(0, 2.0f * ptmass_radius, 100.0f, -total_width * 0.5f, 0.0f, 0.0f, true);
+            rigidboundary.AddRectangle(1, 2.0f * ptmass_radius, 100.0f, total_width * 0.5f, 0.0f, 0.0f, true);
 
 
             default_ptmass_location = new List<float>();
-            int numDOF = 2; // Number of degrees of freedom (DOF) for the system
 
-            for (int i = 1; i < numDOF + 1; i++)
-            {
-                float param_t = (float)i / (float)(numDOF + 1);
+            // Left flexible boundary at -50.0f, right flexible boundary at 50.0f, and point masses in between
+            float location = -(total_width * 0.5f) + relaxed_spring_length;
+            default_ptmass_location.Add(location);
 
-                float location = -50.0f * (1.0f - param_t) + 50.0f * param_t;
+            // Free floating mass at the center of the system
+            location = 0.0f;
+            default_ptmass_location.Add(location);
 
-                default_ptmass_location.Add(location); // Example: 40.0, 50.0, 60.0 for 3 DOF
-            }
-
+            // Right flexible boundary at 50.0f
+            location = (total_width * 0.5f) - relaxed_spring_length;
+            default_ptmass_location.Add(location);
 
 
 
             // Initialize the circle (point mass) data
             pointmass = new circle_store();
 
-            // // Add the reference circle with Radius 45.0f to the model
-            // pointmass.AddCircle(0, 45.0f, 0.0f, 0.0f, false); // Reference circle
-
             // First mass m1 (attached to the flexible boundary)
-            pointmass.AddCircle(0, 5.0f, default_ptmass_location[0], 0.0f, true); // First mass
+            pointmass.AddCircle(0, ptmass_radius, default_ptmass_location[0], 0.0f, true); // First mass
 
             // Second mass m2 (free floating mass)
-            pointmass.AddCircle(1, 5.0f, default_ptmass_location[1], 0.0f, true); // Second mass
+            pointmass.AddCircle(1, ptmass_radius, default_ptmass_location[1], 0.0f, true); // Second mass
 
+            // Third mass m3 (attached to the flexible boundary)
+            pointmass.AddCircle(2, ptmass_radius, default_ptmass_location[2], 0.0f, true); // Third mass
+
+            // Add a reference circle with Radius relaxed spring length to the model
+            pointmass.AddCircle(3, relaxed_spring_length, default_ptmass_location[1], 0.0f, false); // Reference circle
 
 
             // Initialize the spring data
             springs = new spring_store();
-            gvariables_static.spring_element_width = 1.5f; // Set the spring element width to 2.0f
+            gvariables_static.spring_element_width = spring_element_wd; // Set the spring element width to 2.0f
 
             // First spring (attached to the flexible boundary and first mass)
-            springs.AddSpring(0, default_ptmass_location[0], 0.0f, -45.0f, 0.0f); // First spring
+            springs.AddSpring(0, -(total_width * 0.5f) + ptmass_radius, 0.0f, default_ptmass_location[0], 0.0f); // First spring
 
-            // Second spring (attached to the first mass and second mass)
-            springs.AddSpring(1, default_ptmass_location[1], 0.0f, default_ptmass_location[0], 0.0f); // Second spring
+            // Second spring (free floating mass - left free spring)
+            springs.AddSpring(1, default_ptmass_location[1] - relaxed_spring_length, 0.0f, default_ptmass_location[1], 0.0f); // Second spring
+
+            // Third spring (free floating mass - right free spring)
+            springs.AddSpring(2, default_ptmass_location[1], 0.0f, default_ptmass_location[1] + relaxed_spring_length, 0.0f); // Third spring
+
+            // Fourth spring (attached to the flexible boundary and third mass)
+            springs.AddSpring(3, default_ptmass_location[2], 0.0f, (total_width * 0.5f) - ptmass_radius, 0.0f); // Fourth spring
 
 
             PerformSolve();
@@ -103,12 +119,14 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             acceleration_vectors = new vector_store();
 
             // Add a simple vector to the model
-            velocity_vectors.AddVector(0, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M1
-            acceleration_vectors.AddVector(0, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M1
+            velocity_vectors.AddVector(0, default_ptmass_location[0], 10.0f, 1.0f, 0.0f); // mass attached to left flexible boundary
+            velocity_vectors.AddVector(1, default_ptmass_location[1], 10.0f, 1.0f, 0.0f); // Free floating mass
+            velocity_vectors.AddVector(2, default_ptmass_location[2], 10.0f, 1.0f, 0.0f); // mass attached to right flexible boundary
 
-            velocity_vectors.AddVector(1, 10.0f, 0.0f, 0.0f, 10.0f); // Velocity vector for mass M2
-            acceleration_vectors.AddVector(1, 20.0f, 0.0f, 0.0f, 30.0f); // Acceleration vector for mass M2
 
+            acceleration_vectors.AddVector(0, default_ptmass_location[0], -10.0f, 1.0f, 0.0f); // mass attached to left flexible boundary
+            acceleration_vectors.AddVector(1, default_ptmass_location[1], -10.0f, 1.0f, 0.0f); // Free floating mass
+            acceleration_vectors.AddVector(2, default_ptmass_location[2], -10.0f, 1.0f, 0.0f); // mass attached to right flexible boundary
 
 
             // Set the buffer data for the geometry data
@@ -124,7 +142,61 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
         private void PerformSolve()
         {
-         
+
+            // mass and stiffness parameters for the left, strike, and right masses and springs
+            double leftmass_m1 = 0.002f;
+            double strikemass_m2 = 0.002f;
+            double rightmass_m3 = 0.002f;
+            
+            double leftstiffness_k1 = 0.018f;
+            double strikestiffness_k2 = 0.018f;
+            double rightstiffness_k3 = 0.018f;
+
+            double dampratio_zeta = 0.0; // Damping ratio
+
+
+            double total_simulation_time = this.total_simulation_time; // seconds
+
+
+            // Initialize the multi DOF flexible collision solver
+            sdofdoublesided_flexiblecollisionSolver = new sdof_doublesided_flexiblecollisionSolver(
+                leftmass_m1, strikemass_m2, rightmass_m3, leftstiffness_k1, strikestiffness_k2, rightstiffness_k3,
+                 dampratio_zeta);
+
+
+            double strikemass_initial_velocity = -1000.0; // Initial velocity of the strike mass
+            double total_width = 1000.0; // Total width of the system
+
+
+            // Solve the system for the given initial conditions and total simulation time
+            sdofdoublesided_flexiblecollisionSolver.solve_sdof_collision_with_doublesided_flexible_boundary(total_simulation_time, 
+                max_time_increment: 0.001,
+                strikemass_initial_velocity, total_width);
+
+
+            // Find the maximum displacement for the vector representation
+            max_displacement = double.MinValue;
+            max_velocity = double.MinValue;
+            max_acceleration = double.MinValue;
+
+
+
+            int time_points = sdofdoublesided_flexiblecollisionSolver.SimulationResults.TimePoints.Count;
+
+            for (int i = 0; i < time_points; i++)
+            {
+
+                (List<double> displacement_at_t, List<double> velocity_at_t, List<double> acceleration_at_t)
+                    = sdofdoublesided_flexiblecollisionSolver.SimulationResults.GetStateListAtTimeIndex(i);
+
+                for (int j = 0; j < 3; j++)
+                {
+                    max_displacement = Math.Max(max_displacement, Math.Abs(displacement_at_t[j]));
+                    max_velocity = Math.Max(max_velocity, Math.Abs(velocity_at_t[j]));
+                    max_acceleration = Math.Max(max_acceleration, Math.Abs(acceleration_at_t[j]));
+                }
+            }
+
 
         }
 
@@ -179,7 +251,99 @@ gvariables_static.geom_transparency * 0.8f);
         {
             float scale_value = 40.0f; // Scale for visualization   
 
-          
+
+            (List<double> Displacement, List<double> Velocity, List<double> Acceleration, double contact_force)
+                = sdofdoublesided_flexiblecollisionSolver.getResult_at_timet(elapsedRealTime);
+
+
+            int numDOF = 3; // Total number of degrees of freedom (DOF) for the system
+
+            List<float> mapped_displacement_list = new List<float>();
+
+            // Update the point mass locations based on the Displacement values
+            for (int i = 0; i < numDOF; i++)
+            {
+                float location = default_ptmass_location[i];
+                float displacement_scaled = ((float)Displacement[i] / Math.Abs((float)max_displacement)) * scale_value;
+
+                float mapped_displacement = location + displacement_scaled;
+                mapped_displacement_list.Add(mapped_displacement);
+
+
+                pointmass.updateCirclePosition(i, mapped_displacement, 0.0f); // Point mass circles
+            }
+
+            pointmass.UpdateVertexBuffers();
+
+
+            ////_______________________________________________________________________________________________________________________________
+            //// Update the spring locations based on the Displacement values
+            //for (int i = 0; i < fixedendDOF; i++)
+            //{
+            //    if (i == 0)
+            //    {
+            //        springs.updateSpringPosition(i, -50.0f + ptmass_radius, 0.0f, mapped_displacement_list[i], 0.0f); // First spring
+            //        continue; // Skip the first spring as it is attached to the fixed boundary
+            //    }
+
+            //    springs.updateSpringPosition(i, mapped_displacement_list[i - 1] + ptmass_radius, 0.0f,
+            //        mapped_displacement_list[i], 0.0f); // Subsequent spring
+
+            //}
+
+            //for (int i = 0; i < freeendDOF; i++)
+            //{
+            //    int offset = fixedendDOF + i;
+
+            //    if (i == 0)
+            //    {
+            //        // First spring of free flight mass segment (either in contact or not in contact)
+            //        if (contact_force > 0.0f)
+            //        {
+            //            // No contact
+            //            float undeformedspringlength = default_ptmass_location[1] - default_ptmass_location[0];
+
+            //            springs.updateSpringPosition(offset, mapped_displacement_list[offset] - undeformedspringlength + ptmass_radius, 0.0f,
+            //                mapped_displacement_list[offset], 0.0f); // Subsequent spring
+            //        }
+            //        else
+            //        {
+            //            // Contact with the last mass of fixed end segment
+            //            springs.updateSpringPosition(offset, mapped_displacement_list[offset - 1] + ptmass_radius, 0.0f,
+            //                mapped_displacement_list[offset], 0.0f); // Subsequent spring
+            //        }
+
+            //        continue;
+            //    }
+
+
+            //    springs.updateSpringPosition(offset, mapped_displacement_list[offset - 1] + ptmass_radius, 0.0f,
+            //        mapped_displacement_list[offset], 0.0f); // Subsequent spring
+            //}
+
+            //springs.UpdateVertexBuffers();
+
+            //_______________________________________________________________________________________________________________________________
+
+            float vector_scale_value = 20.0f; // Scale for visualization   
+
+            for (int i = 0; i < numDOF; i++)
+            {
+
+                float velocity_scaled = ((float)Velocity[i] / Math.Abs((float)max_velocity)) * vector_scale_value;
+                float acceleration_scaled = ((float)Acceleration[i] / Math.Abs((float)max_acceleration)) * vector_scale_value;
+
+                velocity_vectors.updateVectorPosition(i, mapped_displacement_list[i], 10.0f, velocity_scaled, 0.0f); // Velocity vector for mass M_i
+                acceleration_vectors.updateVectorPosition(i, mapped_displacement_list[i], -10.0f, acceleration_scaled, 0.0f); // Acceleration vector for mass M_i
+
+            }
+
+            velocity_vectors.UpdateVertexBuffers();
+            acceleration_vectors.UpdateVertexBuffers();
+
+
+
+
 
         }
 

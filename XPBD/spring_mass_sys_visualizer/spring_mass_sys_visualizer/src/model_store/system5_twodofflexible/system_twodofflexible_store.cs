@@ -25,6 +25,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         // Geometry data
         private rectangle_store rigidboundary;
         private circle_store pointmass;
+        private circle_store pointmass_refcircle; 
         private spring_store springs;
         private vector_store velocity_vectors;
         private vector_store acceleration_vectors;
@@ -49,7 +50,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
         const float spring_element_wd = 0.5f; // Width of the spring elements
 
         private int fixedendDOF = 2; // Number of fixed end degrees of freedom (DOF) for the system
-        private int freeendDOF = 1; // Number of free end degrees of freedom (DOF) for the system
+        private int freeendDOF = 2; // Number of free end degrees of freedom (DOF) for the system
 
 
         private List<double> fixedend_mass_data; // Mass of the fixed end segment
@@ -87,6 +88,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             // Initialize the circle (point mass) data
             pointmass = new circle_store();
 
+            pointmass_refcircle = new circle_store();
+
             // // Add the reference circle with Radius 45.0f to the model
             // pointmass.AddCircle(0, 45.0f, 0.0f, 0.0f, false); // Reference circle
 
@@ -94,6 +97,13 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
             {
                 float location = default_ptmass_location[i];
                 pointmass.AddCircle(i, ptmass_radius, location, 0.0f, true); // Point mass circles
+            }
+
+
+            for (int i = 0; i < numDOF; i++)
+            {
+                float location = default_ptmass_location[i];
+                pointmass_refcircle.AddCircle(i, ptmass_radius * 3.0f, location, 0.0f, false); // Reference point mass circles
             }
 
 
@@ -167,7 +177,10 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
             // Set the buffer data for the geometry data
             rigidboundary.SetBufferData();
+
             pointmass.SetBufferData();
+            pointmass_refcircle.SetBufferData();
+
             springs.SetBufferData();
             velocity_vectors.SetBufferData();
             acceleration_vectors.SetBufferData();
@@ -183,16 +196,17 @@ namespace spring_mass_sys_visualizer.src.model_store.system5_twodofflexible
 
             double total_mass = 0.002;
 
-            double sr = 0.6;
-            double mr = 1.0;
+            double sr1 = 0.0414;
+            double sr2 = 0.7;
+            double mr = 0.51;  //1.045;
 
-            List<double> fixedend_mass = new List<double> { total_mass * sr, total_mass* (1.0 -sr) }; // Mass of the fixed end segment
+            List<double> fixedend_mass = new List<double> { total_mass * sr1, total_mass* (1.0 - sr1) }; // Mass of the fixed end segment
             List<double> fixedend_stiffness = new List<double> { 0.018, 0.018}; // Stiffness of the fixed end segment
-            List<double> freeend_mass = new List<double> { total_mass * mr }; // Mass of the free end segment
-            List<double> freeend_stiffness = new List<double> { 0.018 }; // Stiffness of the free end segment
+            List<double> freeend_mass = new List<double> { total_mass * sr2 * mr, total_mass * (1.0 - sr2) * mr }; // Mass of the free end segment
+            List<double> freeend_stiffness = new List<double> { 0.018, 0.018 }; // Stiffness of the free end segment
 
-            List<double> u_inl = new List<double> {0.0, 0.0, 1000.0 }; 
-            List<double> v_inl = new List<double> {0.0, 0.0,  -400.0 };
+            List<double> u_inl = new List<double> {0.0, 0.0, 1000.0, 1000.0 }; 
+            List<double> v_inl = new List<double> {0.0, 0.0,  -400.0,  -400.0 };
 
 
             if (fixedendDOF != fixedend_mass.Count || fixedendDOF != fixedend_stiffness.Count ||
@@ -341,9 +355,13 @@ gvariables_static.geom_transparency * 0.8f);
 
 
                 pointmass.updateCirclePosition(i, mapped_displacement, 0.0f); // Point mass circles
+
+                pointmass_refcircle.updateCirclePosition(i, mapped_displacement, 0.0f); // Reference point mass circles
             }
 
             pointmass.UpdateVertexBuffers();
+
+            pointmass_refcircle.UpdateVertexBuffers();
 
 
             //_______________________________________________________________________________________________________________________________

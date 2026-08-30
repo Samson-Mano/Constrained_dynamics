@@ -22,16 +22,15 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
         private double strikestiffness_k2;
 
         private double dampratio_zeta;
-        
+
 
         private ModalProperties _leftcontactModalProperties;  // 2 DOF - The system is fully connected with both springs k2 and k1 active
 
         private ModalProperties _rightcontactModalProperties;  // 2 DOF - The system is fully connected with both springs k2 and k3 active
 
-        // Store the left and right end origin
-        private double _leftend_origin = 0.0; // Left end origin (fixed wall)
-        private double _rightend_origin = 0.0; // Right end origin (fixed wall)
-
+        // Width of trapping space
+        // Total width from left wall to right wall
+        private double total_width = 0.0; // Total width from left wall to right wall
 
 
         public multidof1d_rigidcollisionSolverResult SimulationResults { get; private set; }
@@ -43,9 +42,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
         private double leftcontact_stiffness; // Effective stiffness for contact phase (Rayleigh damping)
         private double rightcontact_stiffness; // Effective stiffness for contact phase (Rayleigh damping)
 
-        public sdof_doublesided_flexiblecollisionSolver(double _leftmass_m1, double _strikemass_m2, 
-            double _rightmass_m3, double _leftstiffness_k1, double _strikestiffness_k2, double _rightstiffness_k3, 
-            double _zeta)
+        public sdof_doublesided_flexiblecollisionSolver(double _leftmass_m1, double _strikemass_m2,
+            double _rightmass_m3, double _leftstiffness_k1, double _strikestiffness_k2, double _rightstiffness_k3,
+            double _zeta, double _total_width)
         {
 
             // Mass data
@@ -61,6 +60,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             // Global damping ratio for the system (used for Rayleigh damping)
             dampratio_zeta = _zeta;
 
+            // Total width from left wall to right wall
+            total_width = _total_width;
 
             this.SimulationResults = new multidof1d_rigidcollisionSolverResult(3); // 3 nodes: m1, m2, m3
 
@@ -101,7 +102,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             ModalProperties modalProps = SolveGeneralizedEigenproblem(M, K, "Contact", 2);
 
             // Calculate damping
-            this.leftcontact_damping =   CalculateDamping(modalProps, M, K, new double[] { dampratio_zeta, dampratio_zeta });
+            this.leftcontact_damping = CalculateDamping(modalProps, M, K, new double[] { dampratio_zeta, dampratio_zeta });
             this.leftcontact_stiffness = strikestiffness_k2; // Effective stiffness for contact phase (Rayleigh damping)
 
             return modalProps;
@@ -428,7 +429,10 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
         {
 
             // Split the displacement and velocity vectors into the left contact phase (2 DOF) and right mass (1 DOF)
-            Vector<double> u_left = Vector<double>.Build.Dense(new double[] { u_at_event[0], u_at_event[1] });
+
+            // Remove the width offset for the left contact phase
+            Vector<double> u_left = Vector<double>.Build.Dense(new double[] { u_at_event[0], 
+                u_at_event[1] + (this.total_width * 0.5)});
             Vector<double> v_left = Vector<double>.Build.Dense(new double[] { v_at_event[0], v_at_event[1] });
 
             double u_right = u_at_event[2];
@@ -508,9 +512,13 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             (double uright_at_t, double vright_at_t, double aright_at_t) = GetSDOFResponse(t, rightmass_m3, rightstiffness_k3, dampratio_zeta,
                 u_right, v_right, const_accla0);
 
+            // Add the width offset back to the left contact phase
+
 
             // Concatenate the left and right responses to form the full system response
-            Vector<double> u_at_t = Vector<double>.Build.Dense(new double[] { uleft_at_t[0], uleft_at_t[1], uright_at_t });
+            Vector<double> u_at_t = Vector<double>.Build.Dense(new double[] { uleft_at_t[0], 
+                uleft_at_t[1] - (this.total_width * 0.5), uright_at_t });
+
             Vector<double> v_at_t = Vector<double>.Build.Dense(new double[] { vleft_at_t[0], vleft_at_t[1], vright_at_t });
             Vector<double> a_at_t = Vector<double>.Build.Dense(new double[] { aleft_at_t[0], aleft_at_t[1], aright_at_t });
 
@@ -529,7 +537,10 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             double u_left = u_at_event[0];
             double v_left = v_at_event[0];
 
-            Vector<double> u_right = Vector<double>.Build.Dense(new double[] { u_at_event[1], u_at_event[2] });
+            // Remove the width offset for the right contact phase
+
+            Vector<double> u_right = Vector<double>.Build.Dense(new double[] { u_at_event[1] - (this.total_width * 0.5), 
+                u_at_event[2] });
             Vector<double> v_right = Vector<double>.Build.Dense(new double[] { v_at_event[1], v_at_event[2] });
 
 
@@ -606,8 +617,12 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             (double uleft_at_t, double vleft_at_t, double aleft_at_t) = GetSDOFResponse(t, leftmass_m1, leftstiffness_k1, dampratio_zeta,
                 u_left, v_left, const_accla0);
 
+
+            // Add the width offset back to the right contact phase
+
             // Concatenate the left and right responses to form the full system response
-            Vector<double> u_at_t = Vector<double>.Build.Dense(new double[] { uleft_at_t, uright_at_t[0], uright_at_t[1] });
+            Vector<double> u_at_t = Vector<double>.Build.Dense(new double[] { uleft_at_t,
+                uright_at_t[0] + (this.total_width * 0.5), uright_at_t[1] });
             Vector<double> v_at_t = Vector<double>.Build.Dense(new double[] { vleft_at_t, vright_at_t[0], vright_at_t[1] });
             Vector<double> a_at_t = Vector<double>.Build.Dense(new double[] { aleft_at_t, aright_at_t[0], aright_at_t[1] });
 
@@ -617,40 +632,63 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
 
 
-        private (double contact_force, double derivative_contact_force)
-            GetLeftContactForce(Vector<double> u_at_t, Vector<double> v_at_t, Vector<double> a_at_t)
+        private (Vector<double> u, Vector<double> v, Vector<double> a)
+            GetContactResponse(double t, Vector<double> u_at_event, Vector<double> v_at_event)
         {
-            // Contact force at the left contact (between mass 2 and mass 1 attached to the wall)
-            double delta_u = u_at_t[1] - (u_at_t[0] - this._leftend_origin); // Relative displacement between mass 2 and mass 1
-            double delta_v = v_at_t[1] - v_at_t[0]; // Relative velocity between mass 2 and mass 1
-            double delta_a = a_at_t[1] - a_at_t[0]; // Relative acceleration between mass 2 and mass 1
+            // Wrapper for the contact force response,
+            // which checks whether the free floating strike mass is closer to
+            // the left or right contact and calls the appropriate function.
 
-            // Contact force with respect to time
-            double contact_force = (leftstiffness_k1 * delta_u) + (leftcontact_damping * delta_v);
+            // Check whether the free floating strike mass is closer to the left or right contact
+            if (u_at_event[1] < 0.0)
+            {
+                return GetLeftContactResponse(t, u_at_event, v_at_event);
+            }
+            else
+            {
+                return GetRightContactResponse(t, u_at_event, v_at_event);
+            }
 
-            // Derivative of contact force with respect to time
-            double derivative_contact_force = (leftstiffness_k1 * delta_v) + (leftcontact_damping * delta_a);
-
-            return (contact_force, derivative_contact_force);
         }
 
 
+
         private (double contact_force, double derivative_contact_force)
-            GetRightContactForce(Vector<double> u_at_t, Vector<double> v_at_t, Vector<double> a_at_t)
+            GetContactForce(Vector<double> u_at_t, Vector<double> v_at_t, Vector<double> a_at_t)
         {
-            // Contact force at the right contact (between mass 2 and mass 3 attached to the wall)
-            double delta_u = u_at_t[1] - (u_at_t[2] - this._rightend_origin); // Relative displacement between mass 2 and mass 3
-            double delta_v = v_at_t[1] - v_at_t[2]; // Relative velocity between mass 2 and mass 3
-            double delta_a = a_at_t[1] - a_at_t[2]; // Relative acceleration between mass 2 and mass 3
+            // Check whether the free floating strike mass is closer to the left or right contact
+            if (u_at_t[1] < 0.0)
+            {
+                // Contact force at the left contact (between mass 2 and mass 1 attached to the wall)
+                double delta_u = u_at_t[1] - (u_at_t[0] - (this.total_width * 0.5)); // Relative displacement between mass 2 and mass 1
+                double delta_v = v_at_t[1] - v_at_t[0]; // Relative velocity between mass 2 and mass 1
+                double delta_a = a_at_t[1] - a_at_t[0]; // Relative acceleration between mass 2 and mass 1
 
-            // Contact force with respect to time
-            double contact_force = (rightstiffness_k3 * delta_u) + (rightcontact_damping * delta_v);
+                // Contact force with respect to time
+                double contact_force = (leftstiffness_k1 * delta_u) + (leftcontact_damping * delta_v);
 
-            // Derivative of contact force with respect to time
-            double derivative_contact_force = (rightstiffness_k3 * delta_v) + (rightcontact_damping * delta_a);
+                // Derivative of contact force with respect to time
+                double derivative_contact_force = (leftstiffness_k1 * delta_v) + (leftcontact_damping * delta_a);
 
-            return (contact_force, derivative_contact_force);
+                return (contact_force, derivative_contact_force);
+            }
+            else
+            {
+                // Contact force at the right contact (between mass 2 and mass 3 attached to the wall)
+                double delta_u = (u_at_t[2] + (this.total_width * 0.5)) - u_at_t[1]; // Relative displacement between mass 2 and mass 3
+                double delta_v = v_at_t[2] - v_at_t[1]; // Relative velocity between mass 2 and mass 3
+                double delta_a = a_at_t[2] - a_at_t[1]; // Relative acceleration between mass 2 and mass 3
+
+                // Contact force with respect to time
+                double contact_force = (rightstiffness_k3 * delta_u) + (rightcontact_damping * delta_v);
+
+                // Derivative of contact force with respect to time
+                double derivative_contact_force = (rightstiffness_k3 * delta_v) + (rightcontact_damping * delta_a);
+
+                return (contact_force, derivative_contact_force);
+            }
         }
+
 
 
 
@@ -661,16 +699,11 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             ResponseFunction(double tau, Vector<double> u_start, Vector<double> v_start);
 
 
-        // Define the contact force function type
-        private delegate (double contact_force, double derivative_contact_force)
-            ContactForceFunction(Vector<double> u_tau, Vector<double> v_tau, Vector<double> a_tau);
-
 
 
         private (double t_exact, Vector<double> u, Vector<double> v, Vector<double> a)
           DetectPhaseTransition(double t_end, Vector<double> u_start, Vector<double> v_start,
-            ResponseFunction getResponse,
-            ContactForceFunction getContactForce)
+            ResponseFunction getResponse)
         {
 
             double tau_low = 0.0;
@@ -685,8 +718,8 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
                 (Vector<double> u_mid, Vector<double> v_mid, Vector<double> a_mid) = getResponse(tau_mid, u_start, v_start);
                 (Vector<double> u_low, Vector<double> v_low, Vector<double> a_low) = getResponse(tau_low, u_start, v_start);
 
-                (double contact_force_mid, _) = getContactForce(u_mid, v_mid, a_mid);
-                (double contact_force_low, _) = getContactForce(u_low, v_low, a_low);
+                (double contact_force_mid, _) = GetContactForce(u_mid, v_mid, a_mid);
+                (double contact_force_low, _) = GetContactForce(u_low, v_low, a_low);
 
                 if ((contact_force_mid * contact_force_low) < 0.0)
                 {
@@ -706,7 +739,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             for (int i = 0; i < 20; ++i)
             {
                 (u_tau, v_tau, a_tau) = getResponse(tau, u_start, v_start);
-                (double contact_force_tau, double derivative_contact_force_tau) = getContactForce(u_tau, v_tau, a_tau);
+                (double contact_force_tau, double derivative_contact_force_tau) = GetContactForce(u_tau, v_tau, a_tau);
 
                 if (Math.Abs(contact_force_tau) < 1e-10)
                 {
@@ -727,12 +760,9 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
 
         public void solve_sdof_collision_with_doublesided_flexible_boundary(double total_simulation_time, double max_time_increment,
-    double strikemass_initial_velocity, double total_width)
+    double strikemass_initial_velocity)
         {
             this.total_time = total_simulation_time;
-
-            this._leftend_origin = -0.5 * total_width;
-            this._rightend_origin = 0.5 * total_width;
 
             // Clear previous results
             SimulationResults.ClearData();
@@ -741,7 +771,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             // Physical initial conditions 
             // Left end --- strike mass --- Right end
             Vector<double> u_at_event = Vector<double>.Build.Dense(new double[] { 0.0, 0.0, 0.0 });
-            Vector<double> v_at_event = Vector<double>.Build.Dense(new double[] { 0.0,  strikemass_initial_velocity, 0.0 });
+            Vector<double> v_at_event = Vector<double>.Build.Dense(new double[] { 0.0, strikemass_initial_velocity, 0.0 });
 
             Vector<double> u_at_t = u_at_event.Clone();
             Vector<double> v_at_t = v_at_event.Clone();
@@ -753,13 +783,21 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
             // Set initial phase
             // No contact at the start, so we are in flight phase
-            bool LeftContact = false;
-            bool RightContact = false;
+            bool IsContact = false;
+            (double contact_force_at_t, _) = GetContactForce(u_at_t, v_at_t, a_at_t);
+            
+            if(contact_force_at_t <= 0.0)
+            {
+               IsContact = true;
+                (_,_, a_at_t) = GetContactResponse(time_t, u_at_event, v_at_event);
 
-            (double left_contact_force, _) = GetLeftContactForce(u_at_t, v_at_t, a_at_t);
-            (double right_contact_force, _) = GetRightContactForce(u_at_t, v_at_t, a_at_t);
-
-            double contact_force_at_t = Math.Min(left_contact_force, right_contact_force);
+                SimulationResults.TimeContactBand.Add(time_t); // Record the start of contact
+            }
+            else
+            {
+                IsContact = false;
+                (_, _, a_at_t) = GetFlightResponse(time_t, u_at_event, v_at_event);
+            }
 
             // Add the first increment to the Response lists 
             SimulationResults.AddResponse(time_t, u_at_t, v_at_t, a_at_t, contact_force_at_t);
@@ -779,121 +817,45 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
                 // Event span
                 double t_tau = time_t - t_event;
 
-                if(LeftContact)
+                if (IsContact)
                 {
-                    // Left Contact phase
-                    (u_at_t, v_at_t, a_at_t) = GetLeftContactResponse(t_tau, u_at_event, v_at_event);
-                }
-                else if(RightContact)
-                {
-                    // Right Contact phase
-                    (u_at_t, v_at_t, a_at_t) = GetRightContactResponse(t_tau, u_at_event, v_at_event);
+                    // Contact phase
+                    // Coupled response of the two SDOF systems (modal decomposition)
+                    (u_at_t, v_at_t, a_at_t) = GetContactResponse(t_tau, u_at_event, v_at_event);
                 }
                 else
                 {
                     // Flight phase
+                    // Uncoupled response of the two SDOF systems (flight mode)
                     (u_at_t, v_at_t, a_at_t) = GetFlightResponse(t_tau, u_at_event, v_at_event);
                 }
 
 
                 // Calculate the contact force at the current time step
-                (left_contact_force, _) = GetLeftContactForce(u_at_t, v_at_t, a_at_t);
-                (right_contact_force, _) = GetRightContactForce(u_at_t, v_at_t, a_at_t);
+                (contact_force_at_t, _) = GetContactForce(u_at_t, v_at_t, a_at_t);
 
-                bool isTransition = false;
-                double tau_exact = 0.0;
+                // ----------------------------------------------------------
+                // Transition detection: flight → contact or contact → flight
+                // ----------------------------------------------------------
 
-                if (LeftContact)
+                if (contact_force_at_t <= 0.0 && IsContact == false)
                 {
-                    // Transition check: Determine if the system transitions from left contact to flight phase
-                    if(left_contact_force > 0.0)
-                    {
-                        // Contact is broken, transition to flight phase
-                        LeftContact = false;
+                    // Flight to Contact transition detected
+                    IsContact = true;
 
-                        // Get previous state
-                        (Vector<double> u_prev, Vector<double> v_prev, _) =
-                            SimulationResults.GetStateAtTimeIndex(SimulationResults.TimePoints.Count - 1);
+                    // Get previous state
+                    (Vector<double> u_prev, Vector<double> v_prev, _) =
+                        SimulationResults.GetStateAtTimeIndex(SimulationResults.TimePoints.Count - 1);
 
+                    // Get the exact fligth to collision transition time using bisection and Newton-Raphson
+                    double tau_exact = 0.0;
 
-                        (tau_exact, u_at_t, v_at_t, a_at_t) = DetectPhaseTransition(max_time_increment,
-                            u_prev, v_prev,
-                            GetLeftContactResponse,
-                            GetLeftContactForce);
+                    (tau_exact, u_at_t, v_at_t, a_at_t) = DetectPhaseTransition(max_time_increment,
+                        u_prev, v_prev, GetFlightResponse);
 
-                        isTransition = true;
+                    // Recalculate the contact force at the exact transition time
+                    (contact_force_at_t, _)  = GetContactForce(u_at_t, v_at_t, a_at_t);
 
-                    }
-
-                }
-                else if(RightContact)
-                {
-                    // Transition check: Determine if the system transitions from right contact to flight phase
-                    if (right_contact_force > 0.0)
-                    {
-                        // Contact is broken, transition to flight phase
-                        RightContact = false;
-
-                        // Get previous state
-                        (Vector<double> u_prev, Vector<double> v_prev, _) =
-                            SimulationResults.GetStateAtTimeIndex(SimulationResults.TimePoints.Count - 1);
-
-
-                        (tau_exact, u_at_t, v_at_t, a_at_t) = DetectPhaseTransition(max_time_increment,
-                            u_prev, v_prev,
-                            GetRightContactResponse,
-                            GetRightContactForce);
-
-                        isTransition = true;
-
-                    }
-
-                }
-                else
-                {
-                    if( left_contact_force < 0.0 )
-                    {
-                        // Contact is made with the left boundary, transition to left contact phase
-                        LeftContact = true;
-
-                        // Get previous state
-                        (Vector<double> u_prev, Vector<double> v_prev, _) =
-                            SimulationResults.GetStateAtTimeIndex(SimulationResults.TimePoints.Count - 1);
-
-
-                        (tau_exact, u_at_t, v_at_t, a_at_t) = DetectPhaseTransition(max_time_increment,
-                            u_prev, v_prev,
-                            GetFlightResponse,
-                            GetLeftContactForce);
-
-                        isTransition = true;
-
-                    }
-                    else if (right_contact_force < 0.0)
-                    {
-                        // Contact is made with the right boundary, transition to right contact phase
-                        RightContact = true;
-
-
-                        // Get previous state
-                        (Vector<double> u_prev, Vector<double> v_prev, _) =
-                            SimulationResults.GetStateAtTimeIndex(SimulationResults.TimePoints.Count - 1);
-
-
-                        (tau_exact, u_at_t, v_at_t, a_at_t) = DetectPhaseTransition(max_time_increment,
-                            u_prev, v_prev,
-                            GetFlightResponse,
-                            GetRightContactForce);
-
-                        isTransition = true;
-
-                    }
-                }
-
-
-                // If a transition occurred, adjust the time and state accordingly
-                if (isTransition == true)
-                {
 
                     // Adjust the time and event time based on the exact transition time
                     time_t = (time_t - max_time_increment) + tau_exact;
@@ -906,6 +868,37 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
                     SimulationResults.TimeContactBand.Add(time_t);
 
                 }
+                else if (contact_force_at_t > 0.0 && IsContact == true)
+                {
+                    // Contact to Flight transition detected
+                    IsContact = false;
+
+                    // Get previous state
+                    (Vector<double> u_prev, Vector<double> v_prev, _) =
+                        SimulationResults.GetStateAtTimeIndex(SimulationResults.TimePoints.Count - 1);
+
+                    // Get the exact contact to flight transition time using bisection and Newton-Raphson
+                    double tau_exact = 0.0;
+
+                    (tau_exact, u_at_t, v_at_t, a_at_t) = DetectPhaseTransition(max_time_increment,
+                        u_prev, v_prev, GetContactResponse);
+
+                    // Recalculate the contact force at the exact transition time
+                    (contact_force_at_t, _) = GetContactForce(u_at_t, v_at_t, a_at_t);
+
+
+                    // Adjust the time and event time based on the exact transition time
+                    time_t = (time_t - max_time_increment) + tau_exact;
+
+                    // Update state to transition point
+                    t_event = time_t;
+                    u_at_event = u_at_t.Clone();
+                    v_at_event = v_at_t.Clone();
+
+                    SimulationResults.TimeContactBand.Add(time_t);
+
+                }
+
 
 
                 // Add the computed response to the list

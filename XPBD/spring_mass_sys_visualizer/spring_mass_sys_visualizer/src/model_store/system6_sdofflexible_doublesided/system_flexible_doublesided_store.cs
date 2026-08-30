@@ -154,6 +154,7 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
 
             double dampratio_zeta = 0.0; // Damping ratio
 
+      double total_width = 1000.0; // Total width of the system
 
             double total_simulation_time = this.total_simulation_time; // seconds
 
@@ -161,17 +162,17 @@ namespace spring_mass_sys_visualizer.src.model_store.system6_sdofflexible_double
             // Initialize the multi DOF flexible collision solver
             sdofdoublesided_flexiblecollisionSolver = new sdof_doublesided_flexiblecollisionSolver(
                 leftmass_m1, strikemass_m2, rightmass_m3, leftstiffness_k1, strikestiffness_k2, rightstiffness_k3,
-                 dampratio_zeta);
+                 dampratio_zeta, total_width);
 
 
             double strikemass_initial_velocity = -1000.0; // Initial velocity of the strike mass
-            double total_width = 1000.0; // Total width of the system
+      
 
 
             // Solve the system for the given initial conditions and total simulation time
             sdofdoublesided_flexiblecollisionSolver.solve_sdof_collision_with_doublesided_flexible_boundary(total_simulation_time, 
                 max_time_increment: 0.001,
-                strikemass_initial_velocity, total_width);
+                strikemass_initial_velocity);
 
 
             // Find the maximum displacement for the vector representation
